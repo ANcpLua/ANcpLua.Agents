@@ -1,0 +1,69 @@
+; ANcpLua.Agents.Testing.Workflows — harvested from microsoft/agent-framework test tree.
+; Headers in each file document the upstream source path. Design goal: zero-drift
+; merges on every MAF version bump. Any stylistic Rider/ReSharper inspection that
+; would push this tree away from upstream spelling or shape is disabled here.
+;
+; Compiler warnings stay honest — that's `dotnet build`. This file targets ONLY
+; ReSharper inspections that Rider surfaces in-IDE.
+
+[*.cs]
+
+; ── Upstream parity: naming + namespace shape ──────────────────────────────────
+; `RNG`, `InProcess_Lockstep`, `OpenAI`, `AGUI`, `MessageCount` are upstream spellings.
+resharper_inconsistent_naming_highlighting = none
+; Flat project namespace is a consumer-API contract ("single import").
+resharper_check_namespace_highlighting = none
+
+; ── Upstream dead code (unused methods / fields / ctors / type params) ─────────
+; Upstream test helpers expose surface we do not call from our samples yet;
+; deleting them would diverge from the harvest source.
+resharper_unused_member_local_highlighting = none
+resharper_unused_member_global_highlighting = none
+resharper_unused_type_parameter_highlighting = none
+resharper_unused_parameter_local_highlighting = none
+resharper_unused_parameter_global_highlighting = none
+resharper_not_accessed_field_local_highlighting = none
+resharper_not_accessed_field_global_highlighting = none
+resharper_unassigned_get_only_auto_property_highlighting = none
+resharper_unused_auto_property_accessor_local_highlighting = none
+resharper_class_never_instantiated_local_highlighting = none
+resharper_redundant_assignment_highlighting = none
+
+; ── Upstream code shape (structural rewrites Rider would suggest) ──────────────
+resharper_convert_if_statement_to_switch_expression_highlighting = none
+resharper_convert_if_statement_to_switch_statement_highlighting = none
+resharper_redundant_class_modifier_highlighting = none
+resharper_redundant_jump_statement_highlighting = none
+resharper_return_type_can_be_not_nullable_highlighting = none
+resharper_redundant_suppress_nullable_warning_expression_highlighting = none
+resharper_condition_is_always_true_or_false_according_to_nullable_annotations_highlighting = none
+resharper_use_not_null_pattern_highlighting = none
+resharper_merge_into_pattern_highlighting = none
+
+; ── MAF-specific false positives ───────────────────────────────────────────────
+; [MessageHandler] methods are invoked via attribute-driven dispatch at runtime;
+; Rider can't see the call site.
+resharper_unused_member_in_super_highlighting = none
+
+; ── Closure patterns in checkpoint/resume samples ──────────────────────────────
+; 05_Checkpointing's local function intentionally re-reads outer state after the
+; outer scope mutates it — that's the whole point of the checkpoint test shape.
+resharper_access_to_modified_closure_highlighting = none
+resharper_access_to_disposed_closure_highlighting = none
+
+; ── Primary-ctor parameter interaction ─────────────────────────────────────────
+; Upstream hides primary-ctor `id` with a local `id` var — cosmetic, harmless.
+resharper_local_variable_hides_primary_constructor_parameter_highlighting = none
+
+; ── Async signature mismatch ───────────────────────────────────────────────────
+; Upstream keeps default CancellationToken on overrides even when base has one.
+resharper_optional_parameter_hierarchy_mismatch_highlighting = none
+
+; ── Suspicious but intentional casts ───────────────────────────────────────────
+; BitNet test harness performs framework-level generic-cast probes.
+resharper_suspicious_type_conversion_global_highlighting = none
+
+; ── Multiple enumeration (potentially real, but upstream pattern) ──────────────
+; Leave as a hint — our own files fix it (WorkflowsHelper.cs); upstream ones can
+; stay until MAF upstream cleans them up.
+resharper_possible_multiple_enumeration_highlighting = hint

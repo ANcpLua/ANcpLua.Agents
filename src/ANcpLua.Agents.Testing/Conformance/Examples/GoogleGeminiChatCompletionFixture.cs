@@ -1,13 +1,13 @@
 // Licensed to the .NET Foundation under one or more agreements.
 //
-// Reference IChatClientAgentFixture for Google Gemini via Mscc.GenerativeAI.
+// Reference IChatClientAgentFixture for Google Gemini via the official Google.GenAI SDK.
 // Gemini has a free tier — set TestSettings.GoogleGeminiApiKey and ChatModelName
 // (e.g. "gemini-2.0-flash") to run conformance tests against it.
 
 using ANcpLua.Agents.Testing.Conformance.Support;
+using Google.GenAI;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
-using Mscc.GenerativeAI.Microsoft;
 
 namespace ANcpLua.Agents.Testing.Conformance.Examples;
 
@@ -34,7 +34,7 @@ public class GoogleGeminiChatCompletionFixture : IChatClientAgentFixture
         var apiKey = TestConfiguration.GetRequiredValue(TestSettings.GoogleGeminiApiKey);
         var modelName = TestConfiguration.GetRequiredValue(TestSettings.GoogleGeminiChatModelName);
 
-        IChatClient chatClient = new GeminiChatClient(apiKey, modelName, null);
+        IChatClient chatClient = new Client(apiKey: apiKey).AsIChatClient(modelName);
 
         return Task.FromResult(new ChatClientAgent(chatClient, new ChatClientAgentOptions
         {

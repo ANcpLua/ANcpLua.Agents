@@ -7,7 +7,7 @@ namespace ANcpLua.Agents.Tests.Governance;
 public sealed class AgentBudgetEnforcerTests
 {
     private static AgentToolPolicy Policy(int maxAttempts = 2, int maxToolCalls = 2) =>
-        new(maxAttempts, maxToolCalls, [], false);
+        new(maxAttempts, maxToolCalls, []);
 
     [Fact]
     public async Task ReserveAttempt_RollsBackWhenNotCommitted()

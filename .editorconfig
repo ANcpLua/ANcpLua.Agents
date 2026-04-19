@@ -3,3 +3,20 @@ root = true
 [*.cs]
 # Treat ALL diagnostics as errors — compiler, analyzers, IDE, style
 dotnet_analyzer_diagnostic.severity = error
+
+# ── Brand / API-mirror naming (all projects) ──────────────────────────────────
+# AIFunction mirrors Microsoft.Extensions.AI base class; OpenAI/AzureOpenAI/AGUI
+# are product or protocol names. Renaming to AiFunction/OpenAi/Agui breaks the
+# naming contract with upstream SDKs.
+resharper_inconsistent_naming_highlighting = none
+
+# ── Harvested upstream test infra (ANcpLua.Agents.Testing/Conformance, ChatClients) ─
+# Scoped further via the src/ANcpLua.Agents.Testing.Workflows/.editorconfig.
+[src/ANcpLua.Agents.Testing/**/*.cs]
+resharper_unused_member_local_highlighting = none
+resharper_not_accessed_field_local_highlighting = none
+resharper_class_never_instantiated_local_highlighting = none
+resharper_return_type_can_be_not_nullable_highlighting = none
+resharper_suspicious_type_conversion_global_highlighting = none
+# Support/AgentCleanup + SessionCleanup: upstream GC.SuppressFinalize pattern.
+resharper_gc_suppress_finalize_for_type_without_destructor_highlighting = none

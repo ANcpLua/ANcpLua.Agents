@@ -1,23 +1,20 @@
 namespace ANcpLua.Agents.Governance;
 
 /// <summary>
-///     Scoped per-request capability set. Controls which capabilities are granted and whether
-///     destructive tool invocations require explicit approval. Register as scoped in DI so each
-///     request scope receives its own grant set.
+///     Scoped per-request capability set. Controls which capabilities are granted to tool
+///     invocations. Register as scoped in DI so each request scope receives its own grant set.
+///     Human approval is orthogonal — wrap tools in <c>ApprovalRequiredAIFunction</c> from
+///     <c>Microsoft.Agents.AI</c> instead of handling it here.
 /// </summary>
 public sealed class AgentCapabilityContext
 {
     private readonly HashSet<string> _grantedCapabilities;
-    private readonly Func<string, CancellationToken, ValueTask>? _approvalHandler;
 
-    public AgentCapabilityContext(
-        IEnumerable<string>? grantedCapabilities = null,
-        Func<string, CancellationToken, ValueTask>? approvalHandler = null)
+    public AgentCapabilityContext(IEnumerable<string>? grantedCapabilities = null)
     {
         _grantedCapabilities = grantedCapabilities is not null
             ? new HashSet<string>(grantedCapabilities, StringComparer.Ordinal)
             : [];
-        _approvalHandler = approvalHandler;
     }
 
     /// <summary>
@@ -32,17 +29,6 @@ public sealed class AgentCapabilityContext
                 throw new AgentCapabilityDeniedException(
                     $"Agent capability denied: '{capability}' is required but not granted.");
         }
-    }
-
-    /// <summary>
-    ///     Requests approval for <paramref name="toolName"/> via the configured handler.
-    ///     Throws <see cref="AgentApprovalRequiredException"/> if no handler is registered.
-    /// </summary>
-    public async ValueTask RequestApprovalAsync(string toolName, CancellationToken cancellationToken)
-    {
-        if (_approvalHandler is null)
-            throw new AgentApprovalRequiredException(toolName, false);
-        await _approvalHandler(toolName, cancellationToken).ConfigureAwait(false);
     }
 
     public void Grant(string capability) => _grantedCapabilities.Add(capability);
@@ -74,23 +60,3 @@ public sealed class AgentCapabilityDeniedException : InvalidOperationException
     public IReadOnlyList<string>? GrantedCapabilities { get; }
 }
 
-/// <summary>
-///     Thrown when a tool requires approval but no approval handler is configured in the
-///     current <see cref="AgentCapabilityContext"/>.
-/// </summary>
-public sealed class AgentApprovalRequiredException : InvalidOperationException
-{
-    public AgentApprovalRequiredException() : base("Agent approval required.") { }
-    public AgentApprovalRequiredException(string message) : base(message) { }
-    public AgentApprovalRequiredException(string message, Exception innerException) : base(message, innerException) { }
-
-    public AgentApprovalRequiredException(string toolName, bool isDestructive)
-        : base($"Agent tool '{toolName}' requires approval but no approval handler is configured.")
-    {
-        ToolName = toolName;
-        IsDestructive = isDestructive;
-    }
-
-    public string? ToolName { get; }
-    public bool IsDestructive { get; }
-}

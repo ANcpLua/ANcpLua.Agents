@@ -16,7 +16,7 @@ public sealed class GovernedAIFunctionTests
         var budget = new AgentBudgetEnforcer();
         using var concurrency = new AgentConcurrencyLimiter(defaultLimit: 1);
         var capabilities = new AgentCapabilityContext();
-        var policy = new AgentToolPolicy(MaxAttempts: 2, MaxToolCalls: 2, RequiredCapabilities: [], RequiresApproval: false);
+        var policy = new AgentToolPolicy(MaxAttempts: 2, MaxToolCalls: 2, RequiredCapabilities: []);
 
         var ok = MakeFunction("ok", () => "ok");
         var fail = MakeFunction("fail", () => throw new InvalidOperationException("boom"));
@@ -39,7 +39,7 @@ public sealed class GovernedAIFunctionTests
         var budget = new AgentBudgetEnforcer();
         using var concurrency = new AgentConcurrencyLimiter();
         var capabilities = new AgentCapabilityContext();
-        var policy = new AgentToolPolicy(MaxAttempts: 1, MaxToolCalls: 1, RequiredCapabilities: ["secrets:read"], RequiresApproval: false);
+        var policy = new AgentToolPolicy(MaxAttempts: 1, MaxToolCalls: 1, RequiredCapabilities: ["secrets:read"]);
 
         var fn = MakeFunction("readSecret", () => "v");
         var governed = new GovernedAIFunction(fn, new AgentToolMetadata("readSecret", policy), budget, concurrency, capabilities);

@@ -16,8 +16,7 @@ src/
     Governance/                     # AgentCallLineage, AgentCallGuard, AgentSpawnTracker,
                                     # AgentBudgetEnforcer, AgentConcurrencyLimiter,
                                     # AgentCapabilityContext, GovernedAIFunction, AgentToolPolicy
-    Instrumentation/                # TracedAIFunction, ToolDecoratingChatClient,
-                                    # ChatClientBuilderExtensions.UseAgentTelemetry
+    Instrumentation/                # TracedAIFunction
     Factory/                        # AgentChatClientFactory (OpenAI-compatible)
     AgentsHelper, WorkflowsHelper, ColorHelper
   ANcpLua.Agents.Testing/           # FakeChatClient, fixtures, conformance suites
@@ -28,8 +27,8 @@ tests/
 
 ### Module guide
 
-- **Governance** — bounded-autonomy primitives. `AgentCallLineage` enforces depth + spawn budgets via `AsyncLocal`. `AgentBudgetEnforcer` tracks per-tool attempts and tool-call counts with rollback-on-failure reservations. `AgentConcurrencyLimiter` is a per-tool semaphore. `GovernedAIFunction` composes capability check + approval gate + budget reservation + concurrency slot in front of any `AIFunction`. Producers project their richer descriptors down to the minimal `AgentToolPolicy` record.
-- **Instrumentation** — generic OTel tracing without semconv hardcoding. `TracedAIFunction` wraps an `AIFunction` and emits an `execute_tool` span with GenAI semconv 1.40 tags, plus optional caller-supplied tags. `ToolDecoratingChatClient` is a generic `DelegatingChatClient` that runs a caller-supplied `Func<AIFunction, AIFunction>` over `ChatOptions.Tools`. `ChatClientBuilderExtensions.UseAgentTelemetry(source)` is sugar that combines both.
+- **Governance** — bounded-autonomy primitives. `AgentCallLineage` enforces depth + spawn budgets via `AsyncLocal`. `AgentBudgetEnforcer` tracks per-tool attempts and tool-call counts with rollback-on-failure reservations. `AgentConcurrencyLimiter` is a per-tool semaphore. `GovernedAIFunction` composes capability check + budget reservation + concurrency slot in front of any `AIFunction`. Producers project their richer descriptors down to the minimal `AgentToolPolicy` record. Human approval is orthogonal — wrap tools in `ApprovalRequiredAIFunction` from `Microsoft.Agents.AI` to drive the native `ToolApprovalRequestContent` loop.
+- **Instrumentation** — generic OTel tracing without semconv hardcoding. `TracedAIFunction` wraps an `AIFunction` and emits an `execute_tool` span with GenAI semconv 1.40 tags, plus optional caller-supplied tags. Compose at tool-registration site — no chat-client middleware layer.
 - **Factory** — `AgentChatClientFactory.TryCreate(options)` builds an `IChatClient` over the OpenAI .NET SDK; supports any OpenAI-compatible endpoint (Ollama, Anthropic-via-proxy, Azure, …). `TryCreateFromEnvironment()` reads `ANCPLUA_AGENT_API_KEY` / `ANCPLUA_AGENT_MODEL` / `ANCPLUA_AGENT_ENDPOINT`.
 
 All packages target `net10.0`. Foundation Roslyn helpers live in the sibling `ANcpLua.Roslyn.Utilities` repo and are consumed here via plain `<PackageReference>` pinned in `Directory.Packages.props`.

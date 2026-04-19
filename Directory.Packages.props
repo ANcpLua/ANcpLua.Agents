@@ -34,8 +34,7 @@
     <PackageVersion Include="Azure.Identity" Version="$(AzureIdentityVersion)"/>
     <PackageVersion Include="Anthropic.SDK" Version="$(AnthropicSDKVersion)"/>
     <PackageVersion Include="OllamaSharp" Version="$(OllamaSharpVersion)"/>
-    <PackageVersion Include="Mscc.GenerativeAI" Version="$(MsccGenerativeAIVersion)"/>
-    <PackageVersion Include="Mscc.GenerativeAI.Microsoft" Version="$(MsccGenerativeAIMicrosoftVersion)"/>
+    <PackageVersion Include="Google.GenAI" Version="$(GoogleGenAIVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="Testing">

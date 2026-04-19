@@ -34,7 +34,7 @@ public sealed class AgentConcurrencyLimiterTests
     public async Task AcquireAsync_WithPolicy_UsesPolicyLimit()
     {
         using var limiter = new AgentConcurrencyLimiter(defaultLimit: 100);
-        var policy = new AgentToolPolicy(MaxAttempts: 1, MaxToolCalls: 1, RequiredCapabilities: [], RequiresApproval: false);
+        var policy = new AgentToolPolicy(MaxAttempts: 1, MaxToolCalls: 1, RequiredCapabilities: []);
 
         var first = await limiter.AcquireAsync("t", policy);
         var pending = limiter.AcquireAsync("t", policy).AsTask();

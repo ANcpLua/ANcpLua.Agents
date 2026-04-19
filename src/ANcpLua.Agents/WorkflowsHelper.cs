@@ -177,7 +177,7 @@ public static class WorkflowsHelper
     {
         if (string.IsNullOrEmpty(e.Update.Text))
         {
-            PrintToolCalls(e.Update.Contents.OfType<FunctionCallContent>());
+            PrintToolCalls([.. e.Update.Contents.OfType<FunctionCallContent>()]);
             return false;
         }
 
@@ -194,9 +194,9 @@ public static class WorkflowsHelper
         return true;
     }
 
-    private static void PrintToolCalls(IEnumerable<FunctionCallContent> calls)
+    private static void PrintToolCalls(IReadOnlyList<FunctionCallContent> calls)
     {
-        if (!calls.Any()) return;
+        if (calls.Count == 0) return;
 
         Console.WriteLine();
         foreach (var call in calls)

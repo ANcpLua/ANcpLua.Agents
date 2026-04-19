@@ -3,9 +3,11 @@ using Microsoft.Extensions.AI;
 namespace ANcpLua.Agents.Governance;
 
 /// <summary>
-///     <see cref="DelegatingAIFunction"/> that enforces capability + approval + budget +
-///     concurrency before delegating. Order: capability verification, approval gate, budget
-///     reservation, concurrency slot. Budget commits only on successful invocation.
+///     <see cref="DelegatingAIFunction"/> that enforces capability + budget + concurrency before
+///     delegating. Order: capability verification, budget reservation, concurrency slot. Budget
+///     commits only on successful invocation. Human approval is orthogonal — compose by wrapping
+///     this function in <c>ApprovalRequiredAIFunction</c> from <c>Microsoft.Agents.AI</c>, which
+///     drives the native <c>ToolApprovalRequestContent</c> loop on the agent run.
 /// </summary>
 public class GovernedAIFunction(
     AIFunction inner,
@@ -27,9 +29,6 @@ public class GovernedAIFunction(
 
         if (Metadata.Policy.RequiredCapabilities.Count > 0)
             capabilities.Verify(Metadata.Policy.RequiredCapabilities);
-
-        if (Metadata.Policy.RequiresApproval)
-            await capabilities.RequestApprovalAsync(Metadata.Name, cancellationToken).ConfigureAwait(false);
 
         await using var reservation = budget.ReserveAttempt(Metadata.Name, Metadata.Policy);
 
