@@ -6,9 +6,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>ANcpLua.Agents</RootNamespace>
         <PackageId>ANcpLua.Agents</PackageId>
-        <Description>Runtime helpers for Microsoft Agent Framework consumers. Console-rendering utilities for agent responses, tool calls, workflow events, and streaming output — meant for demos, samples, and CLI apps that show agent activity to humans.</Description>
+        <Description>Runtime helpers for Microsoft Agent Framework consumers. Governance primitives (call lineage, spawn tracker, budget enforcer, concurrency limiter, governed AIFunction), instrumentation decorators (traced AIFunction, tool-decorating chat client), an OpenAI-compatible chat-client factory, and console-rendering utilities for agent responses, tool calls, workflow events, and streaming output.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>maf;agents;microsoft-agents;helpers;console;workflows</PackageTags>
+        <PackageTags>maf;agents;microsoft-agents;governance;instrumentation;opentelemetry;helpers;console;workflows</PackageTags>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <!-- Method-level XML docs are optional — names self-document console-rendering helpers. -->
         <NoWarn>$(NoWarn);CS1591</NoWarn>
@@ -18,6 +18,8 @@
         <PackageReference Include="Microsoft.Agents.AI"/>
         <PackageReference Include="Microsoft.Agents.AI.Workflows"/>
         <PackageReference Include="Microsoft.Extensions.AI"/>
+        <PackageReference Include="Microsoft.Extensions.AI.OpenAI"/>
+        <PackageReference Include="OpenAI"/>
     </ItemGroup>
 
     <ItemGroup Label="Analyzers">

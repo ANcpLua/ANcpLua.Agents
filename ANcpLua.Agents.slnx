@@ -4,4 +4,7 @@
         <Project Path="src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj"/>
         <Project Path="src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj"/>
     </Folder>
+    <Folder Name="/tests/">
+        <Project Path="tests/ANcpLua.Agents.Tests/ANcpLua.Agents.Tests.csproj"/>
+    </Folder>
 </Solution>
