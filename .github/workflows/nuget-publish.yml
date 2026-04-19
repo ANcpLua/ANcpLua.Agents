@@ -68,13 +68,20 @@ jobs:
       - name: Build
         run: dotnet build ANcpLua.Agents.slnx -c Release --no-restore -p:Version=${{ needs.version.outputs.version }}
 
-      # All three packages ship stable. MAF itself is GA (1.1.0); this repo tracks stable MAF.
-      - name: Pack
+      # ANcpLua.Agents + ANcpLua.Agents.Testing.Workflows pack stable.
+      - name: Pack (stable)
         if: matrix.os == 'ubuntu-latest'
         run: |
           dotnet pack src/ANcpLua.Agents/ANcpLua.Agents.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
-          dotnet pack src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
+
+      # ANcpLua.Agents.Testing depends on Microsoft.Agents.AI.Hosting.AGUI.AspNetCore
+      # which only ships as prerelease on nuget.org. NU5104 forbids stable packages
+      # from depending on prerelease. Append -preview.1 so this package stays on
+      # prerelease feeds until MAF ships AGUI.AspNetCore stable.
+      - name: Pack (Testing — preview)
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet pack src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
 
       - name: Upload artifacts
         if: matrix.os == 'ubuntu-latest'
