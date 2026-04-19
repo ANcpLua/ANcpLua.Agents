@@ -3,7 +3,6 @@
 
 // Copyright (c) Microsoft. All rights reserved.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ANcpLua.Agents.Testing.Workflows.Internals;
@@ -14,39 +13,38 @@ internal readonly struct ExecutorIdentity : IEquatable<ExecutorIdentity>
 
     public string? Id { get; init; }
 
-    public bool Equals(ExecutorIdentity other) =>
-        this.Id is null
+    public bool Equals(ExecutorIdentity other)
+    {
+        return Id is null
             ? other.Id is null
-            : other.Id is not null && StringComparer.OrdinalIgnoreCase.Equals(this.Id, other.Id);
+            : other.Id is not null && StringComparer.OrdinalIgnoreCase.Equals(Id, other.Id);
+    }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (this.Id is null)
-        {
-            return obj is null;
-        }
+        if (Id is null) return obj is null;
 
-        if (obj is null)
-        {
-            return false;
-        }
+        if (obj is null) return false;
 
-        if (obj is ExecutorIdentity id)
-        {
-            return id.Equals(this);
-        }
+        if (obj is ExecutorIdentity id) return id.Equals(this);
 
-        if (obj is string idStr)
-        {
-            return StringComparer.OrdinalIgnoreCase.Equals(this.Id, idStr);
-        }
+        if (obj is string idStr) return StringComparer.OrdinalIgnoreCase.Equals(Id, idStr);
 
         return false;
     }
 
-    public override int GetHashCode() => this.Id is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(this.Id);
+    public override int GetHashCode()
+    {
+        return Id is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(Id);
+    }
 
-    public static implicit operator ExecutorIdentity(string? id) => new() { Id = id };
+    public static implicit operator ExecutorIdentity(string? id)
+    {
+        return new ExecutorIdentity { Id = id };
+    }
 
-    public static implicit operator string?(ExecutorIdentity identity) => identity.Id;
+    public static implicit operator string?(ExecutorIdentity identity)
+    {
+        return identity.Id;
+    }
 }

@@ -3,7 +3,6 @@
 
 // Copyright (c) Microsoft. All rights reserved.
 
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
@@ -11,26 +10,35 @@ namespace ANcpLua.Agents.Testing.Workflows.Internals;
 
 internal sealed class SessionCheckpointCache<TStoreObject>
 {
-    [JsonInclude]
-    internal List<CheckpointInfo> CheckpointIndex { get; } = [];
-
-    [JsonInclude]
-    internal Dictionary<CheckpointInfo, TStoreObject> Cache { get; } = [];
-
-    public SessionCheckpointCache() { }
-
-    [JsonConstructor]
-    internal SessionCheckpointCache(List<CheckpointInfo> checkpointIndex, Dictionary<CheckpointInfo, TStoreObject> cache)
+    public SessionCheckpointCache()
     {
-        this.CheckpointIndex = checkpointIndex;
-        this.Cache = cache;
     }
 
-    [JsonIgnore]
-    public IEnumerable<CheckpointInfo> Index => this.CheckpointIndex;
+    [JsonConstructor]
+    internal SessionCheckpointCache(List<CheckpointInfo> checkpointIndex,
+        Dictionary<CheckpointInfo, TStoreObject> cache)
+    {
+        CheckpointIndex = checkpointIndex;
+        Cache = cache;
+    }
 
-    public bool IsInIndex(CheckpointInfo key) => this.Cache.ContainsKey(key);
-    public bool TryGet(CheckpointInfo key, [MaybeNullWhen(false)] out TStoreObject value) => this.Cache.TryGetValue(key, out value);
+    [JsonInclude] internal List<CheckpointInfo> CheckpointIndex { get; } = [];
+
+    [JsonInclude] internal Dictionary<CheckpointInfo, TStoreObject> Cache { get; } = [];
+
+    [JsonIgnore] public IEnumerable<CheckpointInfo> Index => CheckpointIndex;
+
+    [JsonIgnore] public bool HasCheckpoints => CheckpointIndex.Count > 0;
+
+    public bool IsInIndex(CheckpointInfo key)
+    {
+        return Cache.ContainsKey(key);
+    }
+
+    public bool TryGet(CheckpointInfo key, [MaybeNullWhen(false)] out TStoreObject value)
+    {
+        return Cache.TryGetValue(key, out value);
+    }
 
     public CheckpointInfo Add(string sessionId, TStoreObject value)
     {
@@ -38,33 +46,29 @@ internal sealed class SessionCheckpointCache<TStoreObject>
 
         do
         {
-            key = new(sessionId, Guid.NewGuid().ToString());
-        } while (!this.Add(key, value));
+            key = new CheckpointInfo(sessionId, Guid.NewGuid().ToString());
+        } while (!Add(key, value));
 
         return key;
     }
 
     public bool Add(CheckpointInfo key, TStoreObject value)
     {
-        if (this.IsInIndex(key))
-        {
-            return false;
-        }
+        if (IsInIndex(key)) return false;
 
-        this.Cache[key] = value;
-        this.CheckpointIndex.Add(key);
+        Cache[key] = value;
+        CheckpointIndex.Add(key);
         return true;
     }
 
-    [JsonIgnore]
-    public bool HasCheckpoints => this.CheckpointIndex.Count > 0;
     public bool TryGetLastCheckpointInfo([NotNullWhen(true)] out CheckpointInfo? checkpointInfo)
     {
-        if (this.HasCheckpoints)
+        if (HasCheckpoints)
         {
-            checkpointInfo = this.CheckpointIndex[this.CheckpointIndex.Count - 1];
+            checkpointInfo = CheckpointIndex[CheckpointIndex.Count - 1];
             return true;
         }
+
         checkpointInfo = default;
         return false;
     }

@@ -2,19 +2,17 @@
 // Source: Microsoft.Agents.AI.Workflows.UnitTests/TestRunState.cs
 
 using System.Collections.Concurrent;
-using System.Threading;
-using Microsoft.Agents.AI.Workflows;
-using Microsoft.Agents.AI.Workflows.Execution;
 
 namespace ANcpLua.Agents.Testing.Workflows;
 
 /// <summary>
-/// Shared state bag that lives between one or more <see cref="TestWorkflowContext"/>
-/// instances inside a single test. Use <see cref="ContextFor"/> to materialize a
-/// per-executor context that shares state with its siblings.
+///     Shared state bag that lives between one or more <see cref="TestWorkflowContext" />
+///     instances inside a single test. Use <see cref="ContextFor" /> to materialize a
+///     per-executor context that shares state with its siblings.
 /// </summary>
 internal sealed class TestRunState
 {
+    private int _haltRequests;
     public ConcurrentDictionary<string, ConcurrentQueue<object>> SentMessages = new();
 
     public StateManager StateManager { get; } = new();
@@ -23,11 +21,15 @@ internal sealed class TestRunState
 
     public ConcurrentDictionary<string, ConcurrentQueue<object>> YieldedOutputs { get; } = new();
 
-    private int _haltRequests;
+    public int HaltRequests => Volatile.Read(ref _haltRequests);
 
-    public int HaltRequests => Volatile.Read(ref this._haltRequests);
+    public void IncrementHaltRequests()
+    {
+        Interlocked.Increment(ref _haltRequests);
+    }
 
-    public void IncrementHaltRequests() => Interlocked.Increment(ref this._haltRequests);
-
-    public TestWorkflowContext ContextFor(string executorId) => new(executorId, this);
+    public TestWorkflowContext ContextFor(string executorId)
+    {
+        return new TestWorkflowContext(executorId, this);
+    }
 }

@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Source: microsoft/agent-framework dotnet/tests — ChatClientAgentTestHelper.cs
 
-using System.Text;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,39 +10,19 @@ using Xunit;
 namespace ANcpLua.Agents.Testing.ChatClients;
 
 /// <summary>
-/// Shared test helper for <see cref="ChatClientAgent"/> integration tests. Builds a sequential mock
-/// <see cref="IChatClient"/>, captures inputs, supports multi-turn reuse via shared callIndex/capturedInputs,
-/// and structurally verifies persisted history against <see cref="ExpectedMessage"/> patterns.
+///     Shared test helper for <see cref="ChatClientAgent" /> integration tests. Builds a sequential mock
+///     <see cref="IChatClient" />, captures inputs, supports multi-turn reuse via shared callIndex/capturedInputs,
+///     and structurally verifies persisted history against <see cref="ExpectedMessage" /> patterns.
 /// </summary>
 /// <remarks>
-/// This is a higher-level complement to <see cref="FakeChatClient"/>: FakeChatClient mocks an
-/// <see cref="IChatClient"/> in isolation, whereas <c>ChatClientAgentTestHelper</c> orchestrates the
-/// full agent-&gt;chat-client loop with history verification. Use FakeChatClient for unit tests of
-/// chat-client-level behavior; use this helper when exercising multi-turn agent conversations with
-/// structural assertions over the persisted chat history.
+///     This is a higher-level complement to <see cref="FakeChatClient" />: FakeChatClient mocks an
+///     <see cref="IChatClient" /> in isolation, whereas <c>ChatClientAgentTestHelper</c> orchestrates the
+///     full agent-&gt;chat-client loop with history verification. Use FakeChatClient for unit tests of
+///     chat-client-level behavior; use this helper when exercising multi-turn agent conversations with
+///     structural assertions over the persisted chat history.
 /// </remarks>
 public static class ChatClientAgentTestHelper
 {
-    /// <summary>Expected service call: optional input verifier and the response to return.</summary>
-    public sealed record ServiceCallExpectation(
-        ChatResponse Response,
-        Action<List<ChatMessage>>? VerifyInput = null);
-
-    /// <summary>Expected message shape for structural history comparison.</summary>
-    public sealed record ExpectedMessage(
-        ChatRole Role,
-        string? TextContains = null,
-        Type[]? ContentTypes = null);
-
-    /// <summary>The result of a RunAsync invocation with full diagnostics for further assertions.</summary>
-    public sealed record RunResult(
-        AgentResponse Response,
-        ChatClientAgentSession Session,
-        ChatClientAgent Agent,
-        Mock<IChatClient> MockService,
-        int TotalServiceCalls,
-        List<List<ChatMessage>> CapturedServiceInputs);
-
     public static Mock<IChatClient> CreateSequentialMock(
         List<ServiceCallExpectation> expectations,
         Ref<int> callIndex,
@@ -56,15 +35,13 @@ public static class ChatClientAgentTestHelper
                 It.IsAny<CancellationToken>()))
             .Returns<IEnumerable<ChatMessage>, ChatOptions?, CancellationToken>((msgs, _, _) =>
             {
-                int idx = callIndex.Value++;
+                var idx = callIndex.Value++;
                 var messageList = msgs.ToList();
                 capturedInputs.Add(messageList);
 
                 if (idx >= expectations.Count)
-                {
                     throw new InvalidOperationException(
                         $"Mock received unexpected service call #{idx + 1}. Only {expectations.Count} call(s) were expected.");
-                }
 
                 var expectation = expectations[idx];
                 expectation.VerifyInput?.Invoke(messageList);
@@ -94,25 +71,21 @@ public static class ChatClientAgentTestHelper
 
         var agent = existingAgent ?? new ChatClientAgent(
             mock.Object,
-            options: agentOptions,
+            agentOptions,
             services: new ServiceCollection().BuildServiceProvider());
 
-        var session = existingSession ?? (await agent.CreateSessionAsync().ConfigureAwait(false) as ChatClientAgentSession)!;
+        var session = existingSession ??
+                      (await agent.CreateSessionAsync().ConfigureAwait(false) as ChatClientAgentSession)!;
 
         if (initialChatHistory is not null)
-        {
             (agent.ChatHistoryProvider as InMemoryChatHistoryProvider)
                 ?.SetMessages(session, new List<ChatMessage>(initialChatHistory));
-        }
 
         var response = await agent.RunAsync(inputMessages, session, runOptions).ConfigureAwait(false);
 
         var result = new RunResult(response, session, agent, mock, callIndex.Value, capturedInputs);
 
-        if (expectedServiceCallCount.HasValue)
-        {
-            Assert.Equal(expectedServiceCallCount.Value, callIndex.Value);
-        }
+        if (expectedServiceCallCount.HasValue) Assert.Equal(expectedServiceCallCount.Value, callIndex.Value);
 
         if (expectedHistory is not null)
         {
@@ -129,7 +102,7 @@ public static class ChatClientAgentTestHelper
             expected.Count == actual.Count,
             $"Expected {expected.Count} message(s) but found {actual.Count}.\nActual messages:\n{FormatMessages(actual)}");
 
-        for (int i = 0; i < expected.Count; i++)
+        for (var i = 0; i < expected.Count; i++)
         {
             var exp = expected[i];
             var act = actual[i];
@@ -138,38 +111,29 @@ public static class ChatClientAgentTestHelper
                 exp.Role == act.Role,
                 $"Message [{i}]: expected role {exp.Role} but found {act.Role}.\nActual messages:\n{FormatMessages(actual)}");
 
-            if (exp.TextContains is not null)
-            {
-                Assert.Contains(exp.TextContains, act.Text, StringComparison.Ordinal);
-            }
+            if (exp.TextContains is not null) Assert.Contains(exp.TextContains, act.Text, StringComparison.Ordinal);
 
-            if (exp.ContentTypes is not null)
-            {
-                AssertContentTypes(act.Contents, exp.ContentTypes, i);
-            }
+            if (exp.ContentTypes is not null) AssertContentTypes(act.Contents, exp.ContentTypes, i);
         }
     }
 
-    public static List<ChatMessage> GetPersistedHistory(ChatClientAgent agent, AgentSession session) =>
-        (agent.ChatHistoryProvider as InMemoryChatHistoryProvider)?.GetMessages(session) ?? [];
+    public static List<ChatMessage> GetPersistedHistory(ChatClientAgent agent, AgentSession session)
+    {
+        return (agent.ChatHistoryProvider as InMemoryChatHistoryProvider)?.GetMessages(session) ?? [];
+    }
 
     public static string FormatMessages(IEnumerable<ChatMessage> messages)
     {
         var sb = new StringBuilder();
-        int index = 0;
+        var index = 0;
         foreach (var msg in messages)
         {
-            sb.AppendLine($"  [{index}] Role={msg.Role}, Text=\"{msg.Text}\", Contents=[{string.Join(", ", msg.Contents.Select(c => c.GetType().Name))}]");
+            sb.AppendLine(
+                $"  [{index}] Role={msg.Role}, Text=\"{msg.Text}\", Contents=[{string.Join(", ", msg.Contents.Select(c => c.GetType().Name))}]");
             index++;
         }
 
         return sb.ToString();
-    }
-
-    /// <summary>Mutable reference wrapper for value types so multi-turn callers can share one counter.</summary>
-    public sealed class Ref<T>(T value) where T : struct
-    {
-        public T Value { get; set; } = value;
     }
 
     private static void AssertContentTypes(IList<AIContent> contents, Type[] expectedTypes, int messageIndex)
@@ -180,10 +144,34 @@ public static class ChatClientAgentTestHelper
             $"Actual types: [{string.Join(", ", contents.Select(c => c.GetType().Name))}]");
 
         foreach (var expectedType in expectedTypes)
-        {
             Assert.True(
                 contents.Any(c => expectedType.IsInstanceOfType(c)),
                 $"Message [{messageIndex}]: expected content of type {expectedType.Name} but found [{string.Join(", ", contents.Select(c => c.GetType().Name))}]");
-        }
+    }
+
+    /// <summary>Expected service call: optional input verifier and the response to return.</summary>
+    public sealed record ServiceCallExpectation(
+        ChatResponse Response,
+        Action<List<ChatMessage>>? VerifyInput = null);
+
+    /// <summary>Expected message shape for structural history comparison.</summary>
+    public sealed record ExpectedMessage(
+        ChatRole Role,
+        string? TextContains = null,
+        Type[]? ContentTypes = null);
+
+    /// <summary>The result of a RunAsync invocation with full diagnostics for further assertions.</summary>
+    public sealed record RunResult(
+        AgentResponse Response,
+        ChatClientAgentSession Session,
+        ChatClientAgent Agent,
+        Mock<IChatClient> MockService,
+        int TotalServiceCalls,
+        List<List<ChatMessage>> CapturedServiceInputs);
+
+    /// <summary>Mutable reference wrapper for value types so multi-turn callers can share one counter.</summary>
+    public sealed class Ref<T>(T value) where T : struct
+    {
+        public T Value { get; set; } = value;
     }
 }

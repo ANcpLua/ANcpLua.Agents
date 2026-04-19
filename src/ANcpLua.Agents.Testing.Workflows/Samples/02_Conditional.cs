@@ -1,20 +1,14 @@
 // Conditional fan-out: DetectSpam routes to Respond or Remove by predicate.
 // Source: Sample/02_Simple_Workflow_Condition.cs
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Agents.AI.Workflows;
-
 namespace ANcpLua.Agents.Testing.Workflows.Samples;
 
 internal static class ConditionalSample
 {
     public static Workflow Build(params string[] spamKeywords)
     {
-        DetectSpamExecutor detect = new("DetectSpam", spamKeywords.Length == 0 ? ["spam", "advertisement", "offer"] : spamKeywords);
+        DetectSpamExecutor detect = new("DetectSpam",
+            spamKeywords.Length == 0 ? ["spam", "advertisement", "offer"] : spamKeywords);
         RespondToMessageExecutor respond = new("RespondToMessage");
         RemoveSpamExecutor remove = new("RemoveSpam");
 
@@ -25,16 +19,16 @@ internal static class ConditionalSample
             .Build();
     }
 
-    public static async ValueTask<string> RunAsync(TextWriter writer, IWorkflowExecutionEnvironment environment, string input)
+    public static async ValueTask<string> RunAsync(TextWriter writer, IWorkflowExecutionEnvironment environment,
+        string input)
     {
-        StreamingRun handle = await environment.RunStreamingAsync(Build(), input: input);
+        var handle = await environment.RunStreamingAsync(Build(), input);
 
         await foreach (var evt in handle.WatchStreamAsync())
-        {
             switch (evt)
             {
                 case WorkflowOutputEvent outputEvt:
-                    string result = outputEvt.As<string>()!;
+                    var result = outputEvt.As<string>()!;
                     writer.WriteLine($"Result: {result}");
                     return result;
 
@@ -46,48 +40,61 @@ internal static class ConditionalSample
                     Assert.Fail($"Workflow failed with error: {errorEvent.Exception}");
                     break;
             }
-        }
 
         throw new InvalidOperationException("Workflow failed to yield an output.");
     }
 }
 
-internal sealed partial class DetectSpamExecutor(string id, string[] spamKeywords) : Executor(id, declareCrossRunShareable: true)
+internal sealed class DetectSpamExecutor(string id, string[] spamKeywords)
+    : Executor(id, declareCrossRunShareable: true)
 {
-    protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder) => protocolBuilder;
+    protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder)
+    {
+        return protocolBuilder;
+    }
+
     [MessageHandler]
-    public ValueTask<bool> HandleAsync(string message, IWorkflowContext context, CancellationToken cancellationToken = default)
-        => new(spamKeywords.Any(keyword => message.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0));
+    public ValueTask<bool> HandleAsync(string message, IWorkflowContext context,
+        CancellationToken cancellationToken = default)
+    {
+        return new ValueTask<bool>(spamKeywords.Any(keyword =>
+            message.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
 }
 
-internal sealed partial class RespondToMessageExecutor(string id) : Executor(id, declareCrossRunShareable: true)
+internal sealed class RespondToMessageExecutor(string id) : Executor(id, declareCrossRunShareable: true)
 {
-    protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder) => protocolBuilder;
     public const string ActionResult = "Message processed successfully.";
 
-    [MessageHandler(Yield = [typeof(string)])]
-    public async ValueTask HandleAsync(bool message, IWorkflowContext context, CancellationToken cancellationToken = default)
+    protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder)
     {
-        if (message)
-        {
-            throw new InvalidOperationException("Received a spam message that should not be getting a reply.");
-        }
+        return protocolBuilder;
+    }
+
+    [MessageHandler(Yield = [typeof(string)])]
+    public async ValueTask HandleAsync(bool message, IWorkflowContext context,
+        CancellationToken cancellationToken = default)
+    {
+        if (message) throw new InvalidOperationException("Received a spam message that should not be getting a reply.");
         await context.YieldOutputAsync(ActionResult, cancellationToken);
     }
 }
 
-internal sealed partial class RemoveSpamExecutor(string id) : Executor(id, declareCrossRunShareable: true)
+internal sealed class RemoveSpamExecutor(string id) : Executor(id, declareCrossRunShareable: true)
 {
-    protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder) => protocolBuilder;
     public const string ActionResult = "Spam message removed.";
 
+    protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder)
+    {
+        return protocolBuilder;
+    }
+
     [MessageHandler(Yield = [typeof(string)])]
-    public async ValueTask HandleAsync(bool message, IWorkflowContext context, CancellationToken cancellationToken = default)
+    public async ValueTask HandleAsync(bool message, IWorkflowContext context,
+        CancellationToken cancellationToken = default)
     {
         if (!message)
-        {
             throw new InvalidOperationException("Received a non-spam message that should not be getting removed.");
-        }
         await context.YieldOutputAsync(ActionResult, cancellationToken);
     }
 }

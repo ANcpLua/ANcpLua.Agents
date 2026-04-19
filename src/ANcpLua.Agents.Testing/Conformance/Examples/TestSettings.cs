@@ -3,9 +3,9 @@
 namespace ANcpLua.Agents.Testing.Conformance.Examples;
 
 /// <summary>
-/// Flat configuration key catalog shared by every conformance fixture in this folder.
-/// Populate via <c>testsettings.development.json</c>, environment variables, or user secrets
-/// and resolve through <see cref="Support.TestConfiguration"/>.
+///     Flat configuration key catalog shared by every conformance fixture in this folder.
+///     Populate via <c>testsettings.development.json</c>, environment variables, or user secrets
+///     and resolve through <see cref="Support.TestConfiguration" />.
 /// </summary>
 public static class TestSettings
 {

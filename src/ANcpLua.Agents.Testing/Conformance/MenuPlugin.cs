@@ -12,11 +12,17 @@ public static class MenuPlugin
 {
     /// <summary>Returns a fixed list of three menu specials.</summary>
     [Description("Provides a list of specials from the menu.")]
-    public static string GetSpecials() =>
-        "Special Soup: Clam Chowder\nSpecial Salad: Cobb Salad\nSpecial Drink: Chai Tea";
+    public static string GetSpecials()
+    {
+        return "Special Soup: Clam Chowder\nSpecial Salad: Cobb Salad\nSpecial Drink: Chai Tea";
+    }
 
     /// <summary>Returns a fixed price for any menu item.</summary>
     [Description("Provides the price of the requested menu item.")]
     public static string GetItemPrice(
-        [Description("The name of the menu item.")] string menuItem) => "$9.99";
+        [Description("The name of the menu item.")]
+        string menuItem)
+    {
+        return "$9.99";
+    }
 }

@@ -19,11 +19,7 @@ public sealed class FakeMultiMessageAgent(params string[][] messageChunks) : Fak
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         foreach (var chunks in messageChunks)
-        {
-            await foreach (var update in StreamChunksAsync(chunks, cancellationToken).ConfigureAwait(false))
-            {
-                yield return update;
-            }
-        }
+        await foreach (var update in StreamChunksAsync(chunks, cancellationToken).ConfigureAwait(false))
+            yield return update;
     }
 }

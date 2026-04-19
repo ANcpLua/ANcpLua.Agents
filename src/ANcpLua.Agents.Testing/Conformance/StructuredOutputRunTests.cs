@@ -13,7 +13,8 @@ namespace ANcpLua.Agents.Testing.Conformance;
 ///     a JSON-schema response format and the typed <see cref="AgentResponse{T}" /> shape for
 ///     both reference types and primitives.
 /// </summary>
-public abstract class StructuredOutputRunTests<TFixture>(Func<TFixture> createFixture) : AgentTestBase<TFixture>(createFixture)
+public abstract class StructuredOutputRunTests<TFixture>(Func<TFixture> createFixture)
+    : AgentTestBase<TFixture>(createFixture)
     where TFixture : IAgentFixture
 {
     /// <summary>Conformance test.</summary>
@@ -27,7 +28,7 @@ public abstract class StructuredOutputRunTests<TFixture>(Func<TFixture> createFi
 
         var options = new AgentRunOptions
         {
-            ResponseFormat = ChatResponseFormat.ForJsonSchema<CityInfo>(AgentAbstractionsJsonUtilities.DefaultOptions),
+            ResponseFormat = ChatResponseFormat.ForJsonSchema<CityInfo>(AgentAbstractionsJsonUtilities.DefaultOptions)
         };
 
         var response = await agent.RunAsync(
@@ -39,7 +40,8 @@ public abstract class StructuredOutputRunTests<TFixture>(Func<TFixture> createFi
         Assert.NotNull(response);
         Assert.Single(response.Messages);
         Assert.Contains("Paris", response.Text, StringComparison.Ordinal);
-        Assert.True(TryDeserialize(response.Text, AgentAbstractionsJsonUtilities.DefaultOptions, out CityInfo cityInfo));
+        Assert.True(TryDeserialize(response.Text, AgentAbstractionsJsonUtilities.DefaultOptions,
+            out CityInfo cityInfo));
         Assert.Equal("Paris", cityInfo.Name);
     }
 
@@ -52,7 +54,7 @@ public abstract class StructuredOutputRunTests<TFixture>(Func<TFixture> createFi
         var session = await agent.CreateSessionAsync(ct).ConfigureAwait(false);
         await using var _ = new SessionCleanup(session, Fixture).ConfigureAwait(false);
 
-        AgentResponse<CityInfo> response = await agent.RunAsync<CityInfo>(
+        var response = await agent.RunAsync<CityInfo>(
             new ChatMessage(ChatRole.User, "Provide information about the capital of France."),
             session,
             cancellationToken: ct).ConfigureAwait(false);
@@ -73,7 +75,7 @@ public abstract class StructuredOutputRunTests<TFixture>(Func<TFixture> createFi
         var session = await agent.CreateSessionAsync(ct).ConfigureAwait(false);
         await using var _ = new SessionCleanup(session, Fixture).ConfigureAwait(false);
 
-        AgentResponse<int> response = await agent.RunAsync<int>(
+        var response = await agent.RunAsync<int>(
             new ChatMessage(ChatRole.User, "What is the sum of 15 and 27? Respond with just the number."),
             session,
             cancellationToken: ct).ConfigureAwait(false);

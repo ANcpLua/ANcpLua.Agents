@@ -16,9 +16,9 @@ public class AzureOpenAIChatCompletionFixture : IChatClientAgentFixture
 {
     private ChatClientAgent _agent = null!;
 
-    public AIAgent Agent => this._agent;
+    public AIAgent Agent => _agent;
 
-    public IChatClient ChatClient => this._agent.ChatClient;
+    public IChatClient ChatClient => _agent.ChatClient;
 
     public Task<IReadOnlyList<ChatMessage>> GetChatHistoryAsync(AIAgent agent, AgentSession session)
     {
@@ -36,22 +36,31 @@ public class AzureOpenAIChatCompletionFixture : IChatClientAgentFixture
         var apiKey = TestConfiguration.GetRequiredValue(TestSettings.AzureOpenAIApiKey);
         var deployment = TestConfiguration.GetRequiredValue(TestSettings.AzureOpenAIChatDeploymentName);
 
-        IChatClient chatClient = new AzureOpenAIClient(endpoint, new AzureKeyCredential(apiKey))
+        var chatClient = new AzureOpenAIClient(endpoint, new AzureKeyCredential(apiKey))
             .GetChatClient(deployment)
             .AsIChatClient();
 
-        return Task.FromResult(new ChatClientAgent(chatClient, options: new ChatClientAgentOptions
+        return Task.FromResult(new ChatClientAgent(chatClient, new ChatClientAgentOptions
         {
             Name = name,
-            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools },
+            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools }
         }));
     }
 
-    public Task DeleteAgentAsync(ChatClientAgent agent) => Task.CompletedTask;
+    public Task DeleteAgentAsync(ChatClientAgent agent)
+    {
+        return Task.CompletedTask;
+    }
 
-    public Task DeleteSessionAsync(AgentSession session) => Task.CompletedTask;
+    public Task DeleteSessionAsync(AgentSession session)
+    {
+        return Task.CompletedTask;
+    }
 
-    public async ValueTask InitializeAsync() => this._agent = await this.CreateChatClientAgentAsync().ConfigureAwait(false);
+    public async ValueTask InitializeAsync()
+    {
+        _agent = await CreateChatClientAgentAsync().ConfigureAwait(false);
+    }
 
     public ValueTask DisposeAsync()
     {

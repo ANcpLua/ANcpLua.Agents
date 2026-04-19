@@ -1,22 +1,16 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Source: Microsoft.Agents.AI.Workflows.UnitTests/TestRunContext.cs
 
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Agents.AI.Workflows;
-using Microsoft.Agents.AI.Workflows.Execution;
-using Microsoft.Agents.AI.Workflows.Observability;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ANcpLua.Agents.Testing.Workflows;
 
 /// <summary>
-/// Hand-rolled <see cref="IRunnerContext"/> for unit tests that isolate edge
-/// runners, request ports, or executor protocol plumbing from the real
-/// <c>InProcessRunnerContext</c>. Collects everything it sees into plain lists
-/// and dictionaries that tests can assert against.
+///     Hand-rolled <see cref="IRunnerContext" /> for unit tests that isolate edge
+///     runners, request ports, or executor protocol plumbing from the real
+///     <c>InProcessRunnerContext</c>. Collects everything it sees into plain lists
+///     and dictionaries that tests can assert against.
 /// </summary>
 public class TestRunContext : IRunnerContext
 {
@@ -28,98 +22,113 @@ public class TestRunContext : IRunnerContext
 
     public string StartingExecutorId { get; set; } = string.Empty;
 
-    public bool IsCheckpointingEnabled => false;
-
-    public bool ConcurrentRunsEnabled => false;
-
     internal Dictionary<string, List<MessageEnvelope>> QueuedMessages { get; } = [];
 
     internal Dictionary<string, List<object>> QueuedOutputs { get; } = [];
 
+    public bool IsCheckpointingEnabled => false;
+
+    public bool ConcurrentRunsEnabled => false;
+
     WorkflowTelemetryContext IRunnerContext.TelemetryContext => WorkflowTelemetryContext.Disabled;
+
+    public ValueTask AddEventAsync(WorkflowEvent workflowEvent, CancellationToken cancellationToken)
+    {
+        Events.Add(workflowEvent);
+        return default;
+    }
+
+    public IWorkflowContext BindWorkflowContext(string executorId, Dictionary<string, string>? traceContext = null)
+    {
+        return new BoundContext(executorId, this, traceContext);
+    }
+
+    public ValueTask PostAsync(ExternalRequest request)
+    {
+        ExternalRequests.Enqueue(request);
+        return default;
+    }
+
+    public ValueTask SendMessageAsync(string sourceId, object message, string? targetId = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (!QueuedMessages.TryGetValue(sourceId, out var deliveryQueue)) QueuedMessages[sourceId] = deliveryQueue = [];
+
+        deliveryQueue.Add(new MessageEnvelope(message, sourceId, targetId: targetId));
+        return default;
+    }
+
+    public ValueTask ForwardWorkflowEventAsync(WorkflowEvent workflowEvent,
+        CancellationToken cancellationToken = default)
+    {
+        return AddEventAsync(workflowEvent, cancellationToken);
+    }
+
+    ValueTask<StepContext> IRunnerContext.AdvanceAsync(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    ValueTask<Executor> IRunnerContext.EnsureExecutorAsync(string executorId, IStepTracer? tracer,
+        CancellationToken cancellationToken)
+    {
+        return new ValueTask<Executor>(Executors[executorId]);
+    }
+
+    ValueTask ISuperStepJoinContext.SendMessageAsync<TMessage>(string senderId, [DisallowNull] TMessage message,
+        CancellationToken cancellationToken)
+    {
+        return SendMessageAsync(senderId, message, cancellationToken: cancellationToken);
+    }
+
+    ValueTask ISuperStepJoinContext.YieldOutputAsync<TOutput>(string senderId, [DisallowNull] TOutput output,
+        CancellationToken cancellationToken)
+    {
+        return YieldOutputAsync(senderId, output, cancellationToken);
+    }
+
+    ValueTask<string> ISuperStepJoinContext.AttachSuperstepAsync(ISuperStepRunner superStepRunner,
+        CancellationToken cancellationToken)
+    {
+        return new ValueTask<string>(string.Empty);
+    }
+
+    ValueTask<bool> ISuperStepJoinContext.DetachSuperstepAsync(string joinId)
+    {
+        return new ValueTask<bool>(false);
+    }
 
     internal TestRunContext ConfigureExecutor(Executor executor)
     {
         _ = executor.DescribeProtocol();
-        this.Executors.Add(executor.Id, executor);
+        Executors.Add(executor.Id, executor);
         return this;
     }
 
     internal TestRunContext ConfigureExecutors(IEnumerable<Executor> executors)
     {
-        foreach (var executor in executors)
-        {
-            this.ConfigureExecutor(executor);
-        }
+        foreach (var executor in executors) ConfigureExecutor(executor);
 
         return this;
     }
 
-    public ValueTask AddEventAsync(WorkflowEvent workflowEvent, CancellationToken cancellationToken)
-    {
-        this.Events.Add(workflowEvent);
-        return default;
-    }
-
-    public IWorkflowContext BindWorkflowContext(string executorId, Dictionary<string, string>? traceContext = null)
-        => new BoundContext(executorId, this, traceContext);
-
-    public ValueTask PostAsync(ExternalRequest request)
-    {
-        this.ExternalRequests.Enqueue(request);
-        return default;
-    }
-
-    public ValueTask SendMessageAsync(string sourceId, object message, string? targetId = null, CancellationToken cancellationToken = default)
-    {
-        if (!this.QueuedMessages.TryGetValue(sourceId, out var deliveryQueue))
-        {
-            this.QueuedMessages[sourceId] = deliveryQueue = [];
-        }
-
-        deliveryQueue.Add(new(message, sourceId, targetId: targetId));
-        return default;
-    }
-
     public ValueTask YieldOutputAsync(string sourceId, object output, CancellationToken cancellationToken = default)
     {
-        if (!this.QueuedOutputs.TryGetValue(sourceId, out var outputQueue))
-        {
-            this.QueuedOutputs[sourceId] = outputQueue = [];
-        }
+        if (!QueuedOutputs.TryGetValue(sourceId, out var outputQueue)) QueuedOutputs[sourceId] = outputQueue = [];
 
         outputQueue.Add(output);
         return default;
     }
 
-    public ValueTask ForwardWorkflowEventAsync(WorkflowEvent workflowEvent, CancellationToken cancellationToken = default)
-        => this.AddEventAsync(workflowEvent, cancellationToken);
-
-    public ValueTask<IEnumerable<Type>> GetStartingExecutorInputTypesAsync(CancellationToken cancellationToken = default)
+    public ValueTask<IEnumerable<Type>> GetStartingExecutorInputTypesAsync(
+        CancellationToken cancellationToken = default)
     {
-        if (this.Executors.TryGetValue(this.StartingExecutorId, out var executor))
-        {
-            return new(executor.InputTypes);
-        }
+        if (Executors.TryGetValue(StartingExecutorId, out var executor))
+            return new ValueTask<IEnumerable<Type>>(executor.InputTypes);
 
-        throw new InvalidOperationException($"No executor with ID '{this.StartingExecutorId}' is registered in this context.");
+        throw new InvalidOperationException(
+            $"No executor with ID '{StartingExecutorId}' is registered in this context.");
     }
-
-    ValueTask<StepContext> IRunnerContext.AdvanceAsync(CancellationToken cancellationToken)
-        => throw new NotImplementedException();
-
-    ValueTask<Executor> IRunnerContext.EnsureExecutorAsync(string executorId, IStepTracer? tracer, CancellationToken cancellationToken)
-        => new(this.Executors[executorId]);
-
-    ValueTask ISuperStepJoinContext.SendMessageAsync<TMessage>(string senderId, [System.Diagnostics.CodeAnalysis.DisallowNull] TMessage message, CancellationToken cancellationToken)
-        => this.SendMessageAsync(senderId, message, cancellationToken: cancellationToken);
-
-    ValueTask ISuperStepJoinContext.YieldOutputAsync<TOutput>(string senderId, [System.Diagnostics.CodeAnalysis.DisallowNull] TOutput output, CancellationToken cancellationToken)
-        => this.YieldOutputAsync(senderId, output, cancellationToken);
-
-    ValueTask<string> ISuperStepJoinContext.AttachSuperstepAsync(ISuperStepRunner superStepRunner, CancellationToken cancellationToken) => new(string.Empty);
-
-    ValueTask<bool> ISuperStepJoinContext.DetachSuperstepAsync(string joinId) => new(false);
 
     private sealed class BoundContext(
         string executorId,
@@ -131,44 +140,61 @@ public class TestRunContext : IRunnerContext
         public IReadOnlyDictionary<string, string>? TraceContext => traceContext;
 
         public ValueTask AddEventAsync(WorkflowEvent workflowEvent, CancellationToken cancellationToken = default)
-            => runnerContext.AddEventAsync(workflowEvent, cancellationToken);
+        {
+            return runnerContext.AddEventAsync(workflowEvent, cancellationToken);
+        }
 
         public ValueTask YieldOutputAsync(object output, CancellationToken cancellationToken = default)
         {
             // Preserves the event-type semantics used by InProcessRunnerContext so
             // assertions against AgentResponseUpdateEvent / AgentResponseEvent keep working.
             if (output is AgentResponseUpdate update)
-            {
-                return this.AddEventAsync(new AgentResponseUpdateEvent(executorId, update), cancellationToken);
-            }
+                return AddEventAsync(new AgentResponseUpdateEvent(executorId, update), cancellationToken);
 
             if (output is AgentResponse response)
-            {
-                return this.AddEventAsync(new AgentResponseEvent(executorId, response), cancellationToken);
-            }
+                return AddEventAsync(new AgentResponseEvent(executorId, response), cancellationToken);
 
-            return this.AddEventAsync(new WorkflowOutputEvent(output, executorId), cancellationToken);
+            return AddEventAsync(new WorkflowOutputEvent(output, executorId), cancellationToken);
         }
 
         public ValueTask RequestHaltAsync()
-            => this.AddEventAsync(new RequestHaltEvent());
+        {
+            return AddEventAsync(new RequestHaltEvent());
+        }
 
         public ValueTask QueueClearScopeAsync(string? scopeName = null, CancellationToken cancellationToken = default)
-            => default;
+        {
+            return default;
+        }
 
-        public ValueTask QueueStateUpdateAsync<T>(string key, T? value, string? scopeName = null, CancellationToken cancellationToken = default)
-            => default;
+        public ValueTask QueueStateUpdateAsync<T>(string key, T? value, string? scopeName = null,
+            CancellationToken cancellationToken = default)
+        {
+            return default;
+        }
 
-        public ValueTask<T?> ReadStateAsync<T>(string key, string? scopeName = null, CancellationToken cancellationToken = default)
-            => new(default(T?));
+        public ValueTask<T?> ReadStateAsync<T>(string key, string? scopeName = null,
+            CancellationToken cancellationToken = default)
+        {
+            return new ValueTask<T?>(default(T?));
+        }
 
-        public ValueTask<HashSet<string>> ReadStateKeysAsync(string? scopeName = null, CancellationToken cancellationToken = default)
-            => new([]);
+        public ValueTask<HashSet<string>> ReadStateKeysAsync(string? scopeName = null,
+            CancellationToken cancellationToken = default)
+        {
+            return new ValueTask<HashSet<string>>([]);
+        }
 
-        public ValueTask SendMessageAsync(object message, string? targetId = null, CancellationToken cancellationToken = default)
-            => runnerContext.SendMessageAsync(executorId, message, targetId, cancellationToken);
+        public ValueTask SendMessageAsync(object message, string? targetId = null,
+            CancellationToken cancellationToken = default)
+        {
+            return runnerContext.SendMessageAsync(executorId, message, targetId, cancellationToken);
+        }
 
-        public ValueTask<T> ReadOrInitStateAsync<T>(string key, Func<T> initialStateFactory, string? scopeName = null, CancellationToken cancellationToken = default)
-            => new(initialStateFactory());
+        public ValueTask<T> ReadOrInitStateAsync<T>(string key, Func<T> initialStateFactory, string? scopeName = null,
+            CancellationToken cancellationToken = default)
+        {
+            return new ValueTask<T>(initialStateFactory());
+        }
     }
 }

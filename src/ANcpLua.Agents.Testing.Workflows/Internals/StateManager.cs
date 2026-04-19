@@ -4,7 +4,6 @@
 // Backed by a simple Dictionary<string, Dictionary<string, object?>>.
 
 using System.Collections.Concurrent;
-using Microsoft.Agents.AI.Workflows.Execution;
 
 namespace ANcpLua.Agents.Testing.Workflows.Internals;
 
@@ -13,46 +12,47 @@ internal sealed class StateManager
 {
     private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object?>> _scopes = new();
 
-    private static string ScopeKey(ScopeId scopeId) => $"{scopeId.ExecutorId}::{scopeId.ScopeName}";
+    private static string ScopeKey(ScopeId scopeId)
+    {
+        return $"{scopeId.ExecutorId}::{scopeId.ScopeName}";
+    }
 
     private ConcurrentDictionary<string, object?> GetScope(ScopeId scopeId)
-        => this._scopes.GetOrAdd(ScopeKey(scopeId), _ => new());
+    {
+        return this._scopes.GetOrAdd(ScopeKey(scopeId), _ => new ConcurrentDictionary<string, object?>());
+    }
 
     public ValueTask ClearStateAsync(ScopeId scopeId)
     {
-        this.GetScope(scopeId).Clear();
+        GetScope(scopeId).Clear();
         return default;
     }
 
     public ValueTask WriteStateAsync<T>(ScopeId scopeId, string key, T? value)
     {
-        this.GetScope(scopeId)[key] = value;
+        GetScope(scopeId)[key] = value;
         return default;
     }
 
     public ValueTask<T?> ReadStateAsync<T>(ScopeId scopeId, string key)
     {
-        if (this.GetScope(scopeId).TryGetValue(key, out object? value) && value is T typed)
-        {
-            return new(typed);
-        }
+        if (GetScope(scopeId).TryGetValue(key, out var value) && value is T typed) return new ValueTask<T?>(typed);
 
-        return new(default(T?));
+        return new ValueTask<T?>(default(T?));
     }
 
     public ValueTask<T> ReadOrInitStateAsync<T>(ScopeId scopeId, string key, Func<T> initialStateFactory)
     {
-        var scope = this.GetScope(scopeId);
-        if (scope.TryGetValue(key, out object? value) && value is T typed)
-        {
-            return new(typed);
-        }
+        var scope = GetScope(scopeId);
+        if (scope.TryGetValue(key, out var value) && value is T typed) return new ValueTask<T>(typed);
 
-        T init = initialStateFactory();
+        var init = initialStateFactory();
         scope[key] = init;
-        return new(init);
+        return new ValueTask<T>(init);
     }
 
     public ValueTask<HashSet<string>> ReadKeysAsync(ScopeId scopeId)
-        => new(new HashSet<string>(this.GetScope(scopeId).Keys));
+    {
+        return new ValueTask<HashSet<string>>(new HashSet<string>(this.GetScope(scopeId).Keys));
+    }
 }

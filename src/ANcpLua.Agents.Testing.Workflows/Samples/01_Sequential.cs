@@ -1,13 +1,6 @@
 // Sequential workflow: Uppercase -> Reverse -> output.
 // Source: Sample/01_Simple_Workflow_Sequential.cs
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Agents.AI.Workflows;
-
 namespace ANcpLua.Agents.Testing.Workflows.Samples;
 
 internal static class SequentialSample
@@ -25,31 +18,36 @@ internal static class SequentialSample
 
     public static async ValueTask RunAsync(TextWriter writer, IWorkflowExecutionEnvironment environment)
     {
-        StreamingRun run = await environment.RunStreamingAsync(Build(), input: "Hello, World!");
+        var run = await environment.RunStreamingAsync(Build(), "Hello, World!");
 
         await foreach (var evt in run.WatchStreamAsync())
-        {
             if (evt is ExecutorCompletedEvent completed)
-            {
                 writer.WriteLine($"{completed.ExecutorId}: {completed.Data}");
-            }
-        }
     }
 }
 
-internal sealed class UppercaseExecutor() : Executor<string, string>(nameof(UppercaseExecutor), declareCrossRunShareable: true)
+internal sealed class UppercaseExecutor()
+    : Executor<string, string>(nameof(UppercaseExecutor), declareCrossRunShareable: true)
 {
-    public override ValueTask<string> HandleAsync(string message, IWorkflowContext context, CancellationToken cancellationToken = default)
-        => new(message.ToUpperInvariant());
+    public override ValueTask<string> HandleAsync(string message, IWorkflowContext context,
+        CancellationToken cancellationToken = default)
+    {
+        return new ValueTask<string>(message.ToUpperInvariant());
+    }
 }
 
-internal sealed partial class ReverseTextExecutor() : Executor(nameof(ReverseTextExecutor), declareCrossRunShareable: true)
+internal sealed class ReverseTextExecutor() : Executor(nameof(ReverseTextExecutor), declareCrossRunShareable: true)
 {
-    protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder) => protocolBuilder;
-    [MessageHandler(Yield = [typeof(string)])]
-    public async ValueTask<string> HandleAsync(string message, IWorkflowContext context, CancellationToken cancellationToken = default)
+    protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder)
     {
-        string result = string.Concat(message.Reverse());
+        return protocolBuilder;
+    }
+
+    [MessageHandler(Yield = [typeof(string)])]
+    public async ValueTask<string> HandleAsync(string message, IWorkflowContext context,
+        CancellationToken cancellationToken = default)
+    {
+        var result = string.Concat(message.Reverse());
         await context.YieldOutputAsync(result, cancellationToken);
         return result;
     }

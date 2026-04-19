@@ -33,11 +33,13 @@ public sealed class FakeDelegatingAgent : AIAgent
         static (_, _) => throw new NotSupportedException($"{nameof(DeserializeSessionFunc)} not configured");
 
     /// <summary>Delegate invoked for non-streaming run. Throws by default.</summary>
-    public Func<IEnumerable<ChatMessage>, AgentSession?, AgentRunOptions?, CancellationToken, Task<AgentResponse>> RunAsyncFunc { get; set; } =
+    public Func<IEnumerable<ChatMessage>, AgentSession?, AgentRunOptions?, CancellationToken, Task<AgentResponse>>
+        RunAsyncFunc { get; set; } =
         static (_, _, _, _) => throw new NotSupportedException($"{nameof(RunAsyncFunc)} not configured");
 
     /// <summary>Delegate invoked for streaming run. Throws by default.</summary>
-    public Func<IEnumerable<ChatMessage>, AgentSession?, AgentRunOptions?, CancellationToken, IAsyncEnumerable<AgentResponseUpdate>> RunStreamingAsyncFunc { get; set; } =
+    public Func<IEnumerable<ChatMessage>, AgentSession?, AgentRunOptions?, CancellationToken,
+        IAsyncEnumerable<AgentResponseUpdate>> RunStreamingAsyncFunc { get; set; } =
         static (_, _, _, _) => throw new NotSupportedException($"{nameof(RunStreamingAsyncFunc)} not configured");
 
     /// <summary>Delegate invoked for <see cref="AIAgent.GetService" />. Falls back to base if null.</summary>
@@ -51,21 +53,27 @@ public sealed class FakeDelegatingAgent : AIAgent
 
     /// <inheritdoc />
     protected override ValueTask<AgentSession> CreateSessionCoreAsync(CancellationToken cancellationToken = default)
-        => CreateSessionFunc(cancellationToken);
+    {
+        return CreateSessionFunc(cancellationToken);
+    }
 
     /// <inheritdoc />
     protected override ValueTask<AgentSession> DeserializeSessionCoreAsync(
         JsonElement serializedState,
         JsonSerializerOptions? jsonSerializerOptions = null,
         CancellationToken cancellationToken = default)
-        => new(DeserializeSessionFunc(serializedState, jsonSerializerOptions));
+    {
+        return new ValueTask<AgentSession>(DeserializeSessionFunc(serializedState, jsonSerializerOptions));
+    }
 
     /// <inheritdoc />
     protected override ValueTask<JsonElement> SerializeSessionCoreAsync(
         AgentSession session,
         JsonSerializerOptions? jsonSerializerOptions = null,
         CancellationToken cancellationToken = default)
-        => throw new NotSupportedException($"{nameof(FakeDelegatingAgent)} does not implement session serialization.");
+    {
+        throw new NotSupportedException($"{nameof(FakeDelegatingAgent)} does not implement session serialization.");
+    }
 
     /// <inheritdoc />
     protected override Task<AgentResponse> RunCoreAsync(
@@ -73,7 +81,9 @@ public sealed class FakeDelegatingAgent : AIAgent
         AgentSession? session = null,
         AgentRunOptions? options = null,
         CancellationToken cancellationToken = default)
-        => RunAsyncFunc(messages, session, options, cancellationToken);
+    {
+        return RunAsyncFunc(messages, session, options, cancellationToken);
+    }
 
     /// <inheritdoc />
     protected override IAsyncEnumerable<AgentResponseUpdate> RunCoreStreamingAsync(
@@ -81,9 +91,13 @@ public sealed class FakeDelegatingAgent : AIAgent
         AgentSession? session = null,
         AgentRunOptions? options = null,
         CancellationToken cancellationToken = default)
-        => RunStreamingAsyncFunc(messages, session, options, cancellationToken);
+    {
+        return RunStreamingAsyncFunc(messages, session, options, cancellationToken);
+    }
 
     /// <inheritdoc />
     public override object? GetService(Type serviceType, object? serviceKey = null)
-        => GetServiceFunc?.Invoke(serviceType, serviceKey) ?? base.GetService(serviceType, serviceKey);
+    {
+        return GetServiceFunc?.Invoke(serviceType, serviceKey) ?? base.GetService(serviceType, serviceKey);
+    }
 }

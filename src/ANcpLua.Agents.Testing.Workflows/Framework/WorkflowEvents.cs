@@ -11,22 +11,22 @@
 namespace ANcpLua.Agents.Testing.Workflows.Framework;
 
 /// <summary>
-/// Strongly-typed projection of a flat <see cref="WorkflowEvent"/> list into the categories
-/// that test assertions actually care about (executors, inputs, super-steps, errors).
-/// Constructed once after a run completes — every property is a frozen <see cref="IReadOnlyList{T}"/>.
+///     Strongly-typed projection of a flat <see cref="WorkflowEvent" /> list into the categories
+///     that test assertions actually care about (executors, inputs, super-steps, errors).
+///     Constructed once after a run completes — every property is a frozen <see cref="IReadOnlyList{T}" />.
 /// </summary>
 public sealed class WorkflowEvents
 {
     public WorkflowEvents(IReadOnlyList<WorkflowEvent> workflowEvents)
     {
-        this.Events = workflowEvents;
-        this.EventCounts = workflowEvents.GroupBy(e => e.GetType()).ToDictionary(e => e.Key, e => e.Count());
-        this.ExecutorInvokeEvents = workflowEvents.OfType<ExecutorInvokedEvent>().ToList();
-        this.ExecutorCompleteEvents = workflowEvents.OfType<ExecutorCompletedEvent>().ToList();
-        this.InputEvents = workflowEvents.OfType<RequestInfoEvent>().ToList();
-        this.SuperStepEvents = workflowEvents.OfType<SuperStepCompletedEvent>().ToList();
-        this.ErrorEvents = workflowEvents.OfType<WorkflowErrorEvent>().ToList();
-        this.OutputEvents = workflowEvents.OfType<WorkflowOutputEvent>().ToList();
+        Events = workflowEvents;
+        EventCounts = workflowEvents.GroupBy(e => e.GetType()).ToDictionary(e => e.Key, e => e.Count());
+        ExecutorInvokeEvents = workflowEvents.OfType<ExecutorInvokedEvent>().ToList();
+        ExecutorCompleteEvents = workflowEvents.OfType<ExecutorCompletedEvent>().ToList();
+        InputEvents = workflowEvents.OfType<RequestInfoEvent>().ToList();
+        SuperStepEvents = workflowEvents.OfType<SuperStepCompletedEvent>().ToList();
+        ErrorEvents = workflowEvents.OfType<WorkflowErrorEvent>().ToList();
+        OutputEvents = workflowEvents.OfType<WorkflowOutputEvent>().ToList();
     }
 
     public IReadOnlyList<WorkflowEvent> Events { get; }

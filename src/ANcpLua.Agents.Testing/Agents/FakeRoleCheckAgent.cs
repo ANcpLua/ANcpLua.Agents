@@ -24,16 +24,12 @@ public sealed class FakeRoleCheckAgent(
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         foreach (var message in messages)
-        {
             if (!allowOtherAssistantRoles
                 && message.Role == ChatRole.Assistant
                 && message.AuthorName is not null
                 && !string.Equals(message.AuthorName, Name, StringComparison.Ordinal))
-            {
                 throw new InvalidOperationException(
                     $"Message from a foreign assistant author detected: AuthorName='{message.AuthorName}', expected '{Name ?? "<null>"}'.");
-            }
-        }
 
         yield return new AgentResponseUpdate(ChatRole.Assistant, "Ok")
         {
@@ -41,7 +37,7 @@ public sealed class FakeRoleCheckAgent(
             AuthorName = Name,
             CreatedAt = Time.GetUtcNow(),
             MessageId = Guid.NewGuid().ToString("N"),
-            ResponseId = Guid.NewGuid().ToString("N"),
+            ResponseId = Guid.NewGuid().ToString("N")
         };
 
         await Task.Yield();

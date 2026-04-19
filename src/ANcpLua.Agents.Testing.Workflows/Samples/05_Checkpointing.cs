@@ -2,13 +2,7 @@
 // verify pending RequestInfoEvents are re-emitted.
 // Source: Sample/05_Simple_Workflow_Checkpointing.cs + CheckpointResumeTests.cs
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using AwesomeAssertions;
-using Microsoft.Agents.AI.Workflows;
 using Microsoft.Agents.AI.Workflows.InProc;
 
 namespace ANcpLua.Agents.Testing.Workflows.Samples;
@@ -25,19 +19,19 @@ internal static class CheckpointingSample
         Dictionary<CheckpointInfo, (NumberSignal Signal, string? Prompt)> checkpointedOutputs = [];
 
         var signal = NumberSignal.Init;
-        string? prompt = ExternalRequestSample.UpdatePrompt(null, signal);
+        var prompt = ExternalRequestSample.UpdatePrompt(null, signal);
 
         checkpointManager ??= CheckpointManager.Default;
-        Workflow workflow = ExternalRequestSample.Build();
+        var workflow = ExternalRequestSample.Build();
 
-        StreamingRun handle = await environment
+        var handle = await environment
             .WithCheckpointing(checkpointManager)
             .RunStreamingAsync(workflow, NumberSignal.Init);
 
         List<CheckpointInfo> checkpoints = [];
         CancellationTokenSource cancellationSource = new();
 
-        string? result = await RunStreamToHaltOrMaxStepAsync(maxStep: 6);
+        var result = await RunStreamToHaltOrMaxStepAsync(6);
         result.Should().BeNull();
         checkpoints.Should().HaveCount(6);
 
@@ -47,7 +41,7 @@ internal static class CheckpointingSample
         {
             await handle.DisposeAsync();
             handle = await environment.WithCheckpointing(checkpointManager)
-                                      .ResumeStreamingAsync(workflow, targetCheckpoint, CancellationToken.None);
+                .ResumeStreamingAsync(workflow, targetCheckpoint, CancellationToken.None);
         }
         else
         {
@@ -57,7 +51,7 @@ internal static class CheckpointingSample
         (signal, prompt) = checkpointedOutputs[targetCheckpoint];
 
         cancellationSource.Dispose();
-        cancellationSource = new();
+        cancellationSource = new CancellationTokenSource();
 
         checkpoints.Clear();
         result = await RunStreamToHaltOrMaxStepAsync();
@@ -73,18 +67,14 @@ internal static class CheckpointingSample
             List<ExternalRequest> requests = [];
 
             await foreach (var evt in handle.WatchStreamAsync(cancellationSource.Token))
-            {
                 switch (evt)
                 {
                     case WorkflowOutputEvent outputEvent when outputEvent.ExecutorId == ExternalRequestSample.JudgeId:
                         if (outputEvent.Is(out NumberSignal newSignal))
-                        {
                             prompt = ExternalRequestSample.UpdatePrompt(prompt, signal = newSignal);
-                        }
                         else if (!outputEvent.Is<TryCount>())
-                        {
-                            throw new InvalidOperationException($"Unexpected output type {outputEvent.Data!.GetType()}");
-                        }
+                            throw new InvalidOperationException(
+                                $"Unexpected output type {outputEvent.Data!.GetType()}");
                         break;
 
                     case RequestInfoEvent requestInputEvt:
@@ -106,30 +96,25 @@ internal static class CheckpointingSample
                         }
 
                         foreach (var request in requests)
-                        {
                             await handle.SendResponseAsync(ExecuteExternalRequest(request, userGuessCallback, prompt));
-                        }
                         requests.Clear();
                         break;
                 }
-            }
 
-            if (cancellationSource.IsCancellationRequested)
-            {
-                return null;
-            }
+            if (cancellationSource.IsCancellationRequested) return null;
 
             writer.WriteLine($"Result: {prompt}");
             return prompt!;
         }
     }
 
-    private static ExternalResponse ExecuteExternalRequest(ExternalRequest request, Func<string, int> userGuessCallback, string? runningState)
+    private static ExternalResponse ExecuteExternalRequest(ExternalRequest request, Func<string, int> userGuessCallback,
+        string? runningState)
     {
         object result = request.PortInfo.PortId switch
         {
             "GuessNumber" => userGuessCallback(runningState ?? "Guess the number."),
-            _ => throw new NotSupportedException($"Request {request.PortInfo.PortId} is not supported"),
+            _ => throw new NotSupportedException($"Request {request.PortInfo.PortId} is not supported")
         };
         return request.CreateResponse(result);
     }

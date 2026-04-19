@@ -3,8 +3,8 @@
 // Reference IChatClientAgentFixture for Anthropic (Claude).
 // Uses Anthropic.SDK 5.x — its AnthropicClient.Messages exposes an IChatClient directly.
 
-using Anthropic.SDK;
 using ANcpLua.Agents.Testing.Conformance.Support;
+using Anthropic.SDK;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 
@@ -14,9 +14,9 @@ public class AnthropicChatCompletionFixture : IChatClientAgentFixture
 {
     private ChatClientAgent _agent = null!;
 
-    public AIAgent Agent => this._agent;
+    public AIAgent Agent => _agent;
 
-    public IChatClient ChatClient => this._agent.ChatClient;
+    public IChatClient ChatClient => _agent.ChatClient;
 
     public Task<IReadOnlyList<ChatMessage>> GetChatHistoryAsync(AIAgent agent, AgentSession session)
     {
@@ -33,24 +33,33 @@ public class AnthropicChatCompletionFixture : IChatClientAgentFixture
         var apiKey = TestConfiguration.GetRequiredValue(TestSettings.AnthropicApiKey);
         var model = TestConfiguration.GetRequiredValue(TestSettings.AnthropicChatModelName);
 
-        IChatClient chatClient = new AnthropicClient(new APIAuthentication(apiKey))
+        var chatClient = new AnthropicClient(new APIAuthentication(apiKey))
             .Messages
             .AsBuilder()
             .ConfigureOptions(opts => opts.ModelId ??= model)
             .Build();
 
-        return Task.FromResult(new ChatClientAgent(chatClient, options: new ChatClientAgentOptions
+        return Task.FromResult(new ChatClientAgent(chatClient, new ChatClientAgentOptions
         {
             Name = name,
-            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools, ModelId = model },
+            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools, ModelId = model }
         }));
     }
 
-    public Task DeleteAgentAsync(ChatClientAgent agent) => Task.CompletedTask;
+    public Task DeleteAgentAsync(ChatClientAgent agent)
+    {
+        return Task.CompletedTask;
+    }
 
-    public Task DeleteSessionAsync(AgentSession session) => Task.CompletedTask;
+    public Task DeleteSessionAsync(AgentSession session)
+    {
+        return Task.CompletedTask;
+    }
 
-    public async ValueTask InitializeAsync() => this._agent = await this.CreateChatClientAgentAsync().ConfigureAwait(false);
+    public async ValueTask InitializeAsync()
+    {
+        _agent = await CreateChatClientAgentAsync().ConfigureAwait(false);
+    }
 
     public ValueTask DisposeAsync()
     {

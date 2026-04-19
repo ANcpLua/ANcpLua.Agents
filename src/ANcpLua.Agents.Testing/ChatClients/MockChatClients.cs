@@ -22,35 +22,39 @@ namespace ANcpLua.Agents.Testing.ChatClients;
 
 public static class TestHelpers
 {
-    private static readonly ChatClientMetadata s_metadata = new("Test", new Uri("https://test.example.com"), "test-model");
+    private static readonly ChatClientMetadata s_metadata = new("Test", new Uri("https://test.example.com"),
+        "test-model");
 
-    private static UsageDetails Usage(int messageCount) => new()
+    private static UsageDetails Usage(int messageCount)
     {
-        InputTokenCount = 10 + (messageCount * 5),
-        OutputTokenCount = 5,
-        TotalTokenCount = 15 + (messageCount * 5),
-    };
+        return new UsageDetails
+        {
+            InputTokenCount = 10 + messageCount * 5,
+            OutputTokenCount = 5,
+            TotalTokenCount = 15 + messageCount * 5
+        };
+    }
 
-    private static ChatResponse BuildResponse(string text, int messageCount, ChatFinishReason finishReason = default) =>
-        new([new ChatMessage(ChatRole.Assistant, text)])
+    private static ChatResponse BuildResponse(string text, int messageCount, ChatFinishReason finishReason = default)
+    {
+        return new ChatResponse([new ChatMessage(ChatRole.Assistant, text)])
         {
             ModelId = "test-model",
             FinishReason = finishReason == default ? ChatFinishReason.Stop : finishReason,
-            Usage = Usage(messageCount),
+            Usage = Usage(messageCount)
         };
+    }
 
-    private static async IAsyncEnumerable<ChatResponseUpdate> StreamWords(string text, int messageCount, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    private static async IAsyncEnumerable<ChatResponseUpdate> StreamWords(string text, int messageCount,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         await Task.Delay(1, cancellationToken).ConfigureAwait(false);
-        string[] words = text.Split(' ');
-        for (int i = 0; i < words.Length; i++)
+        var words = text.Split(' ');
+        for (var i = 0; i < words.Length; i++)
         {
-            string content = i < words.Length - 1 ? words[i] + " " : words[i];
+            var content = i < words.Length - 1 ? words[i] + " " : words[i];
             ChatResponseUpdate update = new() { Contents = [new TextContent(content)], Role = ChatRole.Assistant };
-            if (i == words.Length - 1)
-            {
-                update.Contents.Add(new UsageContent(Usage(messageCount)));
-            }
+            if (i == words.Length - 1) update.Contents.Add(new UsageContent(Usage(messageCount)));
             yield return update;
         }
     }
@@ -60,20 +64,28 @@ public static class TestHelpers
         public ChatOptions? LastChatOptions { get; private set; }
         public ChatClientMetadata Metadata { get; } = s_metadata;
 
-        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
+        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
         {
-            if (options is not null) { this.LastChatOptions = options; }
+            if (options is not null) LastChatOptions = options;
             return Task.FromResult(BuildResponse(responseText, messages.Count()));
         }
 
-        public IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null, CancellationToken cancellationToken = default)
         {
-            if (options is not null) { this.LastChatOptions = options; }
+            if (options is not null) LastChatOptions = options;
             return StreamWords(responseText, messages.Count(), cancellationToken);
         }
 
-        public object? GetService(Type serviceType, object? serviceKey = null) => serviceType.IsInstanceOfType(this) ? this : null;
-        public void Dispose() { }
+        public object? GetService(Type serviceType, object? serviceKey = null)
+        {
+            return serviceType.IsInstanceOfType(this) ? this : null;
+        }
+
+        public void Dispose()
+        {
+        }
     }
 
     public sealed class StatefulMockChatClient(string[] responseTexts) : IChatClient
@@ -81,160 +93,211 @@ public static class TestHelpers
         private int _callIndex;
         public ChatClientMetadata Metadata { get; } = s_metadata;
 
-        private string Next() => responseTexts[Math.Min(this._callIndex++, responseTexts.Length - 1)];
+        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(BuildResponse(this.Next(), messages.Count()));
+        }
 
-        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
-            => Task.FromResult(BuildResponse(this.Next(), messages.Count()));
+        public IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            return StreamWords(this.Next(), messages.Count(), cancellationToken);
+        }
 
-        public IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
-            => StreamWords(this.Next(), messages.Count(), cancellationToken);
+        public object? GetService(Type serviceType, object? serviceKey = null)
+        {
+            return serviceType.IsInstanceOfType(this) ? this : null;
+        }
 
-        public object? GetService(Type serviceType, object? serviceKey = null) => serviceType.IsInstanceOfType(this) ? this : null;
-        public void Dispose() { }
+        public void Dispose()
+        {
+        }
+
+        private string Next()
+        {
+            return responseTexts[Math.Min(this._callIndex++, responseTexts.Length - 1)];
+        }
     }
 
     public sealed class ConversationMemoryMockChatClient(string responseText = "Test response") : IChatClient
     {
         /// <summary>Each entry is the messages list received for that call.</summary>
         public List<List<ChatMessage>> CallHistory { get; } = [];
+
         public ChatClientMetadata Metadata { get; } = s_metadata;
 
-        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
+        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
         {
-            this.CallHistory.Add(messages.ToList());
+            CallHistory.Add(messages.ToList());
             return Task.FromResult(BuildResponse(responseText, 1));
         }
 
-        public IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null, CancellationToken cancellationToken = default)
         {
-            this.CallHistory.Add(messages.ToList());
+            CallHistory.Add(messages.ToList());
             return StreamWords(responseText, 1, cancellationToken);
         }
 
-        public object? GetService(Type serviceType, object? serviceKey = null) => serviceType.IsInstanceOfType(this) ? this : null;
-        public void Dispose() { }
+        public object? GetService(Type serviceType, object? serviceKey = null)
+        {
+            return serviceType.IsInstanceOfType(this) ? this : null;
+        }
+
+        public void Dispose()
+        {
+        }
     }
 
-    public sealed class FunctionCallMockChatClient(string functionName = "test_function", string arguments = """{"param":"value"}""") : IChatClient
+    public sealed class FunctionCallMockChatClient(
+        string functionName = "test_function",
+        string arguments = """{"param":"value"}""") : IChatClient
     {
-        private readonly Dictionary<string, object?> _arguments = JsonSerializer.Deserialize<Dictionary<string, object?>>(arguments) ?? [];
+        private readonly Dictionary<string, object?> _arguments =
+            JsonSerializer.Deserialize<Dictionary<string, object?>>(arguments) ?? [];
+
         public ChatClientMetadata Metadata { get; } = s_metadata;
 
-        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
+        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
         {
-            ChatMessage message = new(ChatRole.Assistant, [new FunctionCallContent("call_123", functionName) { Arguments = this._arguments }]);
+            ChatMessage message = new(ChatRole.Assistant,
+                [new FunctionCallContent("call_123", functionName) { Arguments = _arguments }]);
             return Task.FromResult(new ChatResponse([message])
             {
                 ModelId = "test-model",
                 FinishReason = ChatFinishReason.ToolCalls,
-                Usage = new UsageDetails { InputTokenCount = 80, OutputTokenCount = 25, TotalTokenCount = 105 },
+                Usage = new UsageDetails { InputTokenCount = 80, OutputTokenCount = 25, TotalTokenCount = 105 }
             });
         }
 
-        public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             await Task.Delay(1, cancellationToken).ConfigureAwait(false);
             yield return new ChatResponseUpdate
             {
-                Contents = [
-                    new FunctionCallContent("call_123", functionName) { Arguments = this._arguments },
-                    new UsageContent(new UsageDetails { InputTokenCount = 80, OutputTokenCount = 25, TotalTokenCount = 105 }),
+                Contents =
+                [
+                    new FunctionCallContent("call_123", functionName) { Arguments = _arguments },
+                    new UsageContent(new UsageDetails
+                        { InputTokenCount = 80, OutputTokenCount = 25, TotalTokenCount = 105 })
                 ],
-                Role = ChatRole.Assistant,
+                Role = ChatRole.Assistant
             };
         }
 
-        public object? GetService(Type serviceType, object? serviceKey = null) => serviceType.IsInstanceOfType(this) ? this : null;
-        public void Dispose() { }
+        public object? GetService(Type serviceType, object? serviceKey = null)
+        {
+            return serviceType.IsInstanceOfType(this) ? this : null;
+        }
+
+        public void Dispose()
+        {
+        }
     }
 
     public sealed class ToolCallMockChatClient : IChatClient
     {
-        private readonly string _functionName;
         private readonly Dictionary<string, object?> _arguments;
+        private readonly string _functionName;
 
         public ToolCallMockChatClient(string functionName, string argumentsJson)
         {
-            this._functionName = functionName;
+            _functionName = functionName;
             using var doc = JsonDocument.Parse(argumentsJson);
-            this._arguments = [];
+            _arguments = [];
             foreach (var prop in doc.RootElement.EnumerateObject())
-            {
-                this._arguments[prop.Name] = prop.Value.ValueKind switch
+                _arguments[prop.Name] = prop.Value.ValueKind switch
                 {
                     JsonValueKind.String => prop.Value.GetString(),
                     JsonValueKind.Number => prop.Value.GetDouble(),
                     JsonValueKind.True => true,
                     JsonValueKind.False => false,
                     JsonValueKind.Null => null,
-                    _ => prop.Value.ToString(),
+                    _ => prop.Value.ToString()
                 };
-            }
         }
 
         public ChatClientMetadata Metadata { get; } = s_metadata;
 
-        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
+        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
         {
-            int messageCount = messages.Count();
-            FunctionCallContent functionCall = new("call_test123", this._functionName, this._arguments);
+            var messageCount = messages.Count();
+            FunctionCallContent functionCall = new("call_test123", _functionName, _arguments);
             ChatMessage message = new(ChatRole.Assistant, [functionCall]);
             return Task.FromResult(new ChatResponse([message])
             {
                 ModelId = "test-model",
                 FinishReason = ChatFinishReason.ToolCalls,
-                Usage = Usage(messageCount),
+                Usage = Usage(messageCount)
             });
         }
 
-        public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             await Task.Delay(1, cancellationToken).ConfigureAwait(false);
-            int messageCount = messages.Count();
-            FunctionCallContent functionCall = new("call_test123", this._functionName, this._arguments);
+            var messageCount = messages.Count();
+            FunctionCallContent functionCall = new("call_test123", _functionName, _arguments);
             yield return new ChatResponseUpdate
             {
                 Contents = [functionCall, new UsageContent(Usage(messageCount))],
-                Role = ChatRole.Assistant,
+                Role = ChatRole.Assistant
             };
         }
 
-        public object? GetService(Type serviceType, object? serviceKey = null) => serviceType.IsInstanceOfType(this) ? this : null;
-        public void Dispose() { }
+        public object? GetService(Type serviceType, object? serviceKey = null)
+        {
+            return serviceType.IsInstanceOfType(this) ? this : null;
+        }
+
+        public void Dispose()
+        {
+        }
     }
 
-    public sealed class CustomContentMockChatClient(Func<ChatMessage, IEnumerable<AIContent>> contentProvider) : IChatClient
+    public sealed class CustomContentMockChatClient(Func<ChatMessage, IEnumerable<AIContent>> contentProvider)
+        : IChatClient
     {
         public ChatClientMetadata Metadata { get; } = s_metadata;
 
-        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
+        public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
         {
-            ChatMessage lastMessage = messages.Last();
+            var lastMessage = messages.Last();
             ChatMessage message = new(ChatRole.Assistant, contentProvider(lastMessage).ToList());
             return Task.FromResult(new ChatResponse([message])
             {
                 ModelId = "test-model",
                 FinishReason = ChatFinishReason.Stop,
-                Usage = Usage(0),
+                Usage = Usage(0)
             });
         }
 
-        public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             await Task.Delay(1, cancellationToken).ConfigureAwait(false);
-            List<AIContent> contentList = contentProvider(messages.Last()).ToList();
-            for (int i = 0; i < contentList.Count; i++)
+            var contentList = contentProvider(messages.Last()).ToList();
+            for (var i = 0; i < contentList.Count; i++)
             {
                 List<AIContent> updateContents = [contentList[i]];
-                if (i == contentList.Count - 1)
-                {
-                    updateContents.Add(new UsageContent(Usage(0)));
-                }
+                if (i == contentList.Count - 1) updateContents.Add(new UsageContent(Usage(0)));
                 yield return new ChatResponseUpdate { Contents = updateContents, Role = ChatRole.Assistant };
             }
         }
 
-        public object? GetService(Type serviceType, object? serviceKey = null) => serviceType.IsInstanceOfType(this) ? this : null;
-        public void Dispose() { }
+        public object? GetService(Type serviceType, object? serviceKey = null)
+        {
+            return serviceType.IsInstanceOfType(this) ? this : null;
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }

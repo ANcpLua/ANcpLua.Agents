@@ -3,10 +3,6 @@
 
 // Copyright (c) Microsoft. All rights reserved.
 
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace ANcpLua.Agents.Testing.Workflows.Internals;
 
 internal sealed class DeliveryMapping
@@ -18,27 +14,32 @@ internal sealed class DeliveryMapping
     {
         ArgumentNullException.ThrowIfNull(envelopes);
         ArgumentNullException.ThrowIfNull(targets);
-        this._envelopes = envelopes;
-        this._targets = targets;
+        _envelopes = envelopes;
+        _targets = targets;
     }
 
-    public DeliveryMapping(MessageEnvelope envelope, Executor target) : this([envelope], [target]) { }
-    public DeliveryMapping(MessageEnvelope envelope, IEnumerable<Executor> targets) : this([envelope], targets) { }
-    public DeliveryMapping(IEnumerable<MessageEnvelope> envelopes, Executor target) : this(envelopes, [target]) { }
+    public DeliveryMapping(MessageEnvelope envelope, Executor target) : this([envelope], [target])
+    {
+    }
 
-    public IEnumerable<MessageDelivery> Deliveries => from target in this._targets
-                                                      from envelope in this._envelopes
-                                                      select new MessageDelivery(envelope, target);
+    public DeliveryMapping(MessageEnvelope envelope, IEnumerable<Executor> targets) : this([envelope], targets)
+    {
+    }
+
+    public DeliveryMapping(IEnumerable<MessageEnvelope> envelopes, Executor target) : this(envelopes, [target])
+    {
+    }
+
+    public IEnumerable<MessageDelivery> Deliveries => from target in _targets
+        from envelope in _envelopes
+        select new MessageDelivery(envelope, target);
 
     public void MapInto(StepContext nextStep)
     {
-        foreach (Executor target in this._targets)
+        foreach (var target in _targets)
         {
-            ConcurrentQueue<MessageEnvelope> messageQueue = nextStep.MessagesFor(target.Id);
-            foreach (MessageEnvelope envelope in this._envelopes)
-            {
-                messageQueue.Enqueue(envelope);
-            }
+            var messageQueue = nextStep.MessagesFor(target.Id);
+            foreach (var envelope in _envelopes) messageQueue.Enqueue(envelope);
         }
     }
 }

@@ -44,7 +44,7 @@ public static class ChatMessageExtensions
             ResponseId = responseId,
             AgentId = agentId,
             AuthorName = authorName,
-            Contents = [content,],
+            Contents = [content]
         };
     }
 
@@ -76,7 +76,7 @@ public static class ChatMessageExtensions
         {
             AuthorName = authorName,
             CreatedAt = TimeProvider.System.GetUtcNow(),
-            MessageId = messageId ?? Guid.NewGuid().ToString("N"),
+            MessageId = messageId ?? Guid.NewGuid().ToString("N")
         };
     }
 
@@ -122,7 +122,7 @@ public static class ChatMessageExtensions
         string? authorName = null)
     {
         messageId ??= Guid.NewGuid().ToString("N");
-        DateTimeOffset timestamp = createdAt ?? timeProvider.GetUtcNow();
+        var timestamp = createdAt ?? timeProvider.GetUtcNow();
         return message.ToContentStream().Select(content => new AgentResponseUpdate
         {
             Role = ChatRole.Assistant,
@@ -131,7 +131,7 @@ public static class ChatMessageExtensions
             ResponseId = responseId,
             AgentId = agentId,
             AuthorName = authorName,
-            Contents = [content],
+            Contents = [content]
         });
     }
 
@@ -148,7 +148,7 @@ public static class ChatMessageExtensions
             AuthorName = authorName,
             MessageId = Guid.NewGuid().ToString("N"),
             RawRepresentation = text,
-            CreatedAt = TimeProvider.System.GetUtcNow(),
+            CreatedAt = TimeProvider.System.GetUtcNow()
         }).ToList();
     }
 }

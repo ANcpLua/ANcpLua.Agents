@@ -3,8 +3,6 @@
 
 // Copyright (c) Microsoft. All rights reserved.
 
-using System.Threading.Tasks;
-
 namespace ANcpLua.Agents.Testing.Workflows.Internals;
 
 internal interface IExternalRequestSink

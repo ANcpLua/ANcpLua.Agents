@@ -24,36 +24,36 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Agents.AI" />
-        <PackageReference Include="Microsoft.Agents.AI.Workflows" />
-        <PackageReference Include="Microsoft.Agents.AI.Workflows.Declarative" />
-        <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
-        <PackageReference Include="Moq" />
-        <PackageReference Include="AwesomeAssertions" />
-        <PackageReference Include="xunit.v3.extensibility.core" />
-        <PackageReference Include="xunit.v3.assert" />
+        <PackageReference Include="Microsoft.Agents.AI"/>
+        <PackageReference Include="Microsoft.Agents.AI.Workflows"/>
+        <PackageReference Include="Microsoft.Agents.AI.Workflows.Declarative"/>
+        <PackageReference Include="Microsoft.Extensions.AI.Abstractions"/>
+        <PackageReference Include="Moq"/>
+        <PackageReference Include="AwesomeAssertions"/>
+        <PackageReference Include="xunit.v3.extensibility.core"/>
+        <PackageReference Include="xunit.v3.assert"/>
     </ItemGroup>
 
     <ItemGroup Label="Analyzers">
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup Label="Roslyn (for SyntaxTreeFluentExtensions)">
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp"/>
     </ItemGroup>
 
     <ItemGroup Label="Sibling project (for 06_Concurrent sample — uses FakeEchoAgent)">
-        <ProjectReference Include="..\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj" />
+        <ProjectReference Include="..\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
     </ItemGroup>
 
     <ItemGroup Label="Global usings">
-        <Using Include="Microsoft.Agents.AI" />
-        <Using Include="Microsoft.Agents.AI.Workflows" />
-        <Using Include="Microsoft.Agents.AI.Workflows.Declarative" />
-        <Using Include="Microsoft.Extensions.AI" />
-        <Using Include="ANcpLua.Agents.Testing.Workflows.Internals" />
-        <Using Include="Xunit" />
-        <Using Include="ANcpLua.Agents.Testing.Agents" />
+        <Using Include="Microsoft.Agents.AI"/>
+        <Using Include="Microsoft.Agents.AI.Workflows"/>
+        <Using Include="Microsoft.Agents.AI.Workflows.Declarative"/>
+        <Using Include="Microsoft.Extensions.AI"/>
+        <Using Include="ANcpLua.Agents.Testing.Workflows.Internals"/>
+        <Using Include="Xunit"/>
+        <Using Include="ANcpLua.Agents.Testing.Agents"/>
     </ItemGroup>
 
     <!--
@@ -66,12 +66,12 @@
     <!-- DynamicPortsExecutor uses RouteBuilder.AddPortHandler which exists in upstream main
          but hasn't shipped in the 1.1.0 NuGet. Will be unparked when MAF ships the API. -->
     <ItemGroup Label="Parked (post-1.1.0 API)">
-        <Compile Remove="Runtime\DynamicPortsExecutor.cs" />
-        <None Include="Runtime\DynamicPortsExecutor.cs" />
+        <Compile Remove="Runtime\DynamicPortsExecutor.cs"/>
+        <None Include="Runtime\DynamicPortsExecutor.cs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-        <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
     </ItemGroup>
 </Project>

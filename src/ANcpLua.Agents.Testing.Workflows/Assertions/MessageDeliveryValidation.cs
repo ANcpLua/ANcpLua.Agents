@@ -1,18 +1,14 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Source: Microsoft.Agents.AI.Workflows.UnitTests/MessageDeliveryValidation.cs
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using AwesomeAssertions;
-using Microsoft.Agents.AI.Workflows;
-using Microsoft.Agents.AI.Workflows.Execution;
 
 namespace ANcpLua.Agents.Testing.Workflows;
 
 internal static class MessageDeliveryValidation
 {
-    public static void CheckDeliveries(this DeliveryMapping mapping, HashSet<string> receiverIds, HashSet<object> messages)
+    public static void CheckDeliveries(this DeliveryMapping mapping, HashSet<string> receiverIds,
+        HashSet<object> messages)
     {
         HashSet<string> unseenReceivers = [.. receiverIds];
         HashSet<object> unseenMessages = [.. messages];
@@ -26,7 +22,7 @@ internal static class MessageDeliveryValidation
             {
                 // PortableValue.IsDelayedDeserialization and .Value are internal in MAF 1.1.0.
                 // Simplified: just use the envelope message directly.
-                object messageValue = delivery.Envelope.Message;
+                var messageValue = delivery.Envelope.Message;
 
                 messages.Should().Contain(messageValue);
                 unseenMessages.Remove(messageValue);
@@ -37,7 +33,8 @@ internal static class MessageDeliveryValidation
         unseenMessages.Should().BeEmpty();
     }
 
-    public static void CheckForwarded(Dictionary<string, List<MessageEnvelope>> queuedMessages, params (string expectedSender, List<string> expectedMessages)[] expectedForwards)
+    public static void CheckForwarded(Dictionary<string, List<MessageEnvelope>> queuedMessages,
+        params (string expectedSender, List<string> expectedMessages)[] expectedForwards)
     {
         queuedMessages.Should().HaveCount(expectedForwards.Length);
 

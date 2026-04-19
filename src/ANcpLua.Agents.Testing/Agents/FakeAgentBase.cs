@@ -49,14 +49,19 @@ public abstract class FakeAgentBase(string? id = null, string? name = null, Time
 
     /// <inheritdoc />
     protected override ValueTask<AgentSession> CreateSessionCoreAsync(CancellationToken cancellationToken = default)
-        => new(new FakeSession());
+    {
+        return new ValueTask<AgentSession>(new FakeSession());
+    }
 
     /// <inheritdoc />
     protected override ValueTask<AgentSession> DeserializeSessionCoreAsync(
         JsonElement serializedState,
         JsonSerializerOptions? jsonSerializerOptions = null,
         CancellationToken cancellationToken = default)
-        => new(serializedState.Deserialize<FakeSession>(jsonSerializerOptions) ?? new FakeSession());
+    {
+        return new ValueTask<AgentSession>(serializedState.Deserialize<FakeSession>(jsonSerializerOptions) ??
+                                           new FakeSession());
+    }
 
     /// <inheritdoc />
     protected override ValueTask<JsonElement> SerializeSessionCoreAsync(
@@ -65,12 +70,10 @@ public abstract class FakeAgentBase(string? id = null, string? name = null, Time
         CancellationToken cancellationToken = default)
     {
         if (session is not FakeSession fakeSession)
-        {
             throw new InvalidOperationException(
                 $"Session type '{session.GetType().Name}' is not compatible with {GetType().Name}. Expected {nameof(FakeSession)}.");
-        }
 
-        return new(JsonSerializer.SerializeToElement(fakeSession, jsonSerializerOptions));
+        return new ValueTask<JsonElement>(JsonSerializer.SerializeToElement(fakeSession, jsonSerializerOptions));
     }
 
     /// <inheritdoc />
@@ -79,7 +82,10 @@ public abstract class FakeAgentBase(string? id = null, string? name = null, Time
         AgentSession? session = null,
         AgentRunOptions? options = null,
         CancellationToken cancellationToken = default)
-        => RunCoreStreamingAsync(messages, session, options, cancellationToken).ToAgentResponseAsync(cancellationToken);
+    {
+        return RunCoreStreamingAsync(messages, session, options, cancellationToken)
+            .ToAgentResponseAsync(cancellationToken);
+    }
 
     /// <inheritdoc />
     protected override async IAsyncEnumerable<AgentResponseUpdate> RunCoreStreamingAsync(
@@ -89,13 +95,14 @@ public abstract class FakeAgentBase(string? id = null, string? name = null, Time
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         await foreach (var update in StreamResponseAsync(messages, options, cancellationToken).ConfigureAwait(false))
-        {
             yield return update;
-        }
     }
 
     /// <inheritdoc />
-    public override object? GetService(Type serviceType, object? serviceKey = null) => null;
+    public override object? GetService(Type serviceType, object? serviceKey = null)
+    {
+        return null;
+    }
 
     /// <summary>
     ///     Stream a sequence of text chunks as <see cref="AgentResponseUpdate" /> instances that share one message id.
@@ -113,7 +120,7 @@ public abstract class FakeAgentBase(string? id = null, string? name = null, Time
             {
                 MessageId = messageId,
                 Role = ChatRole.Assistant,
-                Contents = [new TextContent(chunk)],
+                Contents = [new TextContent(chunk)]
             };
             await Task.Yield();
         }
@@ -121,9 +128,13 @@ public abstract class FakeAgentBase(string? id = null, string? name = null, Time
 
     private sealed class FakeSession : AgentSession
     {
-        public FakeSession() { }
+        public FakeSession()
+        {
+        }
 
         [JsonConstructor]
-        public FakeSession(AgentSessionStateBag stateBag) : base(stateBag) { }
+        public FakeSession(AgentSessionStateBag stateBag) : base(stateBag)
+        {
+        }
     }
 }

@@ -7,7 +7,6 @@
 using ANcpLua.Agents.Testing.Conformance.Support;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
-using Mscc.GenerativeAI;
 using Mscc.GenerativeAI.Microsoft;
 
 namespace ANcpLua.Agents.Testing.Conformance.Examples;
@@ -16,9 +15,9 @@ public class GoogleGeminiChatCompletionFixture : IChatClientAgentFixture
 {
     private ChatClientAgent _agent = null!;
 
-    public AIAgent Agent => this._agent;
+    public AIAgent Agent => _agent;
 
-    public IChatClient ChatClient => this._agent.ChatClient;
+    public IChatClient ChatClient => _agent.ChatClient;
 
     public Task<IReadOnlyList<ChatMessage>> GetChatHistoryAsync(AIAgent agent, AgentSession session)
     {
@@ -35,20 +34,29 @@ public class GoogleGeminiChatCompletionFixture : IChatClientAgentFixture
         var apiKey = TestConfiguration.GetRequiredValue(TestSettings.GoogleGeminiApiKey);
         var modelName = TestConfiguration.GetRequiredValue(TestSettings.GoogleGeminiChatModelName);
 
-        IChatClient chatClient = new GeminiChatClient(apiKey: apiKey, model: modelName, logger: null);
+        IChatClient chatClient = new GeminiChatClient(apiKey, modelName, null);
 
-        return Task.FromResult(new ChatClientAgent(chatClient, options: new ChatClientAgentOptions
+        return Task.FromResult(new ChatClientAgent(chatClient, new ChatClientAgentOptions
         {
             Name = name,
-            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools, ModelId = modelName },
+            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools, ModelId = modelName }
         }));
     }
 
-    public Task DeleteAgentAsync(ChatClientAgent agent) => Task.CompletedTask;
+    public Task DeleteAgentAsync(ChatClientAgent agent)
+    {
+        return Task.CompletedTask;
+    }
 
-    public Task DeleteSessionAsync(AgentSession session) => Task.CompletedTask;
+    public Task DeleteSessionAsync(AgentSession session)
+    {
+        return Task.CompletedTask;
+    }
 
-    public async ValueTask InitializeAsync() => this._agent = await this.CreateChatClientAgentAsync().ConfigureAwait(false);
+    public async ValueTask InitializeAsync()
+    {
+        _agent = await CreateChatClientAgentAsync().ConfigureAwait(false);
+    }
 
     public ValueTask DisposeAsync()
     {

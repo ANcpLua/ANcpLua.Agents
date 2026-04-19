@@ -15,9 +15,9 @@ namespace ANcpLua.Agents.Testing.Diagnostics;
 ///     <para>Usage:</para>
 ///     <code>
 ///     using var collector = new ActivityCollector("Qyl.Agents");
-///
+/// 
 ///     // ... exercise code that creates activities ...
-///
+/// 
 ///     var span = collector.FindSingle("chat gpt-4");
 ///     span.AssertTag("gen_ai.provider.name", "openai");
 ///     span.AssertStatus(ActivityStatusCode.Ok);
@@ -44,7 +44,7 @@ public sealed class ActivityCollector : IDisposable
         {
             ShouldListenTo = ShouldListen,
             Sample = SampleAlways,
-            ActivityStopped = _activities.Add,
+            ActivityStopped = _activities.Add
         };
 
         ActivitySource.AddActivityListener(_listener);
@@ -54,7 +54,10 @@ public sealed class ActivityCollector : IDisposable
     public IReadOnlyList<Activity> Activities => [.. _activities];
 
     /// <inheritdoc />
-    public void Dispose() => _listener.Dispose();
+    public void Dispose()
+    {
+        _listener.Dispose();
+    }
 
     /// <summary>Returns the single activity whose operation name starts with the given prefix.</summary>
     /// <param name="operationNamePrefix">Prefix to match against <see cref="Activity.OperationName" />.</param>
@@ -77,8 +80,10 @@ public sealed class ActivityCollector : IDisposable
     }
 
     /// <summary>Returns all activities whose operation name starts with the given prefix.</summary>
-    public IReadOnlyList<Activity> Where(string operationNamePrefix) =>
-        [.. _activities.Where(a => a.OperationName.StartsWith(operationNamePrefix, StringComparison.Ordinal))];
+    public IReadOnlyList<Activity> Where(string operationNamePrefix)
+    {
+        return [.. _activities.Where(a => a.OperationName.StartsWith(operationNamePrefix, StringComparison.Ordinal))];
+    }
 
     /// <summary>Asserts that no activities were captured. Returns self for fluent chaining.</summary>
     public ActivityCollector ShouldBeEmpty()
@@ -106,9 +111,13 @@ public sealed class ActivityCollector : IDisposable
         return this;
     }
 
-    private bool ShouldListen(ActivitySource source) =>
-        _sourceFilter is null || _sourceFilter.Contains(source.Name);
+    private bool ShouldListen(ActivitySource source)
+    {
+        return _sourceFilter is null || _sourceFilter.Contains(source.Name);
+    }
 
-    private static ActivitySamplingResult SampleAlways(ref ActivityCreationOptions<ActivityContext> options) =>
-        ActivitySamplingResult.AllDataAndRecorded;
+    private static ActivitySamplingResult SampleAlways(ref ActivityCreationOptions<ActivityContext> options)
+    {
+        return ActivitySamplingResult.AllDataAndRecorded;
+    }
 }

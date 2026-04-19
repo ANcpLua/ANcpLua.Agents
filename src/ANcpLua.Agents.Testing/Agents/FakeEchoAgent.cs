@@ -26,10 +26,7 @@ public sealed class FakeEchoAgent(
     {
         foreach (var message in messages)
         {
-            if (message.Role != ChatRole.User || string.IsNullOrEmpty(message.Text))
-            {
-                continue;
-            }
+            if (message.Role != ChatRole.User || string.IsNullOrEmpty(message.Text)) continue;
 
             yield return new AgentResponseUpdate
             {
@@ -37,7 +34,7 @@ public sealed class FakeEchoAgent(
                 Role = ChatRole.Assistant,
                 AuthorName = Name ?? Id,
                 CreatedAt = Time.GetUtcNow(),
-                Contents = [new TextContent(prefix is null ? message.Text : prefix + message.Text)],
+                Contents = [new TextContent(prefix is null ? message.Text : prefix + message.Text)]
             };
 
             await Task.Yield();

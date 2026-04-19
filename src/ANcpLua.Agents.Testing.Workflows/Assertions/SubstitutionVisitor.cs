@@ -10,5 +10,7 @@ namespace ANcpLua.Agents.Testing.Workflows;
 internal sealed class SubstitutionVisitor(ParameterExpression parameter, Expression substitution) : ExpressionVisitor
 {
     protected override Expression VisitParameter(ParameterExpression node)
-        => node.Name == parameter.Name ? substitution : base.VisitParameter(node);
+    {
+        return node.Name == parameter.Name ? substitution : base.VisitParameter(node);
+    }
 }

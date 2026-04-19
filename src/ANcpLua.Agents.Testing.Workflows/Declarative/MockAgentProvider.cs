@@ -1,12 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Source: Microsoft.Agents.AI.Workflows.Declarative.UnitTests/MockAgentProvider.cs
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.AI;
 using Moq;
 
 namespace ANcpLua.Agents.Testing.Workflows;
@@ -16,21 +10,17 @@ namespace ANcpLua.Agents.Testing.Workflows;
 // hand-fake would be heavier than reading from Moq.Verify.
 internal sealed class MockAgentProvider : Mock<ResponseAgentProvider>
 {
-    public IList<string> ExistingConversationIds { get; } = [];
-
-    public List<ChatMessage> TestMessages { get; set; } = [];
-
     public MockAgentProvider()
     {
-        this.Setup(p => p.CreateConversationAsync(It.IsAny<CancellationToken>()))
-            .Returns(() => Task.FromResult(this.CreateConversationId()));
+        Setup(p => p.CreateConversationAsync(It.IsAny<CancellationToken>()))
+            .Returns(() => Task.FromResult(CreateConversationId()));
 
-        var testMessages = this.CreateMessages();
+        var testMessages = CreateMessages();
 
-        this.Setup(p => p.GetMessageAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        Setup(p => p.GetMessageAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult(testMessages.First()));
 
-        this.Setup(p => p.GetMessagesAsync(
+        Setup(p => p.GetMessagesAsync(
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
                 It.IsAny<string?>(),
@@ -39,41 +29,43 @@ internal sealed class MockAgentProvider : Mock<ResponseAgentProvider>
                 It.IsAny<CancellationToken>()))
             .Returns(ToAsyncEnumerable(testMessages));
 
-        this.Setup(p => p.CreateMessageAsync(
+        Setup(p => p.CreateMessageAsync(
                 It.IsAny<string>(),
                 It.IsAny<ChatMessage>(),
                 It.IsAny<CancellationToken>()))
-            .Returns<string, ChatMessage, CancellationToken>((_, message, _) => Task.FromResult(this.Capture(message)));
+            .Returns<string, ChatMessage, CancellationToken>((_, message, _) => Task.FromResult(Capture(message)));
     }
+
+    public IList<string> ExistingConversationIds { get; } = [];
+
+    public List<ChatMessage> TestMessages { get; set; } = [];
 
     private string CreateConversationId()
     {
-        string id = Guid.NewGuid().ToString("N");
-        this.ExistingConversationIds.Add(id);
+        var id = Guid.NewGuid().ToString("N");
+        ExistingConversationIds.Add(id);
         return id;
     }
 
     private ChatMessage Capture(ChatMessage message)
     {
-        this.TestMessages.Add(message);
+        TestMessages.Add(message);
         return message;
     }
 
     private List<ChatMessage> CreateMessages()
     {
         const int MessageCount = 5;
-        this.TestMessages = Enumerable.Range(1, MessageCount)
-            .Select(i => new ChatMessage(ChatRole.User, $"Test message {i}") { MessageId = Guid.NewGuid().ToString("N") })
+        TestMessages = Enumerable.Range(1, MessageCount)
+            .Select(i => new ChatMessage(ChatRole.User, $"Test message {i}")
+                { MessageId = Guid.NewGuid().ToString("N") })
             .ToList();
-        return this.TestMessages;
+        return TestMessages;
     }
 
     private static async IAsyncEnumerable<ChatMessage> ToAsyncEnumerable(IEnumerable<ChatMessage> messages)
     {
-        foreach (var message in messages)
-        {
-            yield return message;
-        }
+        foreach (var message in messages) yield return message;
         await Task.CompletedTask;
     }
 }

@@ -14,9 +14,9 @@ public sealed class Testcase
     [JsonConstructor]
     public Testcase(string description, TestcaseSetup setup, TestcaseValidation validation)
     {
-        this.Description = description;
-        this.Setup = setup;
-        this.Validation = validation;
+        Description = description;
+        Setup = setup;
+        Validation = validation;
     }
 
     public string Description { get; }
@@ -31,7 +31,7 @@ public sealed class TestcaseSetup
     [JsonConstructor]
     public TestcaseSetup(TestcaseInput input)
     {
-        this.Input = input;
+        Input = input;
     }
 
     public TestcaseInput Input { get; }
@@ -44,8 +44,8 @@ public sealed class TestcaseInput
     [JsonConstructor]
     public TestcaseInput(string type, string value)
     {
-        this.Type = type;
-        this.Value = value;
+        Type = type;
+        Value = value;
     }
 
     public string Type { get; }
@@ -57,9 +57,9 @@ public sealed class TestcaseValidation
     [JsonConstructor]
     public TestcaseValidation(int conversationCount, int minActionCount, int minResponseCount)
     {
-        this.ConversationCount = conversationCount;
-        this.MinActionCount = minActionCount;
-        this.MinResponseCount = minResponseCount;
+        ConversationCount = conversationCount;
+        MinActionCount = minActionCount;
+        MinResponseCount = minResponseCount;
     }
 
     public TestcaseValidationActions Actions { get; init; } = TestcaseValidationActions.Empty;
@@ -74,13 +74,13 @@ public sealed class TestcaseValidation
 
 public sealed class TestcaseValidationActions
 {
-    public static TestcaseValidationActions Empty { get; } = new([]);
-
     [JsonConstructor]
     public TestcaseValidationActions(IList<string> start)
     {
-        this.Start = start;
+        Start = start;
     }
+
+    public static TestcaseValidationActions Empty { get; } = new([]);
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public IList<string> Start { get; }

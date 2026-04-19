@@ -21,9 +21,9 @@ namespace ANcpLua.Agents.Testing.ChatClients;
 /// </remarks>
 public sealed class FakeChatClient : IChatClient
 {
+    private readonly List<ChatClientCall> _calls = [];
     private readonly Lock _lock = new();
     private readonly Queue<object> _responses = new(); // PreparedResponse | ChatResponseUpdate[] | Exception
-    private readonly List<ChatClientCall> _calls = [];
     private int _callIndex;
     private Func<RequestContext, PreparedResponse>? _fallbackFactory;
 
@@ -85,7 +85,7 @@ public sealed class FakeChatClient : IChatClient
             Exception ex => Task.FromException<ChatResponse>(ex),
             ChatResponseUpdate[] updates => Task.FromResult(CreateResponseFromUpdates(updates)),
             PreparedResponse prepared => Task.FromResult(CreateResponse(prepared)),
-            _ => Task.FromResult(CreateResponse(CreatePreparedResponse([new TextContent(string.Empty)]))),
+            _ => Task.FromResult(CreateResponse(CreatePreparedResponse([new TextContent(string.Empty)])))
         };
     }
 
@@ -114,9 +114,7 @@ public sealed class FakeChatClient : IChatClient
 
             case PreparedResponse prepared:
                 await foreach (var update in StreamPreparedResponse(prepared, cancellationToken).ConfigureAwait(false))
-                {
                     yield return update;
-                }
 
                 yield break;
 
@@ -354,7 +352,7 @@ public sealed class FakeChatClient : IChatClient
         {
             FinishReason = prepared.FinishReason,
             Usage = prepared.Usage,
-            ModelId = prepared.ModelId,
+            ModelId = prepared.ModelId
         };
     }
 
@@ -388,7 +386,7 @@ public sealed class FakeChatClient : IChatClient
         return new ChatResponse(new ChatMessage(ChatRole.Assistant, [.. contents]))
         {
             FinishReason = ChatFinishReason.Stop,
-            Usage = usage,
+            Usage = usage
         };
     }
 
@@ -401,13 +399,11 @@ public sealed class FakeChatClient : IChatClient
         if (expanded.Count == 0)
         {
             if (prepared.Usage is not null)
-            {
                 yield return new ChatResponseUpdate
                 {
                     Contents = [new UsageContent(prepared.Usage)],
-                    Role = ChatRole.Assistant,
+                    Role = ChatRole.Assistant
                 };
-            }
 
             yield break;
         }
@@ -424,7 +420,7 @@ public sealed class FakeChatClient : IChatClient
             yield return new ChatResponseUpdate
             {
                 Contents = updateContents,
-                Role = ChatRole.Assistant,
+                Role = ChatRole.Assistant
             };
 
             await Task.Yield();

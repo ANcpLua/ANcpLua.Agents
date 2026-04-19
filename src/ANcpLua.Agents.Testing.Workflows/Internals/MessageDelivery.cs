@@ -14,20 +14,19 @@ internal sealed class MessageDelivery
     {
         ArgumentNullException.ThrowIfNull(envelope);
         ArgumentNullException.ThrowIfNull(targetId);
-        this.Envelope = envelope;
-        this.TargetId = targetId;
+        Envelope = envelope;
+        TargetId = targetId;
     }
 
     internal MessageDelivery(MessageEnvelope envelope, Executor target)
         : this(envelope, target.Id)
     {
         ArgumentNullException.ThrowIfNull(target);
-        this.TargetCache = target;
+        TargetCache = target;
     }
 
     public string TargetId { get; }
     public MessageEnvelope Envelope { get; }
 
-    [JsonIgnore]
-    internal Executor? TargetCache { get; set; }
+    [JsonIgnore] internal Executor? TargetCache { get; set; }
 }

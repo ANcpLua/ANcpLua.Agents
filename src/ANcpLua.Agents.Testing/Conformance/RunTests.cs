@@ -8,7 +8,8 @@ using Xunit;
 namespace ANcpLua.Agents.Testing.Conformance;
 
 /// <summary>
-///     Provider-agnostic conformance tests for <see cref="AIAgent.RunAsync(AgentSession?,AgentRunOptions?,CancellationToken)" />.
+///     Provider-agnostic conformance tests for
+///     <see cref="AIAgent.RunAsync(AgentSession?,AgentRunOptions?,CancellationToken)" />.
 ///     Inherit this class with a concrete <typeparamref name="TFixture" /> to run all five tests
 ///     against a specific provider — no per-provider duplication.
 /// </summary>
@@ -86,7 +87,7 @@ public abstract class RunTests<TFixture>(Func<TFixture> createFixture) : AgentTe
         ChatMessage[] messages =
         [
             new(ChatRole.User, "Hello."),
-            new(ChatRole.User, "What is the capital of France."),
+            new(ChatRole.User, "What is the capital of France.")
         ];
 
         var response = await agent.RunAsync(

@@ -8,7 +8,9 @@ namespace ANcpLua.Agents.Testing.Workflows.Internals;
 /// <summary>Minimal stub — TestRunContext returns WorkflowTelemetryContext.Disabled to opt out of telemetry.</summary>
 internal sealed class WorkflowTelemetryContext
 {
-    public static WorkflowTelemetryContext Disabled { get; } = new();
+    private WorkflowTelemetryContext()
+    {
+    }
 
-    private WorkflowTelemetryContext() { }
+    public static WorkflowTelemetryContext Disabled { get; } = new();
 }

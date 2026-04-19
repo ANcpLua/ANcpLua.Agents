@@ -23,7 +23,10 @@ public sealed class FakeReplayAgent(
     public IReadOnlyList<ChatMessage> Messages { get; } = ValidateNoDuplicateConsecutiveIds(messages) ?? [];
 
     /// <summary>Build a replay agent from plain text strings, one assistant message per string.</summary>
-    public static FakeReplayAgent FromStrings(params string[] texts) => new(texts.ToChatMessages());
+    public static FakeReplayAgent FromStrings(params string[] texts)
+    {
+        return new FakeReplayAgent(texts.ToChatMessages());
+    }
 
     /// <inheritdoc />
     protected override async IAsyncEnumerable<AgentResponseUpdate> StreamResponseAsync(
@@ -36,7 +39,6 @@ public sealed class FakeReplayAgent(
         foreach (var message in Messages)
         {
             foreach (var content in message.Contents)
-            {
                 yield return new AgentResponseUpdate
                 {
                     AgentId = Id,
@@ -44,9 +46,8 @@ public sealed class FakeReplayAgent(
                     MessageId = message.MessageId,
                     ResponseId = responseId,
                     Role = message.Role,
-                    Contents = [content],
+                    Contents = [content]
                 };
-            }
 
             await Task.Yield();
         }
@@ -54,18 +55,13 @@ public sealed class FakeReplayAgent(
 
     private static IReadOnlyList<ChatMessage>? ValidateNoDuplicateConsecutiveIds(IReadOnlyList<ChatMessage>? candidates)
     {
-        if (candidates is null)
-        {
-            return null;
-        }
+        if (candidates is null) return null;
 
         string? previous = null;
         foreach (var message in candidates)
         {
             if (previous is not null && string.Equals(previous, message.MessageId, StringComparison.Ordinal))
-            {
                 throw new ArgumentException("Duplicate consecutive message ids are not allowed.", nameof(candidates));
-            }
 
             previous = message.MessageId;
         }

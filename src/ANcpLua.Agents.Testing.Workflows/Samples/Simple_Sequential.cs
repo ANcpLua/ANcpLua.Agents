@@ -5,7 +5,7 @@
 namespace ANcpLua.Agents.Testing.Workflows.Samples;
 
 /// <summary>
-/// Two executors chained by an edge, output yielded from the final executor.
+///     Two executors chained by an edge, output yielded from the final executor.
 /// </summary>
 public static class SimpleSequentialSample
 {
@@ -23,15 +23,19 @@ public static class SimpleSequentialSample
 
     internal sealed class UppercaseExecutor() : Executor<string, string>(nameof(UppercaseExecutor))
     {
-        public override ValueTask<string> HandleAsync(string message, IWorkflowContext context, CancellationToken cancellationToken = default)
-            => new(message.ToUpperInvariant());
+        public override ValueTask<string> HandleAsync(string message, IWorkflowContext context,
+            CancellationToken cancellationToken = default)
+        {
+            return new ValueTask<string>(message.ToUpperInvariant());
+        }
     }
 
     internal sealed class ReverseTextExecutor() : Executor<string, string>(nameof(ReverseTextExecutor))
     {
-        public override async ValueTask<string> HandleAsync(string message, IWorkflowContext context, CancellationToken cancellationToken = default)
+        public override async ValueTask<string> HandleAsync(string message, IWorkflowContext context,
+            CancellationToken cancellationToken = default)
         {
-            string result = string.Concat(message.Reverse());
+            var result = string.Concat(message.Reverse());
             await context.YieldOutputAsync(result, cancellationToken).ConfigureAwait(false);
             return result;
         }

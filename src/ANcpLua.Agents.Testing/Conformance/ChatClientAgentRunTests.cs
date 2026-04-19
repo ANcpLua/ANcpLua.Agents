@@ -8,10 +8,12 @@ using Xunit;
 namespace ANcpLua.Agents.Testing.Conformance;
 
 /// <summary>
-///     <see cref="ChatClientAgent" />-specific conformance tests in addition to those in <see cref="RunTests{TFixture}" />.
+///     <see cref="ChatClientAgent" />-specific conformance tests in addition to those in <see cref="RunTests{TFixture}" />
+///     .
 ///     Exercises instructions-only runs and end-to-end function calling against the <see cref="MenuPlugin" />.
 /// </summary>
-public abstract class ChatClientAgentRunTests<TFixture>(Func<TFixture> createFixture) : AgentTestBase<TFixture>(createFixture)
+public abstract class ChatClientAgentRunTests<TFixture>(Func<TFixture> createFixture)
+    : AgentTestBase<TFixture>(createFixture)
     where TFixture : IChatClientAgentFixture
 {
     /// <summary>Conformance test.</summary>
@@ -20,7 +22,8 @@ public abstract class ChatClientAgentRunTests<TFixture>(Func<TFixture> createFix
     {
         var ct = TestContext.Current.CancellationToken;
         var agent = await Fixture.CreateChatClientAgentAsync(
-            instructions: "ALWAYS RESPOND WITH 'Computer says no', even if there was no user input.").ConfigureAwait(false);
+                instructions: "ALWAYS RESPOND WITH 'Computer says no', even if there was no user input.")
+            .ConfigureAwait(false);
         var session = await agent.CreateSessionAsync(ct).ConfigureAwait(false);
         await using var _agentCleanup = new AgentCleanup(agent, Fixture).ConfigureAwait(false);
         await using var _sessionCleanup = new SessionCleanup(session, Fixture).ConfigureAwait(false);
@@ -44,14 +47,14 @@ public abstract class ChatClientAgentRunTests<TFixture>(Func<TFixture> createFix
             ("What is the special soup?", "Clam Chowder"),
             ("What is the special drink?", "Chai Tea"),
             ("What is the special salad?", "Cobb Salad"),
-            ("Thank you", string.Empty),
+            ("Thank you", string.Empty)
         ];
 
         var agent = await Fixture.CreateChatClientAgentAsync(
             aiTools:
             [
                 AIFunctionFactory.Create(MenuPlugin.GetSpecials),
-                AIFunctionFactory.Create(MenuPlugin.GetItemPrice),
+                AIFunctionFactory.Create(MenuPlugin.GetItemPrice)
             ]).ConfigureAwait(false);
         var session = await agent.CreateSessionAsync(ct).ConfigureAwait(false);
         await using var _agentCleanup = new AgentCleanup(agent, Fixture).ConfigureAwait(false);

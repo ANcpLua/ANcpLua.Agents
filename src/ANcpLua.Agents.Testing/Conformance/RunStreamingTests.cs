@@ -28,9 +28,9 @@ public abstract class RunStreamingTests<TFixture>(Func<TFixture> createFixture) 
         await using var _ = new SessionCleanup(session, Fixture).ConfigureAwait(false);
 
         await foreach (var _update in agent.RunStreamingAsync(
-            session,
-            await AgentRunOptionsFactory.Invoke().ConfigureAwait(false),
-            ct).ConfigureAwait(false))
+                           session,
+                           await AgentRunOptionsFactory.Invoke().ConfigureAwait(false),
+                           ct).ConfigureAwait(false))
         {
             // Drain to surface any provider exceptions.
         }
@@ -85,8 +85,10 @@ public abstract class RunStreamingTests<TFixture>(Func<TFixture> createFixture) 
         await using var _ = new SessionCleanup(session, Fixture).ConfigureAwait(false);
 
         var options = await AgentRunOptionsFactory.Invoke().ConfigureAwait(false);
-        var first = await ConcatStreamAsync(agent.RunStreamingAsync(FranceQuestion, session, options, ct), ct).ConfigureAwait(false);
-        var second = await ConcatStreamAsync(agent.RunStreamingAsync(AustriaQuestion, session, options, ct), ct).ConfigureAwait(false);
+        var first = await ConcatStreamAsync(agent.RunStreamingAsync(FranceQuestion, session, options, ct), ct)
+            .ConfigureAwait(false);
+        var second = await ConcatStreamAsync(agent.RunStreamingAsync(AustriaQuestion, session, options, ct), ct)
+            .ConfigureAwait(false);
 
         Assert.Contains("Paris", first, StringComparison.Ordinal);
         Assert.Contains("Vienna", second, StringComparison.Ordinal);
@@ -97,13 +99,12 @@ public abstract class RunStreamingTests<TFixture>(Func<TFixture> createFixture) 
         Assert.Equal(2, history.Count(static m => m.Role == ChatRole.Assistant));
     }
 
-    private static async Task<string> ConcatStreamAsync(IAsyncEnumerable<AgentResponseUpdate> updates, CancellationToken cancellationToken)
+    private static async Task<string> ConcatStreamAsync(IAsyncEnumerable<AgentResponseUpdate> updates,
+        CancellationToken cancellationToken)
     {
         var builder = new StringBuilder();
         await foreach (var update in updates.WithCancellation(cancellationToken).ConfigureAwait(false))
-        {
             builder.Append(update.Text);
-        }
 
         return builder.ToString();
     }

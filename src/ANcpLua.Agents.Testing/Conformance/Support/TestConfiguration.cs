@@ -6,22 +6,28 @@ using Microsoft.Extensions.Configuration;
 namespace ANcpLua.Agents.Testing.Conformance.Support;
 
 /// <summary>
-/// Helper for loading test configuration settings.
-/// Reads from <c>testsettings.development.json</c> (optional), environment variables, then UserSecrets.
+///     Helper for loading test configuration settings.
+///     Reads from <c>testsettings.development.json</c> (optional), environment variables, then UserSecrets.
 /// </summary>
 public sealed class TestConfiguration
 {
     private static readonly IConfiguration s_configuration = new ConfigurationBuilder()
-        .AddJsonFile(path: "testsettings.development.json", optional: true)
+        .AddJsonFile("testsettings.development.json", true)
         .AddEnvironmentVariables()
         .AddUserSecrets<TestConfiguration>()
         .Build();
 
     /// <summary>Gets a configuration value by its flat key name.</summary>
-    public static string? GetValue(string key) => s_configuration[key];
+    public static string? GetValue(string key)
+    {
+        return s_configuration[key];
+    }
 
     /// <summary>Gets a required configuration value by its flat key name.</summary>
     /// <exception cref="InvalidOperationException">Thrown if the configuration value is not found.</exception>
-    public static string GetRequiredValue(string key) =>
-        s_configuration[key] ?? throw new InvalidOperationException($"Configuration key '{key}' is required but was not found.");
+    public static string GetRequiredValue(string key)
+    {
+        return s_configuration[key] ??
+               throw new InvalidOperationException($"Configuration key '{key}' is required but was not found.");
+    }
 }

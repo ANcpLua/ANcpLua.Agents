@@ -19,9 +19,9 @@ public class OllamaChatCompletionFixture : IChatClientAgentFixture
     private ChatClientAgent _agent = null!;
     private OllamaApiClient? _ollamaClient;
 
-    public AIAgent Agent => this._agent;
+    public AIAgent Agent => _agent;
 
-    public IChatClient ChatClient => this._agent.ChatClient;
+    public IChatClient ChatClient => _agent.ChatClient;
 
     public Task<IReadOnlyList<ChatMessage>> GetChatHistoryAsync(AIAgent agent, AgentSession session)
     {
@@ -38,25 +38,34 @@ public class OllamaChatCompletionFixture : IChatClientAgentFixture
         var endpoint = TestConfiguration.GetValue(TestSettings.OllamaEndpoint) ?? DefaultEndpoint;
         var model = TestConfiguration.GetRequiredValue(TestSettings.OllamaChatModelName);
 
-        this._ollamaClient = new OllamaApiClient(new Uri(endpoint), model);
-        IChatClient chatClient = this._ollamaClient;
+        _ollamaClient = new OllamaApiClient(new Uri(endpoint), model);
+        IChatClient chatClient = _ollamaClient;
 
-        return Task.FromResult(new ChatClientAgent(chatClient, options: new ChatClientAgentOptions
+        return Task.FromResult(new ChatClientAgent(chatClient, new ChatClientAgentOptions
         {
             Name = name,
-            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools, ModelId = model },
+            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools, ModelId = model }
         }));
     }
 
-    public Task DeleteAgentAsync(ChatClientAgent agent) => Task.CompletedTask;
+    public Task DeleteAgentAsync(ChatClientAgent agent)
+    {
+        return Task.CompletedTask;
+    }
 
-    public Task DeleteSessionAsync(AgentSession session) => Task.CompletedTask;
+    public Task DeleteSessionAsync(AgentSession session)
+    {
+        return Task.CompletedTask;
+    }
 
-    public async ValueTask InitializeAsync() => this._agent = await this.CreateChatClientAgentAsync().ConfigureAwait(false);
+    public async ValueTask InitializeAsync()
+    {
+        _agent = await CreateChatClientAgentAsync().ConfigureAwait(false);
+    }
 
     public ValueTask DisposeAsync()
     {
-        this._ollamaClient?.Dispose();
+        _ollamaClient?.Dispose();
         GC.SuppressFinalize(this);
         return default;
     }

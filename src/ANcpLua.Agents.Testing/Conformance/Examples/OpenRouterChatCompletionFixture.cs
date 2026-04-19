@@ -4,6 +4,7 @@
 // OpenRouter is a meta-provider that fronts 100+ models behind an OpenAI-compatible
 // ChatCompletion endpoint, so we reuse the OpenAI SDK with a custom base URL.
 
+using System.ClientModel;
 using ANcpLua.Agents.Testing.Conformance.Support;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
@@ -17,9 +18,9 @@ public class OpenRouterChatCompletionFixture : IChatClientAgentFixture
 
     private ChatClientAgent _agent = null!;
 
-    public AIAgent Agent => this._agent;
+    public AIAgent Agent => _agent;
 
-    public IChatClient ChatClient => this._agent.ChatClient;
+    public IChatClient ChatClient => _agent.ChatClient;
 
     public Task<IReadOnlyList<ChatMessage>> GetChatHistoryAsync(AIAgent agent, AgentSession session)
     {
@@ -38,22 +39,31 @@ public class OpenRouterChatCompletionFixture : IChatClientAgentFixture
         var baseUrl = TestConfiguration.GetValue(TestSettings.OpenRouterBaseUrl) ?? DefaultBaseUrl;
 
         var options = new OpenAIClientOptions { Endpoint = new Uri(baseUrl) };
-        IChatClient chatClient = new OpenAIClient(new System.ClientModel.ApiKeyCredential(apiKey), options)
+        var chatClient = new OpenAIClient(new ApiKeyCredential(apiKey), options)
             .GetChatClient(model)
             .AsIChatClient();
 
-        return Task.FromResult(new ChatClientAgent(chatClient, options: new ChatClientAgentOptions
+        return Task.FromResult(new ChatClientAgent(chatClient, new ChatClientAgentOptions
         {
             Name = name,
-            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools },
+            ChatOptions = new ChatOptions { Instructions = instructions, Tools = aiTools }
         }));
     }
 
-    public Task DeleteAgentAsync(ChatClientAgent agent) => Task.CompletedTask;
+    public Task DeleteAgentAsync(ChatClientAgent agent)
+    {
+        return Task.CompletedTask;
+    }
 
-    public Task DeleteSessionAsync(AgentSession session) => Task.CompletedTask;
+    public Task DeleteSessionAsync(AgentSession session)
+    {
+        return Task.CompletedTask;
+    }
 
-    public async ValueTask InitializeAsync() => this._agent = await this.CreateChatClientAgentAsync().ConfigureAwait(false);
+    public async ValueTask InitializeAsync()
+    {
+        _agent = await CreateChatClientAgentAsync().ConfigureAwait(false);
+    }
 
     public ValueTask DisposeAsync()
     {

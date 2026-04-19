@@ -6,12 +6,14 @@ namespace ANcpLua.Agents.Testing.Workflows.Runtime;
 
 internal static class ExecutionExtensions
 {
-    public static InProcessExecutionEnvironment ToWorkflowExecutionEnvironment(this ExecutionEnvironment environment) =>
-        environment switch
+    public static InProcessExecutionEnvironment ToWorkflowExecutionEnvironment(this ExecutionEnvironment environment)
+    {
+        return environment switch
         {
             ExecutionEnvironment.InProcess_OffThread => InProcessExecution.OffThread,
             ExecutionEnvironment.InProcess_Lockstep => InProcessExecution.Lockstep,
             ExecutionEnvironment.InProcess_Concurrent => InProcessExecution.Concurrent,
             _ => throw new InvalidOperationException($"Unknown execution environment {environment}")
         };
+    }
 }

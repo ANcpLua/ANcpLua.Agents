@@ -16,5 +16,7 @@ public sealed class FakeTextStreamingAgent(params string[] chunks) : FakeAgentBa
         IEnumerable<ChatMessage> messages,
         AgentRunOptions? options,
         CancellationToken cancellationToken)
-        => StreamChunksAsync(chunks, cancellationToken);
+    {
+        return StreamChunksAsync(chunks, cancellationToken);
+    }
 }
