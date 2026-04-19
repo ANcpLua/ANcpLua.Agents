@@ -68,20 +68,23 @@ jobs:
       - name: Build
         run: dotnet build ANcpLua.Agents.slnx -c Release --no-restore -p:Version=${{ needs.version.outputs.version }}
 
-      # ANcpLua.Agents + ANcpLua.Agents.Testing.Workflows pack stable.
+      # Runtime helpers — no MAF prerelease deps, packs stable.
       - name: Pack (stable)
         if: matrix.os == 'ubuntu-latest'
-        run: |
-          dotnet pack src/ANcpLua.Agents/ANcpLua.Agents.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
-          dotnet pack src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
+        run: dotnet pack src/ANcpLua.Agents/ANcpLua.Agents.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
 
-      # ANcpLua.Agents.Testing depends on Microsoft.Agents.AI.Hosting.AGUI.AspNetCore
-      # which only ships as prerelease on nuget.org. NU5104 forbids stable packages
-      # from depending on prerelease. Append -preview.1 so this package stays on
-      # prerelease feeds until MAF ships AGUI.AspNetCore stable.
-      - name: Pack (Testing — preview)
+      # Both test packages pull MAF prereleases:
+      #   .Testing         → Microsoft.Agents.AI.Hosting.AGUI.AspNetCore 1.0.0-preview.*
+      #   .Testing.Workflows → Microsoft.Agents.AI.Workflows.Declarative 1.0.0-rc6
+      #                       + transitive AGUI via ProjectReference to .Testing
+      # NU5104 forbids stable packages from depending on prerelease. Append
+      # -preview.1 suffix so both ship on prerelease feeds until upstream MAF
+      # ships these two transitives as stable.
+      - name: Pack (test packages — preview)
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet pack src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
+        run: |
+          dotnet pack src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
+          dotnet pack src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
 
       - name: Upload artifacts
         if: matrix.os == 'ubuntu-latest'
