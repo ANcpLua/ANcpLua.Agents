@@ -28,7 +28,7 @@ internal static class SubworkflowSample
         IWorkflowExecutionEnvironment environment,
         List<string> textsToProcess)
     {
-        var processText = ProcessTextAsync;
+        Func<TextProcessingRequest, IWorkflowContext, CancellationToken, ValueTask> processText = ProcessTextAsync;
         var innerBinding = processText.BindAsExecutor("TextProcessor", threadsafe: true);
 
         var innerWorkflow = new WorkflowBuilder(innerBinding).WithOutputFrom(innerBinding).Build();
