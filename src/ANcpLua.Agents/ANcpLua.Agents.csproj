@@ -10,6 +10,8 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>maf;agents;microsoft-agents;helpers;console;workflows</PackageTags>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!-- Method-level XML docs are optional — names self-document console-rendering helpers. -->
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
