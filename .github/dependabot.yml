@@ -7,6 +7,10 @@ updates:
       day: "wednesday"
     commit-message:
       prefix: "deps"
+    # Stay on stable SDK — ignore preview/RC/alpha bumps. Manual opt-in only.
+    ignore:
+      - dependency-name: "dotnet-sdk"
+        versions: ["~*.pre.*", "~*-preview*", "~*-rc*", "~*-alpha*", "~*-beta*"]
 
   - package-ecosystem: "nuget"
     directory: "/"
