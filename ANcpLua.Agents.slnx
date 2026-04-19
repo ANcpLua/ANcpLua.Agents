@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ANcpLua.Agents/ANcpLua.Agents.csproj" />
+    <Project Path="src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj" />
+    <Project Path="src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj" />
+  </Folder>
+</Solution>

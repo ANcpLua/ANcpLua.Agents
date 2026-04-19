@@ -1,0 +1,55 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)Version.props"/>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup Label="Roslyn.Utilities (sibling repo)">
+    <PackageVersion Include="ANcpLua.Roslyn.Utilities" Version="$(ANcpLuaRoslynUtilitiesVersion)"/>
+    <PackageVersion Include="ANcpLua.Roslyn.Utilities.Testing" Version="$(ANcpLuaRoslynUtilitiesTestingVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Microsoft.Agents (MAF)">
+    <PackageVersion Include="Microsoft.Agents.AI" Version="$(MicrosoftAgentsAIVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Hosting" Version="$(MicrosoftAgentsAIVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore" Version="$(MicrosoftAgentsAIHostingAGUIAspNetCoreVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Workflows" Version="$(MicrosoftAgentsAIWorkflowsVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Workflows.Declarative" Version="$(MicrosoftAgentsAIWorkflowsDeclarativeVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Anthropic" Version="$(MicrosoftAgentsAIAnthropicVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.OpenAI" Version="$(MicrosoftAgentsAIVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Microsoft.Extensions.AI">
+    <PackageVersion Include="Microsoft.Extensions.AI" Version="$(MicrosoftExtensionsAIVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="$(MicrosoftExtensionsAIAbstractionsVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="$(MicrosoftExtensionsAIOpenAIVersion)"/>
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(MicrosoftBclAsyncInterfacesVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="LLM Providers (Conformance fixtures)">
+    <PackageVersion Include="OpenAI" Version="$(OpenAIVersion)"/>
+    <PackageVersion Include="Azure.AI.OpenAI" Version="$(AzureAIOpenAIVersion)"/>
+    <PackageVersion Include="Azure.Identity" Version="$(AzureIdentityVersion)"/>
+    <PackageVersion Include="Anthropic.SDK" Version="$(AnthropicSDKVersion)"/>
+    <PackageVersion Include="OllamaSharp" Version="$(OllamaSharpVersion)"/>
+    <PackageVersion Include="Mscc.GenerativeAI" Version="$(MsccGenerativeAIVersion)"/>
+    <PackageVersion Include="Mscc.GenerativeAI.Microsoft" Version="$(MsccGenerativeAIMicrosoftVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Testing">
+    <PackageVersion Include="xunit.v3" Version="$(XunitV3Version)"/>
+    <PackageVersion Include="xunit.v3.extensibility.core" Version="$(XunitV3Version)"/>
+    <PackageVersion Include="xunit.v3.assert" Version="$(XunitV3Version)"/>
+    <PackageVersion Include="AwesomeAssertions" Version="$(AwesomeAssertionsVersion)"/>
+    <PackageVersion Include="Microsoft.Testing.Platform" Version="$(MTPExtensionsVersion)"/>
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspNetCoreVersion)"/>
+    <PackageVersion Include="Moq" Version="$(MoqVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Roslyn (SyntaxTreeFluentExtensions + analyzer framework)">
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)"/>
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynAnalyzersVersion)"/>
+  </ItemGroup>
+</Project>
