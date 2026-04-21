@@ -35,3 +35,4 @@ docs/api/*.md
 .claude/journal/
 .claude/elegance_pipeline/
 .LANE-*
+.worktrees/
