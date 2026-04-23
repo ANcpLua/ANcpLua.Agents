@@ -13,7 +13,7 @@
 
   <ItemGroup Label="Microsoft.Agents (MAF)">
     <PackageVersion Include="Microsoft.Agents.AI" Version="$(MicrosoftAgentsAIVersion)"/>
-    <PackageVersion Include="Microsoft.Agents.AI.Hosting" Version="$(MicrosoftAgentsAIVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Hosting" Version="$(MicrosoftAgentsAIHostingVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore" Version="$(MicrosoftAgentsAIHostingAGUIAspNetCoreVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Workflows" Version="$(MicrosoftAgentsAIWorkflowsVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Workflows.Declarative" Version="$(MicrosoftAgentsAIWorkflowsDeclarativeVersion)"/>

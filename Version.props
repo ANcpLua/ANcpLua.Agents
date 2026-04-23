@@ -18,12 +18,16 @@
     <ANcpLuaRoslynUtilitiesTestingVersion>1.56.1</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF)">
-    <MicrosoftAgentsAIVersion>1.1.0</MicrosoftAgentsAIVersion>
-    <MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>1.0.0-preview.260402.1</MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>
-    <MicrosoftAgentsAIWorkflowsVersion>1.1.0</MicrosoftAgentsAIWorkflowsVersion>
-    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.0.0-rc6</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
-    <MicrosoftAgentsAIAnthropicVersion>1.1.0-rc1</MicrosoftAgentsAIAnthropicVersion>
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.2)">
+    <!-- Stable 1.2.0: core, abstractions, workflows, OpenAI, Foundry -->
+    <MicrosoftAgentsAIVersion>1.2.0</MicrosoftAgentsAIVersion>
+    <MicrosoftAgentsAIWorkflowsVersion>1.2.0</MicrosoftAgentsAIWorkflowsVersion>
+    <!-- Preview 1.2.0-preview.260421.1: Hosting (no stable exists), AGUI, Anthropic, A2A, hosting satellites -->
+    <MicrosoftAgentsAIHostingVersion>1.2.0-preview.260421.1</MicrosoftAgentsAIHostingVersion>
+    <MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>1.2.0-preview.260421.1</MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>
+    <MicrosoftAgentsAIAnthropicVersion>1.2.0-preview.260421.1</MicrosoftAgentsAIAnthropicVersion>
+    <!-- rc1: Declarative workflows (separate train from core 1.2) -->
+    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.2.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions.AI">
