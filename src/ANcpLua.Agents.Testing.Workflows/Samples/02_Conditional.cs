@@ -1,6 +1,8 @@
 // Conditional fan-out: DetectSpam routes to Respond or Remove by predicate.
 // Source: Sample/02_Simple_Workflow_Condition.cs
 
+using ANcpLua.Roslyn.Utilities;
+
 namespace ANcpLua.Agents.Testing.Workflows.Samples;
 
 internal static class ConditionalSample
@@ -60,7 +62,7 @@ internal sealed class DetectSpamExecutor(string id, string[] spamKeywords)
         _ = context;
         _ = cancellationToken;
         return new ValueTask<bool>(spamKeywords.Any(keyword =>
-            message.AsSpan().IndexOf(keyword.AsSpan(), StringComparison.OrdinalIgnoreCase) >= 0));
+            message.IndexOfIgnoreCase(keyword) >= 0));
     }
 }
 

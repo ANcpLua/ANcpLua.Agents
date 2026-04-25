@@ -63,7 +63,7 @@ public sealed class AgentBudgetEnforcerTests
     }
 
     [Fact]
-    public async Task ReserveToolCall_DisposalDoesNotRollBackToolCallCount()
+    public async Task ReserveToolCall_RollsBackWhenNotCommitted()
     {
         var enforcer = new AgentBudgetEnforcer();
         var policy = Policy(maxToolCalls: 1);
@@ -73,7 +73,7 @@ public sealed class AgentBudgetEnforcerTests
             enforcer.GetToolCallCount("t").Should().Be(1);
         }
 
-        enforcer.GetToolCallCount("t").Should().Be(1);
+        enforcer.GetToolCallCount("t").Should().Be(0);
     }
 
     [Fact]

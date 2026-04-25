@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Source: Microsoft.Agents.AI.Workflows.Generators.UnitTests/SyntaxTreeFluentExtensions.cs
 
+using ANcpLua.Roslyn.Utilities;
 using AwesomeAssertions;
 using AwesomeAssertions.Execution;
 using AwesomeAssertions.Primitives;
@@ -103,7 +104,7 @@ internal sealed class SyntaxTreeAssertions : ObjectAssertions<SyntaxTree, Syntax
 
         var indicies = new int[expectedNesting.Length];
         for (var i = 0; i < expectedNesting.Length; i++)
-            indicies[i] = _syntaxString.AsSpan().IndexOf($"partial class {expectedNesting[i]}".AsSpan(), StringComparison.Ordinal);
+            indicies[i] = _syntaxString.IndexOfOrdinal($"partial class {expectedNesting[i]}");
 
         var runningResult = Contain(0, indicies[0], expectedNesting[0]);
         for (var i = 1; i < expectedNesting.Length; i++)
@@ -115,7 +116,7 @@ internal sealed class SyntaxTreeAssertions : ObjectAssertions<SyntaxTree, Syntax
     private AndConstraint<SyntaxTreeAssertions> Match(string expected, string reason)
     {
         CurrentAssertionChain
-            .ForCondition(_syntaxString.AsSpan().Contains(expected.AsSpan(), StringComparison.Ordinal))
+            .ForCondition(_syntaxString.ContainsOrdinal(expected))
             .BecauseOf(reason)
             .FailWith("Expected {context} to contain {0}{reason}, but it was not found. Actual syntax: {1}", expected,
                 _syntaxString);
@@ -125,7 +126,7 @@ internal sealed class SyntaxTreeAssertions : ObjectAssertions<SyntaxTree, Syntax
     private AndConstraint<SyntaxTreeAssertions> MatchAbsent(string needle, string reason)
     {
         CurrentAssertionChain
-            .ForCondition(!_syntaxString.AsSpan().Contains(needle.AsSpan(), StringComparison.Ordinal))
+            .ForCondition(!_syntaxString.ContainsOrdinal(needle))
             .BecauseOf(reason)
             .FailWith("Expected {context} to not contain {0}{reason}. Actual syntax: {1}", needle, _syntaxString);
         return new AndConstraint<SyntaxTreeAssertions>(this);

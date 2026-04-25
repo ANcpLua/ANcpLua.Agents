@@ -1,5 +1,6 @@
 using System.Text.Json;
 using ANcpLua.Agents.Governance;
+using ANcpLua.Roslyn.Utilities;
 using Microsoft.Extensions.AI;
 
 namespace ANcpLua.Agents.Tests.Governance;
@@ -90,10 +91,10 @@ public sealed class AgentCallGuardTests
         var summary = guard.BuildDiagnosticSummary();
 
         summary.Should().Contain("6/10 tool calls");
-        summary.AsSpan().IndexOf("high".AsSpan(), StringComparison.Ordinal)
-            .Should().BeLessThan(summary.AsSpan().IndexOf("mid".AsSpan(), StringComparison.Ordinal));
-        summary.AsSpan().IndexOf("mid".AsSpan(), StringComparison.Ordinal)
-            .Should().BeLessThan(summary.AsSpan().IndexOf("low".AsSpan(), StringComparison.Ordinal));
+        summary.IndexOfOrdinal("high")
+            .Should().BeLessThan(summary.IndexOfOrdinal("mid"));
+        summary.IndexOfOrdinal("mid")
+            .Should().BeLessThan(summary.IndexOfOrdinal("low"));
     }
 
     [Fact]
@@ -159,5 +160,17 @@ public sealed class AgentCallGuardTests
 
         summary.Should().Contain("0/7 tool calls");
         summary.Should().NotContain("Partial results:");
+    }
+
+    [Fact]
+    public async Task Wrap_JsonElementStringResult_CapturedAsPartialResult()
+    {
+        var guard = new AgentCallGuard(maxToolCalls: 5);
+        var inner = AIFunctionFactory.Create(static () => "hello", new AIFunctionFactoryOptions { Name = "t" });
+        var wrapped = guard.Wrap(inner);
+
+        await wrapped.InvokeAsync(new AIFunctionArguments());
+
+        guard.BuildDiagnosticSummary().ContainsOrdinal("hello").Should().BeTrue();
     }
 }

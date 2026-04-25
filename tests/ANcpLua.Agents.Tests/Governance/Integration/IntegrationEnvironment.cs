@@ -13,7 +13,7 @@ internal static class IntegrationEnvironment
         HasValue(ApiKeyVariable) && HasValue(ModelVariable) && HasValue(EndpointVariable);
 
     public static string SkipReason =>
-        $"Live integration disabled. Set {ApiKeyVariable}, {ModelVariable}, and {EndpointVariable} to run against an OpenAI-compatible endpoint.";
+        $"Live integration disabled. Set {ApiKeyVariable}, {ModelVariable}, and {EndpointVariable} to run against an OpenAI-compatible endpoint. CI wiring tracked at https://github.com/ANcpLua/ANcpLua.Agents/issues/2.";
 
     public static IChatClient CreateClient() =>
         AgentChatClientFactory.TryCreateFromEnvironment()

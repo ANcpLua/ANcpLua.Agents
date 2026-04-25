@@ -136,4 +136,19 @@ public sealed class AgentConcurrencyLimiterTests
         await first.DisposeAsync();
         await second.DisposeAsync();
     }
+
+    [Fact]
+    public async Task GetInUseCount_RespectsPerPolicySize()
+    {
+        using var limiter = new AgentConcurrencyLimiter(defaultLimit: 100);
+        var policy = new AgentToolPolicy(MaxAttempts: 99, MaxToolCalls: 3, RequiredCapabilities: []);
+
+        var first = await limiter.AcquireAsync("t", policy);
+        var second = await limiter.AcquireAsync("t", policy);
+
+        limiter.GetInUseCount("t").Should().Be(2);
+
+        await first.DisposeAsync();
+        await second.DisposeAsync();
+    }
 }

@@ -10,12 +10,14 @@ public sealed class AgentBudgetReservation : IAsyncDisposable
 {
     private readonly AgentBudgetEnforcer _enforcer;
     private readonly string _toolName;
+    private readonly bool _isToolCall;
     private bool _committed;
 
-    internal AgentBudgetReservation(AgentBudgetEnforcer enforcer, string toolName)
+    internal AgentBudgetReservation(AgentBudgetEnforcer enforcer, string toolName, bool isToolCall)
     {
         _enforcer = enforcer;
         _toolName = toolName;
+        _isToolCall = isToolCall;
     }
 
     /// <summary>Marks the reservation as successfully consumed; rollback is skipped on disposal.</summary>
@@ -24,7 +26,7 @@ public sealed class AgentBudgetReservation : IAsyncDisposable
     public ValueTask DisposeAsync()
     {
         if (!_committed)
-            _enforcer.Rollback(_toolName);
+            _enforcer.Rollback(_toolName, _isToolCall);
 
         return ValueTask.CompletedTask;
     }
@@ -54,7 +56,7 @@ public sealed class AgentBudgetEnforcer
             throw new AgentBudgetExceededException(toolName, "MaxAttempts", policy.MaxAttempts, current);
         }
 
-        return new AgentBudgetReservation(this, toolName);
+        return new AgentBudgetReservation(this, toolName, isToolCall: false);
     }
 
     /// <summary>
@@ -71,7 +73,7 @@ public sealed class AgentBudgetEnforcer
             throw new AgentBudgetExceededException(toolName, "MaxToolCalls", policy.MaxToolCalls, current);
         }
 
-        return new AgentBudgetReservation(this, toolName);
+        return new AgentBudgetReservation(this, toolName, isToolCall: true);
     }
 
     /// <summary>Current attempt count for a tool.</summary>
@@ -80,9 +82,12 @@ public sealed class AgentBudgetEnforcer
     /// <summary>Current tool-call count for a tool.</summary>
     public int GetToolCallCount(string toolName) => _toolCallCounts.GetValueOrDefault(toolName);
 
-    /// <summary>Rolls back an uncommitted reservation.</summary>
-    internal void Rollback(string toolName) =>
-        _attemptCounts.AddOrUpdate(toolName, 0, static (_, count) => Math.Max(0, count - 1));
+    /// <summary>Rolls back an uncommitted reservation against the matching counter.</summary>
+    internal void Rollback(string toolName, bool isToolCall)
+    {
+        var counter = isToolCall ? _toolCallCounts : _attemptCounts;
+        counter.AddOrUpdate(toolName, 0, static (_, count) => Math.Max(0, count - 1));
+    }
 
     /// <summary>Resets all counters; intended for the start of a new run.</summary>
     public void Reset()

@@ -56,3 +56,19 @@ Imported from `ANcpLua.NET.Sdk` (global `AGENTS.md`). Key house rules:
 - Foundation Roslyn helpers + netstandard2.0 lib: `ANcpLua/ANcpLua.Roslyn.Utilities`
 - MSBuild SDK + build conventions: `ANcpLua/ANcpLua.NET.Sdk`
 - Analyzers: `ANcpLua/ANcpLua.Analyzers`
+
+## Scope of "outstanding"
+
+"Pre-existing" is not an exclusion. Bugs surfaced during a session are in
+scope — fix them, or list them with an explicit decision (won't fix
+because X), not as "not introduced by me."
+
+Outstanding items require external blockers. An item may remain outstanding
+only if it has:
+(a) an upstream PR/issue link, or
+(b) a ship-date dependency on external code, or
+(c) a cross-repo handoff with linked tracking, or
+(d) an explicit won't-do with technical rationale (analyzer collision,
+    ALC mismatch, protocol violation — not "not worth it").
+
+"Future session" / "out of scope" / "not worth the rework" do not qualify.

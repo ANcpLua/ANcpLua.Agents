@@ -32,7 +32,7 @@ public sealed class AgentConcurrencySlot : IAsyncDisposable
 /// </summary>
 public sealed class AgentConcurrencyLimiter : IDisposable
 {
-    private readonly ConcurrentDictionary<string, SemaphoreSlim> _semaphores = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, SizedSemaphore> _semaphores = new(StringComparer.Ordinal);
     private readonly int _defaultLimit;
     private bool _disposed;
 
@@ -49,9 +49,11 @@ public sealed class AgentConcurrencyLimiter : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
         Guard.NotNullOrWhiteSpace(toolName);
 
-        var semaphore = _semaphores.GetOrAdd(toolName, _ => new SemaphoreSlim(_defaultLimit, _defaultLimit));
-        await semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-        return new AgentConcurrencySlot(semaphore);
+        var sized = _semaphores.GetOrAdd(
+            toolName,
+            _ => new SizedSemaphore(new SemaphoreSlim(_defaultLimit, _defaultLimit), _defaultLimit));
+        await sized.Semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+        return new AgentConcurrencySlot(sized.Semaphore);
     }
 
     /// <summary>
@@ -66,31 +68,33 @@ public sealed class AgentConcurrencyLimiter : IDisposable
         Guard.NotNull(policy);
 
         var limit = policy.MaxToolCalls > 0 ? policy.MaxToolCalls : _defaultLimit;
-        var semaphore = _semaphores.GetOrAdd(toolName, _ => new SemaphoreSlim(limit, limit));
-        await semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-        return new AgentConcurrencySlot(semaphore);
+        var sized = _semaphores.GetOrAdd(
+            toolName,
+            _ => new SizedSemaphore(new SemaphoreSlim(limit, limit), limit));
+        await sized.Semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+        return new AgentConcurrencySlot(sized.Semaphore);
     }
 
     /// <summary>Available (unacquired) slots for a tool; default when never acquired.</summary>
     public int GetAvailableSlots(string toolName) =>
-        _semaphores.TryGetValue(toolName, out var semaphore)
-            ? semaphore.CurrentCount
+        _semaphores.TryGetValue(toolName, out var sized)
+            ? sized.Semaphore.CurrentCount
             : _defaultLimit;
 
     /// <summary>Slots currently held for a tool; 0 when never acquired.</summary>
     public int GetInUseCount(string toolName)
     {
-        if (!_semaphores.TryGetValue(toolName, out var semaphore))
+        if (!_semaphores.TryGetValue(toolName, out var sized))
             return 0;
 
-        return Math.Max(0, _defaultLimit - semaphore.CurrentCount);
+        return Math.Max(0, sized.InitialSize - sized.Semaphore.CurrentCount);
     }
 
     /// <summary>Disposes the per-tool semaphore so the next acquire creates a fresh one.</summary>
     public void Reset(string toolName)
     {
-        if (_semaphores.TryRemove(toolName, out var semaphore))
-            semaphore.Dispose();
+        if (_semaphores.TryRemove(toolName, out var sized))
+            sized.Semaphore.Dispose();
     }
 
     public void Dispose()
@@ -101,8 +105,10 @@ public sealed class AgentConcurrencyLimiter : IDisposable
         _disposed = true;
 
         foreach (var kvp in _semaphores)
-            kvp.Value.Dispose();
+            kvp.Value.Semaphore.Dispose();
 
         _semaphores.Clear();
     }
+
+    private sealed record SizedSemaphore(SemaphoreSlim Semaphore, int InitialSize);
 }

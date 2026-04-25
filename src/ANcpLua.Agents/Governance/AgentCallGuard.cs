@@ -90,8 +90,14 @@ public sealed class AgentCallGuard(int maxToolCalls)
         {
             guard.RecordCall(inner.Name);
             var result = await inner.InvokeAsync(arguments, cancellationToken).ConfigureAwait(false);
-            if (result is string text)
-                guard.AddPartialResult(inner.Name, text);
+            var captured = result switch
+            {
+                string s => s,
+                System.Text.Json.JsonElement je when je.ValueKind == System.Text.Json.JsonValueKind.String => je.GetString(),
+                _ => null
+            };
+            if (captured is not null)
+                guard.AddPartialResult(inner.Name, captured);
             return result;
         }
     }

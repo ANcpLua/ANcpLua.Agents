@@ -12,10 +12,12 @@ public static class WorkflowsHelper
     public static async Task PrintWorkflowFinalMessageAsync(StreamingRun run)
     {
         await foreach (var evt in run.WatchStreamAsync())
+        {
             if (evt is WorkflowOutputEvent outputEvent)
                 ColorHelper.PrintColoredLine(
                     $"{outputEvent.ExecutorId}: {outputEvent.As<List<ChatMessage>>()?.LastOrDefault()?.Text}",
                     ConsoleColor.Yellow);
+        }
     }
 
     public static async Task PrintAgentResponseStreamAsync(string query, AIAgent workflowAgent)

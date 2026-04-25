@@ -1,6 +1,7 @@
 ﻿<Project Sdk="ANcpLua.NET.Sdk.Test">
     <PropertyGroup>
         <RootNamespace>ANcpLua.Agents.Tests</RootNamespace>
+        <OutputType>Exe</OutputType>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <!--
             CA1707 — underscores in identifiers: convention for test names (Method_Condition_Expected).
