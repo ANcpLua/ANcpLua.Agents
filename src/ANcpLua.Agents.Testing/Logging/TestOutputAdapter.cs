@@ -2,6 +2,7 @@
 
 using System.Collections.Concurrent;
 using System.Globalization;
+using ANcpLua.Roslyn.Utilities;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -120,7 +121,7 @@ public sealed class TestOutputAdapter(ITestOutputHelper output) : TextWriter, IL
         {
             _output.WriteLine(value);
         }
-        catch (InvalidOperationException ex) when (ex.Message.AsSpan().Contains("no currently active test", StringComparison.Ordinal))
+        catch (InvalidOperationException ex) when (ex.Message.ContainsOrdinal("no currently active test"))
         {
             // Swallow — test context no longer active (e.g. async continuation after test completes)
         }

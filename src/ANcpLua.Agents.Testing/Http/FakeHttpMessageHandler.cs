@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 
 using System.Net;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Agents.Testing.Http;
 
@@ -147,7 +148,7 @@ public sealed class FakeHttpMessageHandler : HttpMessageHandler
 
             foreach (var rule in _rules)
             {
-                if (!url.AsSpan().Contains(rule.UrlPattern, StringComparison.OrdinalIgnoreCase)) continue;
+                if (!url.ContainsIgnoreCase(rule.UrlPattern)) continue;
 
                 if (rule.IsLimited)
                 {

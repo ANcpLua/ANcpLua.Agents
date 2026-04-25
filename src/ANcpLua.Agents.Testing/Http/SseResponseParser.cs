@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 
 using System.Text.Json;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Agents.Testing.Http;
 
@@ -24,7 +25,7 @@ public static class SseResponseParser
         string? line;
 
         while ((line = reader.ReadLine()) is not null)
-            if (line.AsSpan().StartsWith(DataPrefix.AsSpan(), StringComparison.Ordinal))
+            if (line.StartsWithOrdinal(DataPrefix))
             {
                 var payload = line.Length > DataPrefix.Length && line[DataPrefix.Length] == ' '
                     ? line[(DataPrefix.Length + 1)..]
