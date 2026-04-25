@@ -13,6 +13,7 @@ internal class PortBinding(RequestPort port, IExternalRequestSink sink)
     public ValueTask PostRequestAsync<TRequest>(TRequest request, string? requestId = null,
         CancellationToken cancellationToken = default)
     {
+        _ = cancellationToken;
         var externalRequest = ExternalRequest.Create(Port, request, requestId);
         return Sink.PostAsync(externalRequest);
     }

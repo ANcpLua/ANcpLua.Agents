@@ -1,28 +1,35 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="ANcpLua.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>ANcpLua.Agents.Testing</RootNamespace>
         <PackageId>ANcpLua.Agents.Testing</PackageId>
         <Description>Test infrastructure for Microsoft Agent Framework. Fake agents, scripted chat clients, SSE parsing, mock HTTP handlers, AG-UI integration, and IChatClientAgentFixture reference implementations for OpenAI, Azure OpenAI, Anthropic, Ollama, Google Gemini, and OpenRouter.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>agent;agui;testing;sse;mock;streaming;microsoft-agents;conformance</PackageTags>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <!--
             Harvested upstream exception (~/.claude/CLAUDE.md "upstream sample repos" clause):
-            ChatClients/ChatClientAgentTestHelper.cs + ChatClients/MockChatClients.cs +
-            Conformance/Examples/* originate from microsoft/agent-framework test tree.
-            These CA style rules don't catch bugs — they enforce conventions upstream
-            writes differently. Real-bug CA rules stay on.
+            ChatClients/ChatClientAgentTestHelper.cs + ChatClients/FakeChatClient.cs +
+            ChatClients/MockChatClients.cs + Conformance/Examples/* +
+            Conformance/ChatClientAgentRunStreamingTests.cs originate from
+            microsoft/agent-framework test tree. These CA / AL / IDE style rules don't catch
+            bugs in OUR code — they enforce conventions upstream writes differently.
+            Real-bug CA rules stay on.
+                CA1002 — exposed List<T> on public surface (upstream uses List<T> directly)
+                CA1034 — nested public types (upstream nests test helper records)
                 CA1305 — culture-sensitive formatting (upstream uses invariant)
                 CA1707 — underscores in identifier
                 CA1816 — Dispose should call GC.SuppressFinalize
+                CA1819 — properties returning arrays (upstream's expected-content shape)
                 CA1826 — Enumerable on indexable collections
+                CA2000 — IDisposable not disposed (upstream fixtures own client lifetime)
                 CS1591 — missing XML doc on public members
+                AL0014 — pattern-match length checks (upstream uses == 0)
+                AL0025 — static lambdas (upstream non-static lambdas)
+                AL0131 — direct provider SDK calls (upstream conformance examples)
+                IDE1006 — naming style (s_/_ prefix locals upstream uses different convention)
+                IDE0060 — unused parameter (upstream demo APIs keep all params for signature stability)
+                IDE0059 — unnecessary value assignment (upstream initializes for clarity)
         -->
-        <NoWarn>$(NoWarn);CA1305;CA1707;CA1816;CA1826;CS1591</NoWarn>
+        <NoWarn>$(NoWarn);CA1002;CA1034;CA1305;CA1707;CA1816;CA1819;CA1826;CA2000;CS1591;AL0014;AL0025;AL0131;IDE1006;IDE0060;IDE0059</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -47,10 +54,6 @@
 
     <ItemGroup>
         <Using Include="System.Text"/>
-    </ItemGroup>
-
-    <ItemGroup Label="Analyzers">
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -123,7 +123,7 @@ public sealed record WorkflowRunResult(IReadOnlyList<WorkflowEvent> Events, Chec
     public IReadOnlyList<WorkflowErrorEvent> Errors { get; } = [.. Events.OfType<WorkflowErrorEvent>()];
 
     public IReadOnlyList<ExternalRequest> PendingRequests { get; }
-        = [.. Events.OfType<RequestInfoEvent>().Select(e => e.Request)];
+        = [.. Events.OfType<RequestInfoEvent>().Select(static e => e.Request)];
 
     public WorkflowRunAssertions Should()
     {

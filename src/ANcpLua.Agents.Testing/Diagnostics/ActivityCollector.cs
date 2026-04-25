@@ -64,7 +64,7 @@ public sealed class ActivityCollector : IDisposable
     public Activity FindSingle(string operationNamePrefix)
     {
         var matches = _activities
-            .Where(a => a.OperationName.StartsWith(operationNamePrefix, StringComparison.Ordinal))
+            .Where(a => a.OperationName.AsSpan().StartsWith(operationNamePrefix.AsSpan(), StringComparison.Ordinal))
             .ToList();
 
         Assert.True(
@@ -82,7 +82,7 @@ public sealed class ActivityCollector : IDisposable
     /// <summary>Returns all activities whose operation name starts with the given prefix.</summary>
     public IReadOnlyList<Activity> Where(string operationNamePrefix)
     {
-        return [.. _activities.Where(a => a.OperationName.StartsWith(operationNamePrefix, StringComparison.Ordinal))];
+        return [.. _activities.Where(a => a.OperationName.AsSpan().StartsWith(operationNamePrefix.AsSpan(), StringComparison.Ordinal))];
     }
 
     /// <summary>Asserts that no activities were captured. Returns self for fluent chaining.</summary>

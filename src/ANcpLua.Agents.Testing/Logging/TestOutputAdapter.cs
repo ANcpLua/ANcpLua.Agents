@@ -120,8 +120,7 @@ public sealed class TestOutputAdapter(ITestOutputHelper output) : TextWriter, IL
         {
             _output.WriteLine(value);
         }
-        catch (InvalidOperationException ex) when (ex.Message.Contains("no currently active test",
-                                                       StringComparison.Ordinal))
+        catch (InvalidOperationException ex) when (ex.Message.AsSpan().Contains("no currently active test", StringComparison.Ordinal))
         {
             // Swallow — test context no longer active (e.g. async continuation after test completes)
         }

@@ -23,7 +23,7 @@ public sealed class SequentialQuickstart(ITestOutputHelper output) : WorkflowFix
         var run = await RunAsync("Hello, World!", environment);
 
         run.Should()
-            .YieldOutput<string>(s => s.Should().Be("!DLROW ,OLLEH"))
+            .YieldOutput<string>(static s => s.Should().Be("!DLROW ,OLLEH"))
             .And.CompletedExecutors(nameof(UppercaseExecutor), nameof(ReverseTextExecutor))
             .And.HaveNoErrors();
     }

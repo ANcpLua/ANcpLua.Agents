@@ -2,6 +2,7 @@
 // Source: Microsoft.Agents.AI.Workflows.UnitTests/TestRequestAgent.cs
 
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text.Json;
 using AwesomeAssertions;
 
@@ -29,8 +30,6 @@ internal sealed class TestRequestAgent(
     string? id,
     string? name) : AIAgent
 {
-    public Random RNG { get; set; } = new(HashCode.Combine(requestType, nameof(TestRequestAgent)));
-
     public AgentSession? LastSession { get; set; }
 
     protected override string? IdCore => id;
@@ -74,20 +73,22 @@ internal sealed class TestRequestAgent(
         return requestType switch
         {
             TestAgentRequestType.FunctionCall => this.RunStreamingAsync(new FunctionCallStrategy(), messages, session,
-                options, cancellationToken),
+                cancellationToken),
             TestAgentRequestType.UserInputRequest => this.RunStreamingAsync(new FunctionApprovalStrategy(), messages,
-                session, options, cancellationToken),
+                session, cancellationToken),
             _ => throw new NotSupportedException($"Unknown AgentRequestType {requestType}")
         };
     }
 
     // Reservoir sampling: uniformly pick c indices from [0..n) without listing them all.
-    private static int[] SampleIndicies(Random rng, int n, int c)
+    // Uses RandomNumberGenerator.GetInt32 (CA5394-clean) — security is not the concern here,
+    // but the analyzer treats any System.Random use as insecure under this rule set.
+    private static int[] SampleIndicies(int n, int c)
     {
         var result = Enumerable.Range(0, c).ToArray();
         for (var i = c; i < n; i++)
         {
-            var radix = rng.Next(i);
+            var radix = RandomNumberGenerator.GetInt32(i);
             if (radix < c) result[radix] = i;
         }
 
@@ -98,7 +99,6 @@ internal sealed class TestRequestAgent(
         IRequestResponseStrategy<TRequest, TResponse> strategy,
         IEnumerable<ChatMessage> messages,
         AgentSession? session = null,
-        AgentRunOptions? options = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
         where TRequest : AIContent
         where TResponse : AIContent
@@ -111,7 +111,7 @@ internal sealed class TestRequestAgent(
             foreach (var response in messages.SelectMany(m => m.Contents).OfType<TResponse>())
                 strategy.ProcessResponse(response, traSession);
 
-            yield return traSession.UnservicedRequests.Count == 0
+            yield return traSession.UnservicedRequests.Count is 0
                 ? new AgentResponseUpdate(ChatRole.Assistant, "Done")
                 : new AgentResponseUpdate(ChatRole.Assistant, $"Remaining: {traSession.UnservicedRequests.Count}");
 
@@ -122,7 +122,7 @@ internal sealed class TestRequestAgent(
         yield return new AgentResponseUpdate(ChatRole.Assistant,
             $"Creating {totalRequestCount} requests, {pairedRequestCount} paired.");
 
-        HashSet<int> servicedIndicies = [.. SampleIndicies(RNG, totalRequestCount, pairedRequestCount)];
+        HashSet<int> servicedIndicies = [.. SampleIndicies(totalRequestCount, pairedRequestCount)];
         var requests = strategy.CreateRequests(totalRequestCount).ToArray();
         List<AIContent> pairedResponses = new(pairedRequestCount);
 
@@ -189,7 +189,7 @@ internal sealed class TestRequestAgent(
         where TResponse : AIContent
     {
         LastSession.Should().NotBeNull();
-        var traSession = ConvertSession<TRequest, TResponse>(LastSession!);
+        var traSession = ConvertSession<TRequest, TResponse>(LastSession);
 
         requests.Should().HaveCount(traSession.UnservicedRequests.Count);
         foreach (var request in requests)
@@ -311,7 +311,7 @@ internal sealed class TestRequestAgent(
                         ?? throw new ArgumentException("Unable to deserialize session state.");
 
             StateBag = AgentSessionStateBag.Deserialize(state.SessionState);
-            UnservicedRequests = state.UnservicedRequests.ToDictionary(kv => kv.Key, kv => kv.Value.As<TRequest>()!);
+            UnservicedRequests = state.UnservicedRequests.ToDictionary(static kv => kv.Key, static kv => kv.Value.As<TRequest>()!);
             ServicedRequests = state.ServicedRequests;
             PairedRequests = state.PairedRequests;
         }
@@ -326,7 +326,7 @@ internal sealed class TestRequestAgent(
 
         internal JsonElement Serialize(JsonSerializerOptions? jsonSerializerOptions = null)
         {
-            var portable = UnservicedRequests.ToDictionary(kv => kv.Key, kv => new PortableValue(kv.Value));
+            var portable = UnservicedRequests.ToDictionary(static kv => kv.Key, static kv => new PortableValue(kv.Value));
             var state = new TestRequestAgentSessionState(StateBag.Serialize(), portable, ServicedRequests,
                 PairedRequests);
             return JsonSerializer.SerializeToElement(state, jsonSerializerOptions);

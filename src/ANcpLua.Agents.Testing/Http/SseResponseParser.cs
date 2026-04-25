@@ -24,14 +24,14 @@ public static class SseResponseParser
         string? line;
 
         while ((line = reader.ReadLine()) is not null)
-            if (line.StartsWith(DataPrefix, StringComparison.Ordinal))
+            if (line.AsSpan().StartsWith(DataPrefix.AsSpan(), StringComparison.Ordinal))
             {
                 var payload = line.Length > DataPrefix.Length && line[DataPrefix.Length] == ' '
                     ? line[(DataPrefix.Length + 1)..]
                     : line[DataPrefix.Length..];
                 dataBuilder.Append(payload);
             }
-            else if (line.Length == 0 && dataBuilder.Length > 0)
+            else if (line.Length is 0 && dataBuilder.Length > 0)
             {
                 using var document = JsonDocument.Parse(dataBuilder.ToString());
                 events.Add(document.RootElement.Clone());

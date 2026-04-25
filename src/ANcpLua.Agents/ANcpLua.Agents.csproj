@@ -1,29 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="ANcpLua.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>ANcpLua.Agents</RootNamespace>
         <PackageId>ANcpLua.Agents</PackageId>
         <Description>Runtime helpers for Microsoft Agent Framework consumers. Governance primitives (call lineage, spawn tracker, budget enforcer, concurrency limiter, governed AIFunction), instrumentation decorators (traced AIFunction, tool-decorating chat client), an OpenAI-compatible chat-client factory, and console-rendering utilities for agent responses, tool calls, workflow events, and streaming output.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>maf;agents;microsoft-agents;governance;instrumentation;opentelemetry;helpers;console;workflows</PackageTags>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <!-- Method-level XML docs are optional — names self-document console-rendering helpers. -->
-        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
         <PackageReference Include="Microsoft.Agents.AI"/>
         <PackageReference Include="Microsoft.Agents.AI.Workflows"/>
         <PackageReference Include="Microsoft.Extensions.AI"/>
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI"/>
         <PackageReference Include="OpenAI"/>
-    </ItemGroup>
-
-    <ItemGroup Label="Analyzers">
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>

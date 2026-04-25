@@ -25,8 +25,8 @@ public sealed class TracedAIFunction(
     Func<AIFunction, IEnumerable<KeyValuePair<string, object?>>>? tagFactory = null)
     : DelegatingAIFunction(inner)
 {
-    private readonly ActivitySource _source = source ?? throw new ArgumentNullException(nameof(source));
-    private readonly AIFunction _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+    private readonly ActivitySource _source = source;
+    private readonly AIFunction _inner = inner;
 
     /// <inheritdoc />
     protected override async ValueTask<object?> InvokeCoreAsync(

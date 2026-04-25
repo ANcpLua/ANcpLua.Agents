@@ -15,8 +15,7 @@ public sealed class ToolDecoratingChatClient(
     IChatClient inner,
     Func<AIFunction, AIFunction> decorator) : DelegatingChatClient(inner)
 {
-    private readonly Func<AIFunction, AIFunction> _decorator =
-        decorator ?? throw new ArgumentNullException(nameof(decorator));
+    private readonly Func<AIFunction, AIFunction> _decorator = decorator;
 
     public override Task<ChatResponse> GetResponseAsync(
         IEnumerable<ChatMessage> messages,

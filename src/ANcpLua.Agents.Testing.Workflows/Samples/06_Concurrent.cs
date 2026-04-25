@@ -16,9 +16,11 @@ internal static class ConcurrentSample
 
     public static Workflow Build()
     {
-        var agents = Enumerable.Range(1, AgentCount)
-            .Select(i => new FakeEchoAgent($"{EchoAgentIdPrefix}{i}", $"{EchoAgentNamePrefix}{i}"))
-            .ToArray();
+        FakeEchoAgent[] agents =
+        [
+            .. Enumerable.Range(1, AgentCount)
+                .Select(static i => new FakeEchoAgent($"{EchoAgentIdPrefix}{i}", $"{EchoAgentNamePrefix}{i}"))
+        ];
 
         return AgentWorkflowBuilder.BuildConcurrent(agents);
     }

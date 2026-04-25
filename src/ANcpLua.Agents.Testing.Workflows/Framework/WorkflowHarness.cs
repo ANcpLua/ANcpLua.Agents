@@ -20,11 +20,17 @@ namespace ANcpLua.Agents.Testing.Workflows.Framework;
 ///     Callers that need testcase-driven response pumping inspect <see cref="WorkflowEvents.InputEvents" />
 ///     and call <see cref="ResumeAsync" /> with their own <see cref="ExternalResponse" /> instances.
 /// </summary>
-public sealed class WorkflowHarness(Workflow workflow, string runId, TimeProvider? timeProvider = null)
+public sealed class WorkflowHarness(Workflow workflow, string runId, TimeProvider? timeProvider = null) : IDisposable
 {
     private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
     private CheckpointManager? _checkpointManager;
+    private FileSystemJsonCheckpointStore? _jsonStore;
     private CheckpointInfo? _lastCheckpoint;
+
+    public void Dispose()
+    {
+        (_jsonStore as IDisposable)?.Dispose();
+    }
 
     public async Task<WorkflowEvents> RunWorkflowAsync<TInput>(TInput input, bool useJson = false)
         where TInput : notnull
@@ -56,7 +62,8 @@ public sealed class WorkflowHarness(Workflow workflow, string runId, TimeProvide
         {
             var stamp = _timeProvider.GetUtcNow().ToString("yyMMdd-HHmmss-ff", CultureInfo.InvariantCulture);
             var checkpointFolder = Directory.CreateDirectory(Path.Combine(".", $"chk-{stamp}"));
-            _checkpointManager = CheckpointManager.CreateJson(new FileSystemJsonCheckpointStore(checkpointFolder));
+            _jsonStore = new FileSystemJsonCheckpointStore(checkpointFolder);
+            _checkpointManager = CheckpointManager.CreateJson(_jsonStore);
         }
         else
         {

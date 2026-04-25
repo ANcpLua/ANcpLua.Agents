@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Agents.Governance;
 
@@ -46,7 +47,7 @@ public sealed class AgentConcurrencyLimiter : IDisposable
         string toolName, CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        ArgumentException.ThrowIfNullOrWhiteSpace(toolName);
+        Guard.NotNullOrWhiteSpace(toolName);
 
         var semaphore = _semaphores.GetOrAdd(toolName, _ => new SemaphoreSlim(_defaultLimit, _defaultLimit));
         await semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -61,8 +62,8 @@ public sealed class AgentConcurrencyLimiter : IDisposable
         string toolName, AgentToolPolicy policy, CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        ArgumentException.ThrowIfNullOrWhiteSpace(toolName);
-        ArgumentNullException.ThrowIfNull(policy);
+        Guard.NotNullOrWhiteSpace(toolName);
+        Guard.NotNull(policy);
 
         var limit = policy.MaxToolCalls > 0 ? policy.MaxToolCalls : _defaultLimit;
         var semaphore = _semaphores.GetOrAdd(toolName, _ => new SemaphoreSlim(limit, limit));

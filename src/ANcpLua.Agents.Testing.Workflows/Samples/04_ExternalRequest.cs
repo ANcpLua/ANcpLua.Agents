@@ -14,7 +14,7 @@ internal static class ExternalRequestSample
 
         return new WorkflowBuilder(guessNumber)
             .AddEdge(guessNumber, judge)
-            .AddEdge(judge, guessNumber, (NumberSignal signal) => signal != NumberSignal.Matched)
+            .AddEdge(judge, guessNumber, static (NumberSignal signal) => signal != NumberSignal.Matched)
             .WithOutputFrom(judge)
             .Build();
     }

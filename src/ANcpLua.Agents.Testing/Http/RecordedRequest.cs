@@ -6,4 +6,4 @@ namespace ANcpLua.Agents.Testing.Http;
 /// <param name="Method">The HTTP method.</param>
 /// <param name="Url">The full request URL.</param>
 /// <param name="Authorization">The Authorization header value, if present.</param>
-public sealed record RecordedRequest(HttpMethod Method, string Url, string? Authorization);
+public sealed record RecordedRequest(HttpMethod Method, Uri Url, string? Authorization);

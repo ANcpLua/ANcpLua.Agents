@@ -5,6 +5,7 @@
 // streaming response updates. Validates no duplicate consecutive message ids
 // on construction.
 
+using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
@@ -16,27 +17,24 @@ namespace ANcpLua.Agents.Testing.Workflows;
 ///     Used to simulate deterministic agent outputs in workflow tests.
 /// </summary>
 public class TestReplayAgent(
-    List<ChatMessage>? messages = null,
+    IReadOnlyList<ChatMessage>? messages = null,
     string? id = null,
-    string? name = null,
-    TimeProvider? timeProvider = null) : AIAgent
+    string? name = null) : AIAgent
 {
-    private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
-
     protected override string? IdCore => id;
 
     public override string? Name => name;
 
-    public List<ChatMessage> Messages { get; } = Validate(messages) ?? [];
+    public Collection<ChatMessage> Messages { get; } = [.. Validate(messages) ?? []];
 
-    public static List<ChatMessage> ToChatMessages(TimeProvider timeProvider, params string[] messages)
+    public static Collection<ChatMessage> ToChatMessages(TimeProvider timeProvider, params string[] messages)
     {
-        return messages.Select(text => ToMessage(text, timeProvider)).ToList();
+        return [.. messages.Select(text => ToMessage(text, timeProvider))];
     }
 
     public static TestReplayAgent FromStrings(TimeProvider timeProvider, params string[] messages)
     {
-        return new TestReplayAgent(ToChatMessages(timeProvider, messages), timeProvider: timeProvider);
+        return new TestReplayAgent(ToChatMessages(timeProvider, messages));
     }
 
     protected override ValueTask<AgentSession> CreateSessionCoreAsync(CancellationToken cancellationToken = default)
@@ -98,7 +96,7 @@ public class TestReplayAgent(
         var splits = text.Split(' ');
         for (var i = 0; i < splits.Length - 1; i++) splits[i] += ' ';
 
-        var contents = splits.Select<string, AIContent>(t => new TextContent(t) { RawRepresentation = t }).ToList();
+        var contents = splits.Select<string, AIContent>(static t => new TextContent(t) { RawRepresentation = t }).ToList();
         return new ChatMessage(ChatRole.Assistant, contents)
         {
             MessageId = Guid.NewGuid().ToString("N"),
@@ -107,7 +105,7 @@ public class TestReplayAgent(
         };
     }
 
-    private static List<ChatMessage>? Validate(List<ChatMessage>? candidateMessages)
+    private static IReadOnlyList<ChatMessage>? Validate(IReadOnlyList<ChatMessage>? candidateMessages)
     {
         string? currentMessageId = null;
 

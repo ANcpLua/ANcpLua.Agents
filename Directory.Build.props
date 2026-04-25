@@ -9,18 +9,11 @@
         <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
         <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>
 
-        <Deterministic>true</Deterministic>
-
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <NoWarn>$(NoWarn);NU1604</NoWarn>
 
         <Authors>Alexander Nachtmann</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/ANcpLua/ANcpLua.Agents</RepositoryUrl>
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(CI)' == 'true'">
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 </Project>

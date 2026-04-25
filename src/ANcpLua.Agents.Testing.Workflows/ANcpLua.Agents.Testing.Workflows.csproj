@@ -1,15 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="ANcpLua.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>ANcpLua.Agents.Testing.Workflows</RootNamespace>
         <PackageId>ANcpLua.Agents.Testing.Workflows</PackageId>
         <Description>Test infrastructure for Microsoft Agent Framework Workflows. Workflow fixture base with fluent assertions, execution-environment parametric axis, and a harvest of the MAF test helpers.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>maf;workflows;testing;declarative;checkpointing;inproc;microsoft-agents</PackageTags>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <!--
             Harvested upstream exception (~/.claude/CLAUDE.md "upstream sample repos" clause):
             the CA style rules below don't catch bugs, they enforce conventions that
@@ -19,8 +14,9 @@
                 CA1816 — Dispose should call GC.SuppressFinalize (upstream pattern)
                 CA1826 — Enumerable on indexable collections (performance hint, not a bug)
                 CS1591 — missing XML doc comment on public members (harvest files are partially documented)
+                RS0030 — banned ArgumentNullException.ThrowIfNull in Internals/ copies of MAF 1.1.0 internal types
         -->
-        <NoWarn>$(NoWarn);CA1707;CA1816;CA1822;CA1826;CA1852;CA1305;CA2249;CS1591;MEAI001</NoWarn>
+        <NoWarn>$(NoWarn);CA1707;CA1816;CA1822;CA1826;CA1852;CA1305;CA2249;CS1591;MEAI001;RS0030</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,13 +25,9 @@
         <PackageReference Include="Microsoft.Agents.AI.Workflows.Declarative"/>
         <PackageReference Include="Microsoft.Extensions.AI.Abstractions"/>
         <PackageReference Include="Moq"/>
-        <PackageReference Include="AwesomeAssertions"/>
+        <PackageReference Include="AwesomeAssertions" VersionOverride="$(AwesomeAssertionsVersion)"/>
         <PackageReference Include="xunit.v3.extensibility.core"/>
         <PackageReference Include="xunit.v3.assert"/>
-    </ItemGroup>
-
-    <ItemGroup Label="Analyzers">
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup Label="Roslyn (for SyntaxTreeFluentExtensions)">

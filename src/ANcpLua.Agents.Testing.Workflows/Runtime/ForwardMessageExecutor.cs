@@ -9,7 +9,7 @@ internal sealed class ForwardMessageExecutor<TMessage>(string id) : Executor(id)
 {
     protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder)
     {
-        protocolBuilder.RouteBuilder.AddHandler<TMessage>((message, ctx) => ctx.SendMessageAsync(message));
+        protocolBuilder.RouteBuilder.AddHandler<TMessage>(static (message, ctx) => ctx.SendMessageAsync(message));
         return protocolBuilder.SendsMessage<TMessage>();
     }
 }

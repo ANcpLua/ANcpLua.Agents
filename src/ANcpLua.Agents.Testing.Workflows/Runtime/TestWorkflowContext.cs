@@ -24,14 +24,14 @@ internal sealed class TestWorkflowContext : IWorkflowContext
     }
 
     public ConcurrentQueue<object> SentMessages =>
-        _state.SentMessages.GetOrAdd(_executorId, _ => new ConcurrentQueue<object>());
+        _state.SentMessages.GetOrAdd(_executorId, static _ => new ConcurrentQueue<object>());
 
     public StateManager StateManager => _state.StateManager;
 
     public ConcurrentQueue<WorkflowEvent> EmittedEvents => _state.EmittedEvents;
 
     public ConcurrentQueue<object> YieldedOutputs =>
-        _state.YieldedOutputs.GetOrAdd(_executorId, _ => new ConcurrentQueue<object>());
+        _state.YieldedOutputs.GetOrAdd(_executorId, static _ => new ConcurrentQueue<object>());
 
     public bool ConcurrentRunsEnabled { get; }
 

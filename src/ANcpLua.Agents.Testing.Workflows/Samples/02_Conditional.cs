@@ -8,13 +8,13 @@ internal static class ConditionalSample
     public static Workflow Build(params string[] spamKeywords)
     {
         DetectSpamExecutor detect = new("DetectSpam",
-            spamKeywords.Length == 0 ? ["spam", "advertisement", "offer"] : spamKeywords);
+            spamKeywords.Length is 0 ? ["spam", "advertisement", "offer"] : spamKeywords);
         RespondToMessageExecutor respond = new("RespondToMessage");
         RemoveSpamExecutor remove = new("RemoveSpam");
 
         return new WorkflowBuilder(detect)
-            .AddEdge(detect, respond, (bool isSpam) => !isSpam)
-            .AddEdge(detect, remove, (bool isSpam) => isSpam)
+            .AddEdge(detect, respond, static (bool isSpam) => !isSpam)
+            .AddEdge(detect, remove, static (bool isSpam) => isSpam)
             .WithOutputFrom(respond, remove)
             .Build();
     }
@@ -57,8 +57,10 @@ internal sealed class DetectSpamExecutor(string id, string[] spamKeywords)
     public ValueTask<bool> HandleAsync(string message, IWorkflowContext context,
         CancellationToken cancellationToken = default)
     {
+        _ = context;
+        _ = cancellationToken;
         return new ValueTask<bool>(spamKeywords.Any(keyword =>
-            message.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0));
+            message.AsSpan().IndexOf(keyword.AsSpan(), StringComparison.OrdinalIgnoreCase) >= 0));
     }
 }
 

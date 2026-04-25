@@ -1,6 +1,4 @@
 ﻿using ANcpLua.Agents.Factory;
-using AwesomeAssertions;
-using Xunit;
 
 namespace ANcpLua.Agents.Tests.Factory;
 

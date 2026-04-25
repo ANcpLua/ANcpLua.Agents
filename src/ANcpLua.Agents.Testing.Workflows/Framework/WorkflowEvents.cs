@@ -20,7 +20,7 @@ public sealed class WorkflowEvents
     public WorkflowEvents(IReadOnlyList<WorkflowEvent> workflowEvents)
     {
         Events = workflowEvents;
-        EventCounts = workflowEvents.GroupBy(e => e.GetType()).ToDictionary(e => e.Key, e => e.Count());
+        EventCounts = workflowEvents.GroupBy(static e => e.GetType()).ToDictionary(static e => e.Key, static e => e.Count());
         ExecutorInvokeEvents = workflowEvents.OfType<ExecutorInvokedEvent>().ToList();
         ExecutorCompleteEvents = workflowEvents.OfType<ExecutorCompletedEvent>().ToList();
         InputEvents = workflowEvents.OfType<RequestInfoEvent>().ToList();

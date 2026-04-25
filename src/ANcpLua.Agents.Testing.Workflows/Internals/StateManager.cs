@@ -19,7 +19,7 @@ internal sealed class StateManager
 
     private ConcurrentDictionary<string, object?> GetScope(ScopeId scopeId)
     {
-        return this._scopes.GetOrAdd(ScopeKey(scopeId), _ => new ConcurrentDictionary<string, object?>());
+        return this._scopes.GetOrAdd(ScopeKey(scopeId), static _ => new ConcurrentDictionary<string, object?>());
     }
 
     public ValueTask ClearStateAsync(ScopeId scopeId)

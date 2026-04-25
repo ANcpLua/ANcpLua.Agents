@@ -13,7 +13,7 @@ internal static class MessageDeliveryValidation
         HashSet<string> unseenReceivers = [.. receiverIds];
         HashSet<object> unseenMessages = [.. messages];
 
-        foreach (var grouping in mapping.Deliveries.GroupBy(d => d.TargetId))
+        foreach (var grouping in mapping.Deliveries.GroupBy(static d => d.TargetId))
         {
             receiverIds.Should().Contain(grouping.Key);
             unseenReceivers.Remove(grouping.Key);

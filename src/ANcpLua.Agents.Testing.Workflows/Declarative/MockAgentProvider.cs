@@ -56,10 +56,12 @@ internal sealed class MockAgentProvider : Mock<ResponseAgentProvider>
     private List<ChatMessage> CreateMessages()
     {
         const int MessageCount = 5;
-        TestMessages = Enumerable.Range(1, MessageCount)
-            .Select(i => new ChatMessage(ChatRole.User, $"Test message {i}")
-                { MessageId = Guid.NewGuid().ToString("N") })
-            .ToList();
+        TestMessages =
+        [
+            .. Enumerable.Range(1, MessageCount)
+                .Select(static i => new ChatMessage(ChatRole.User, $"Test message {i}")
+                    { MessageId = Guid.NewGuid().ToString("N") })
+        ];
         return TestMessages;
     }
 

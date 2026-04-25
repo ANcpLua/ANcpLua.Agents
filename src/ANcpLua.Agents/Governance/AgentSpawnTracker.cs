@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Agents.Governance;
 
@@ -28,8 +29,8 @@ public sealed class AgentSpawnTracker
     /// </summary>
     public AgentSpawnContext Register(string runId, string? parentRunId, AgentToolPolicy policy)
     {
-        ArgumentNullException.ThrowIfNull(runId);
-        ArgumentNullException.ThrowIfNull(policy);
+        Guard.NotNull(runId);
+        Guard.NotNull(policy);
 
         var (rootRunId, depth) = parentRunId is not null
             ? ResolveLineage(parentRunId)
@@ -63,7 +64,7 @@ public sealed class AgentSpawnTracker
     /// </summary>
     public void Unregister(string runId)
     {
-        ArgumentNullException.ThrowIfNull(runId);
+        Guard.NotNull(runId);
 
         var (rootRunId, _) = ResolveLineage(runId);
 
@@ -76,7 +77,7 @@ public sealed class AgentSpawnTracker
     /// <summary>Spawn context for an existing run, or <c>null</c> when not tracked.</summary>
     public AgentSpawnContext? GetContext(string runId)
     {
-        ArgumentNullException.ThrowIfNull(runId);
+        Guard.NotNull(runId);
 
         if (!_parents.ContainsKey(runId))
             return null;
@@ -90,7 +91,7 @@ public sealed class AgentSpawnTracker
     /// <summary>Total descendant count for a root run.</summary>
     public int GetDescendantCount(string rootRunId)
     {
-        ArgumentNullException.ThrowIfNull(rootRunId);
+        Guard.NotNull(rootRunId);
         return _descendantCounts.GetValueOrDefault(rootRunId);
     }
 

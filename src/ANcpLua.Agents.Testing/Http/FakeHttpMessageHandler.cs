@@ -40,29 +40,29 @@ public sealed class FakeHttpMessageHandler : HttpMessageHandler
     // ── Builder methods ──────────────────────────────────────────────────────
 
     /// <summary>
-    ///     Adds a rule: requests whose URL contains <paramref name="urlPattern" /> get the
+    ///     Adds a rule: requests whose URL contains <paramref name="pattern" /> get the
     ///     specified response. Rules are evaluated in order; first match wins.
     /// </summary>
-    /// <param name="urlPattern">Substring to match in the request URL. Use "*" prefix for contains-match.</param>
+    /// <param name="pattern">Substring to match in the request URL. Use "*" prefix for contains-match.</param>
     /// <param name="statusCode">HTTP status code to return.</param>
     /// <param name="body">Response body (JSON or other content).</param>
     /// <param name="contentType">Content-Type header. Defaults to "application/json".</param>
     public FakeHttpMessageHandler WithResponse(
-        string urlPattern,
+        string pattern,
         HttpStatusCode statusCode,
         string body,
         string contentType = "application/json")
     {
-        _rules.Add(new ResponseRule(urlPattern.TrimStart('*'), statusCode, body, contentType, null));
+        _rules.Add(new ResponseRule(pattern.TrimStart('*'), statusCode, body, contentType, null));
         return this;
     }
 
     /// <summary>
     ///     Adds a rule that returns an error response (empty body) for matching URLs.
     /// </summary>
-    public FakeHttpMessageHandler WithError(string urlPattern, HttpStatusCode statusCode)
+    public FakeHttpMessageHandler WithError(string pattern, HttpStatusCode statusCode)
     {
-        _rules.Add(new ResponseRule(urlPattern.TrimStart('*'), statusCode, string.Empty, "text/plain", null));
+        _rules.Add(new ResponseRule(pattern.TrimStart('*'), statusCode, string.Empty, "text/plain", null));
         return this;
     }
 
@@ -70,13 +70,13 @@ public sealed class FakeHttpMessageHandler : HttpMessageHandler
     ///     Adds a rule that matches only N times, then falls through to the next rule.
     /// </summary>
     public FakeHttpMessageHandler WithResponse(
-        string urlPattern,
+        string pattern,
         HttpStatusCode statusCode,
         string body,
         int times,
         string contentType = "application/json")
     {
-        _rules.Add(new ResponseRule(urlPattern.TrimStart('*'), statusCode, body, contentType, times));
+        _rules.Add(new ResponseRule(pattern.TrimStart('*'), statusCode, body, contentType, times));
         return this;
     }
 
@@ -84,17 +84,17 @@ public sealed class FakeHttpMessageHandler : HttpMessageHandler
     ///     Adds a rule returning an SSE (Server-Sent Events) stream for matching URLs.
     ///     Each event string should be the JSON payload (without the "data:" prefix).
     /// </summary>
-    /// <param name="urlPattern">Substring to match in the request URL.</param>
+    /// <param name="pattern">Substring to match in the request URL.</param>
     /// <param name="serializedEvents">JSON payloads for each SSE event.</param>
     public FakeHttpMessageHandler WithSseResponse(
-        string urlPattern,
+        string pattern,
         IEnumerable<string> serializedEvents)
     {
         StringBuilder sb = new();
         foreach (var e in serializedEvents) sb.Append("data: ").Append(e).Append("\n\n");
 
         _rules.Add(new ResponseRule(
-            urlPattern.TrimStart('*'), HttpStatusCode.OK, sb.ToString(), "text/event-stream", null));
+            pattern.TrimStart('*'), HttpStatusCode.OK, sb.ToString(), "text/event-stream", null));
         return this;
     }
 
@@ -138,15 +138,16 @@ public sealed class FakeHttpMessageHandler : HttpMessageHandler
 
         foreach (var validator in _requestValidators) validator(request);
 
-        var url = request.RequestUri?.ToString() ?? string.Empty;
+        var requestUri = request.RequestUri ?? new Uri("about:blank", UriKind.Absolute);
+        var url = requestUri.ToString();
 
         using (_lock.EnterScope())
         {
-            Requests.Add(new RecordedRequest(request.Method, url, request.Headers.Authorization?.ToString()));
+            Requests.Add(new RecordedRequest(request.Method, requestUri, request.Headers.Authorization?.ToString()));
 
             foreach (var rule in _rules)
             {
-                if (!url.Contains(rule.UrlPattern, StringComparison.OrdinalIgnoreCase)) continue;
+                if (!url.AsSpan().Contains(rule.UrlPattern, StringComparison.OrdinalIgnoreCase)) continue;
 
                 if (rule.IsLimited)
                 {

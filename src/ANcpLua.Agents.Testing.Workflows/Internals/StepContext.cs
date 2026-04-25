@@ -12,10 +12,10 @@ internal sealed class StepContext
     public ConcurrentDictionary<string, ConcurrentQueue<MessageEnvelope>> QueuedMessages { get; } = [];
 
     public bool HasMessages =>
-        !QueuedMessages.IsEmpty && QueuedMessages.Values.Any(messageQueue => !messageQueue.IsEmpty);
+        !QueuedMessages.IsEmpty && QueuedMessages.Values.Any(static messageQueue => !messageQueue.IsEmpty);
 
     public ConcurrentQueue<MessageEnvelope> MessagesFor(string target)
     {
-        return QueuedMessages.GetOrAdd(target, _ => new ConcurrentQueue<MessageEnvelope>());
+        return QueuedMessages.GetOrAdd(target, static _ => new ConcurrentQueue<MessageEnvelope>());
     }
 }

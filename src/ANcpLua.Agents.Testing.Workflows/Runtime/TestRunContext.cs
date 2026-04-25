@@ -2,6 +2,7 @@
 // Source: Microsoft.Agents.AI.Workflows.UnitTests/TestRunContext.cs
 
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ANcpLua.Agents.Testing.Workflows;
@@ -14,7 +15,7 @@ namespace ANcpLua.Agents.Testing.Workflows;
 /// </summary>
 public class TestRunContext : IRunnerContext
 {
-    public List<WorkflowEvent> Events { get; } = [];
+    public Collection<WorkflowEvent> Events { get; } = [];
 
     public ConcurrentQueue<ExternalRequest> ExternalRequests { get; } = [];
 
@@ -114,6 +115,7 @@ public class TestRunContext : IRunnerContext
 
     public ValueTask YieldOutputAsync(string sourceId, object output, CancellationToken cancellationToken = default)
     {
+        _ = cancellationToken;
         if (!QueuedOutputs.TryGetValue(sourceId, out var outputQueue)) QueuedOutputs[sourceId] = outputQueue = [];
 
         outputQueue.Add(output);
@@ -123,6 +125,7 @@ public class TestRunContext : IRunnerContext
     public ValueTask<IEnumerable<Type>> GetStartingExecutorInputTypesAsync(
         CancellationToken cancellationToken = default)
     {
+        _ = cancellationToken;
         if (Executors.TryGetValue(StartingExecutorId, out var executor))
             return new ValueTask<IEnumerable<Type>>(executor.InputTypes);
 

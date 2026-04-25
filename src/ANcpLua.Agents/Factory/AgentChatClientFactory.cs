@@ -1,4 +1,5 @@
 using System.ClientModel;
+using ANcpLua.Roslyn.Utilities;
 using Microsoft.Extensions.AI;
 using OpenAI;
 
@@ -28,7 +29,7 @@ public static class AgentChatClientFactory
     /// </summary>
     public static IChatClient? TryCreate(AgentChatClientOptions options)
     {
-        ArgumentNullException.ThrowIfNull(options);
+        Guard.NotNull(options);
 
         if (string.IsNullOrEmpty(options.ApiKey))
             return null;

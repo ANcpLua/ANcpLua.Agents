@@ -28,6 +28,7 @@ internal static class SubworkflowSample
         IWorkflowExecutionEnvironment environment,
         List<string> textsToProcess)
     {
+        _ = writer;
         Func<TextProcessingRequest, IWorkflowContext, CancellationToken, ValueTask> processText = ProcessTextAsync;
         var innerBinding = processText.BindAsExecutor("TextProcessor", threadsafe: true);
 
@@ -35,7 +36,7 @@ internal static class SubworkflowSample
         var textProcessor = innerWorkflow.BindAsExecutor("TextProcessor");
 
         Func<string, string, ValueTask<Executor>> createOrchestrator =
-            (id, _) => new ValueTask<Executor>(new TextProcessingOrchestrator(id));
+            static (id, _) => new ValueTask<Executor>(new TextProcessingOrchestrator(id));
         var orchestrator = createOrchestrator.BindExecutor();
 
         var workflow = new WorkflowBuilder(orchestrator)
@@ -48,8 +49,8 @@ internal static class SubworkflowSample
 
         var status = await run.GetStatusAsync();
         var errors = run.OutgoingEvents.OfType<WorkflowErrorEvent>()
-            .Select(e => e.Exception)
-            .Where(e => e is not null)
+            .Select(static e => e.Exception)
+            .Where(static e => e is not null)
             .ToList();
 
         if (errors.Count > 0)
@@ -67,7 +68,7 @@ internal static class SubworkflowSample
 
         var results = output.As<List<TextProcessingResult>>();
         results.Should().NotBeNull("the output event should contain the results");
-        results!.Sort((l, r) => StringComparer.Ordinal.Compare(l.TaskId, r.TaskId));
+        results!.Sort(static (l, r) => StringComparer.Ordinal.Compare(l.TaskId, r.TaskId));
         return results;
     }
 
@@ -78,7 +79,7 @@ internal static class SubworkflowSample
         var wordCount = 0;
         var charCount = 0;
 
-        if (request.Text.Length != 0)
+        if (request.Text.Length is not 0)
         {
             wordCount = request.Text.Split([' '], StringSplitOptions.RemoveEmptyEntries).Length;
             charCount = request.Text.Length;
@@ -89,7 +90,7 @@ internal static class SubworkflowSample
     }
 
     private sealed class TextProcessingOrchestrator(string id)
-        : StatefulExecutor<TextProcessingOrchestrator.State>(id, () => new State(), declareCrossRunShareable: false)
+        : StatefulExecutor<TextProcessingOrchestrator.State>(id, static () => new State(), declareCrossRunShareable: false)
     {
         protected override ProtocolBuilder ConfigureProtocol(ProtocolBuilder protocolBuilder)
         {
@@ -120,7 +121,7 @@ internal static class SubworkflowSample
             await InvokeWithStateAsync(async (state, ctx, ct) =>
             {
                 if (state.PendingTaskIds.Remove(result.TaskId)) state.Results.Add(result);
-                if (state.PendingTaskIds.Count == 0) await ctx.YieldOutputAsync(state.Results, ct);
+                if (state.PendingTaskIds.Count is 0) await ctx.YieldOutputAsync(state.Results, ct);
                 return state;
             }, context, cancellationToken: cancellationToken);
         }

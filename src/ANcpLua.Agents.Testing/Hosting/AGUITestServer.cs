@@ -17,31 +17,19 @@ namespace ANcpLua.Agents.Testing.Hosting;
 /// </summary>
 public sealed class AGUITestServer : IAsyncDisposable
 {
-    private readonly AIAgent _agent;
-    private readonly Action<WebApplicationBuilder>? _configureBuilder;
-    private readonly Action<IServiceCollection>? _configureServices;
-    private readonly JsonSerializerOptions? _jsonOptions;
-    private WebApplication? _app;
+    private readonly WebApplication _app;
 
-    private AGUITestServer(
-        AIAgent agent,
-        string endpointPattern,
-        Action<WebApplicationBuilder>? configureBuilder,
-        Action<IServiceCollection>? configureServices,
-        JsonSerializerOptions? jsonOptions)
+    private AGUITestServer(WebApplication app, HttpClient client, string endpointPattern)
     {
-        _agent = agent;
+        _app = app;
+        Client = client;
         EndpointPattern = endpointPattern;
-        _configureBuilder = configureBuilder;
-        _configureServices = configureServices;
-        _jsonOptions = jsonOptions;
     }
 
     /// <summary>
     ///     Gets the <see cref="HttpClient" /> configured to target the test server.
-    ///     Available after <see cref="StartAsync" /> completes.
     /// </summary>
-    public HttpClient Client { get; private set; } = null!;
+    public HttpClient Client { get; }
 
     /// <summary>
     ///     Gets the endpoint pattern used for the AG-UI endpoint.
@@ -52,7 +40,7 @@ public sealed class AGUITestServer : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         Client.Dispose();
-        if (_app is not null) await _app.DisposeAsync().ConfigureAwait(false);
+        await _app.DisposeAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -65,9 +53,31 @@ public sealed class AGUITestServer : IAsyncDisposable
         Action<IServiceCollection>? configureServices = null,
         JsonSerializerOptions? jsonOptions = null)
     {
-        AGUITestServer server = new(agent, endpointPattern, configureBuilder, configureServices, jsonOptions);
-        await server.StartAsync().ConfigureAwait(false);
-        return server;
+        var builder = WebApplication.CreateBuilder();
+        builder.WebHost.UseTestServer();
+
+        configureBuilder?.Invoke(builder);
+
+        builder.Services.AddAGUI();
+        builder.Services.AddHealthChecks();
+        configureServices?.Invoke(builder.Services);
+
+        if (jsonOptions?.TypeInfoResolver is not null)
+            builder.Services.ConfigureHttpJsonOptions(options =>
+                options.SerializerOptions.TypeInfoResolverChain.Add(jsonOptions.TypeInfoResolver));
+
+        var app = builder.Build();
+        app.MapAGUI(endpointPattern, agent);
+
+        await app.StartAsync(CancellationToken.None).ConfigureAwait(false);
+
+        var testServer = app.Services.GetRequiredService<IServer>() as TestServer
+                         ?? throw new InvalidOperationException("TestServer not found in services.");
+
+        var client = testServer.CreateClient();
+        client.BaseAddress = new Uri($"http://localhost{endpointPattern}");
+
+        return new AGUITestServer(app, client, endpointPattern);
     }
 
     /// <summary>
@@ -80,31 +90,5 @@ public sealed class AGUITestServer : IAsyncDisposable
     {
         var effectiveChunks = chunks.Length > 0 ? chunks : ["Hello", " from", " fake", " agent!"];
         return CreateAsync(new FakeTextStreamingAgent(effectiveChunks), endpointPattern);
-    }
-
-    private async Task StartAsync()
-    {
-        var builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseTestServer();
-
-        _configureBuilder?.Invoke(builder);
-
-        builder.Services.AddAGUI();
-        _configureServices?.Invoke(builder.Services);
-
-        if (_jsonOptions?.TypeInfoResolver is not null)
-            builder.Services.ConfigureHttpJsonOptions(options =>
-                options.SerializerOptions.TypeInfoResolverChain.Add(_jsonOptions.TypeInfoResolver));
-
-        _app = builder.Build();
-        _app.MapAGUI(EndpointPattern, _agent);
-
-        await _app.StartAsync(CancellationToken.None).ConfigureAwait(false);
-
-        var testServer = _app.Services.GetRequiredService<IServer>() as TestServer
-                         ?? throw new InvalidOperationException("TestServer not found in services.");
-
-        Client = testServer.CreateClient();
-        Client.BaseAddress = new Uri($"http://localhost{EndpointPattern}");
     }
 }

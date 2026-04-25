@@ -4,6 +4,10 @@
     "rollForward": "latestPatch",
     "allowPrerelease": true
   },
+  "msbuild-sdks": {
+    "ANcpLua.NET.Sdk": "3.4.3",
+    "ANcpLua.NET.Sdk.Test": "3.4.3"
+  },
   "test": {
     "runner": "Microsoft.Testing.Platform"
   }

@@ -51,6 +51,7 @@ public static class WorkflowsHelper
         var executorDurations = new Dictionary<string, TimeSpan>();
 
         await foreach (var evt in run.WatchStreamAsync())
+        {
             switch (evt)
             {
                 case SuperStepStartedEvent stepStarted:
@@ -58,7 +59,7 @@ public static class WorkflowsHelper
                     PrintEventWithData(evt);
                     if (stepStarted.Data is SuperStepStartInfo startInfo)
                         ColorHelper.PrintColoredLine(
-                            $"Sending Executors: {string.Join(", ", startInfo.SendingExecutors.Select(s => s.Split('_')[0]))}",
+                            $"Sending Executors: {string.Join(", ", startInfo.SendingExecutors.Select(static s => s.Split('_')[0]))}",
                             ConsoleColor.Yellow);
                     break;
 
@@ -66,7 +67,7 @@ public static class WorkflowsHelper
                     PrintEventWithData(evt);
                     if (stepCompleted.Data is SuperStepCompletionInfo completionInfo)
                         ColorHelper.PrintColoredLine(
-                            $"Activated Executors: {string.Join(", ", completionInfo.ActivatedExecutors.Select(s => s.Split('_')[0]))}",
+                            $"Activated Executors: {string.Join(", ", completionInfo.ActivatedExecutors.Select(static s => s.Split('_')[0]))}",
                             ConsoleColor.Yellow);
                     Console.WriteLine();
                     break;
@@ -139,6 +140,7 @@ public static class WorkflowsHelper
                     Console.WriteLine(JsonSerializer.Serialize(evt));
                     break;
             }
+        }
 
         workflowStopwatch.Stop();
         PrintExecutionSummary(executorDurations, workflowStopwatch.Elapsed);
@@ -196,7 +198,7 @@ public static class WorkflowsHelper
 
     private static void PrintToolCalls(IReadOnlyList<FunctionCallContent> calls)
     {
-        if (calls.Count == 0) return;
+        if (calls.Count is 0) return;
 
         Console.WriteLine();
         foreach (var call in calls)
@@ -231,10 +233,10 @@ public static class WorkflowsHelper
             ConsoleColor.Magenta);
         Console.WriteLine();
 
-        if (executorDurations.Count != 0)
+        if (executorDurations.Count is not 0)
         {
             Console.WriteLine("Executor/Agent Execution Times:");
-            foreach (var kvp in executorDurations.OrderByDescending(x => x.Value))
+            foreach (var kvp in executorDurations.OrderByDescending(static x => x.Value))
             {
                 var executorName = kvp.Key.Split('_')[0];
                 Console.WriteLine(

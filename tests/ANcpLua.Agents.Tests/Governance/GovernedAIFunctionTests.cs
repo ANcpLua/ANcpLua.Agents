@@ -1,7 +1,5 @@
-﻿using ANcpLua.Agents.Governance;
-using AwesomeAssertions;
+using ANcpLua.Agents.Governance;
 using Microsoft.Extensions.AI;
-using Xunit;
 
 namespace ANcpLua.Agents.Tests.Governance;
 
@@ -46,5 +44,100 @@ public sealed class GovernedAIFunctionTests
 
         var act = async () => await governed.InvokeAsync(new AIFunctionArguments());
         await act.Should().ThrowAsync<AgentCapabilityDeniedException>();
+    }
+
+    [Fact]
+    public async Task InvokeAsync_CapabilityCheckedBeforeBudget()
+    {
+        var budget = new AgentBudgetEnforcer();
+        using var concurrency = new AgentConcurrencyLimiter();
+        var capabilities = new AgentCapabilityContext();
+        var policy = new AgentToolPolicy(MaxAttempts: 1, MaxToolCalls: 1, RequiredCapabilities: ["x"]);
+
+        var fn = MakeFunction("blocked", () => "v");
+        var governed = new GovernedAIFunction(fn, new AgentToolMetadata("blocked", policy), budget, concurrency, capabilities);
+
+        var act = async () => await governed.InvokeAsync(new AIFunctionArguments());
+        await act.Should().ThrowAsync<AgentCapabilityDeniedException>();
+
+        budget.GetAttemptCount("blocked").Should().Be(0);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_PermissivePolicy_BypassesCapabilityCheck()
+    {
+        var budget = new AgentBudgetEnforcer();
+        using var concurrency = new AgentConcurrencyLimiter();
+        var capabilities = new AgentCapabilityContext();
+
+        var fn = MakeFunction("free", static () => "v");
+        var governed = new GovernedAIFunction(
+            fn,
+            new AgentToolMetadata("free", AgentToolPolicy.Permissive),
+            budget,
+            concurrency,
+            capabilities);
+
+        var result = await governed.InvokeAsync(new AIFunctionArguments());
+
+        result.Should().NotBeNull();
+        budget.GetAttemptCount("free").Should().Be(1);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_ToolFailure_ReleasesConcurrencySlot()
+    {
+        var budget = new AgentBudgetEnforcer();
+        using var concurrency = new AgentConcurrencyLimiter(defaultLimit: 5);
+        var capabilities = new AgentCapabilityContext();
+        var policy = new AgentToolPolicy(MaxAttempts: 5, MaxToolCalls: 5, RequiredCapabilities: []);
+
+        var fail = MakeFunction("fail", () => throw new InvalidOperationException("boom"));
+        var governed = new GovernedAIFunction(
+            fail, new AgentToolMetadata("fail", policy), budget, concurrency, capabilities);
+
+        var act = async () => await governed.InvokeAsync(new AIFunctionArguments());
+        await act.Should().ThrowAsync<InvalidOperationException>();
+
+        concurrency.GetInUseCount("fail").Should().Be(0);
+        concurrency.GetAvailableSlots("fail").Should().Be(5);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_BudgetExceeded_DoesNotInvokeInner()
+    {
+        var budget = new AgentBudgetEnforcer();
+        using var concurrency = new AgentConcurrencyLimiter();
+        var capabilities = new AgentCapabilityContext();
+        var policy = new AgentToolPolicy(MaxAttempts: 1, MaxToolCalls: 1, RequiredCapabilities: []);
+
+        var calls = 0;
+        var fn = MakeFunction("once", () => { calls++; return "v"; });
+        var governed = new GovernedAIFunction(fn, new AgentToolMetadata("once", policy), budget, concurrency, capabilities);
+
+        await governed.InvokeAsync(new AIFunctionArguments());
+        var act = async () => await governed.InvokeAsync(new AIFunctionArguments());
+        await act.Should().ThrowAsync<AgentBudgetExceededException>();
+
+        calls.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_GrantedCapabilities_AllowsInvocation()
+    {
+        var budget = new AgentBudgetEnforcer();
+        using var concurrency = new AgentConcurrencyLimiter();
+        var capabilities = new AgentCapabilityContext(["secrets:read"]);
+        var policy = new AgentToolPolicy(MaxAttempts: 1, MaxToolCalls: 1, RequiredCapabilities: ["secrets:read"]);
+
+        var fn = MakeFunction("readSecret", static () => "secret-value");
+        var governed = new GovernedAIFunction(fn, new AgentToolMetadata("readSecret", policy), budget, concurrency, capabilities);
+
+        var result = await governed.InvokeAsync(new AIFunctionArguments());
+
+        result.Should().NotBeNull();
+        var text = result?.ToString() ?? string.Empty;
+        text.Should().Contain("secret-value");
+        budget.GetAttemptCount("readSecret").Should().Be(1);
     }
 }

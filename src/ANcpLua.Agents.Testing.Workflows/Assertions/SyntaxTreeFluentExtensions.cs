@@ -99,11 +99,11 @@ internal sealed class SyntaxTreeAssertions : ObjectAssertions<SyntaxTree, Syntax
 
     public AndConstraint<SyntaxTreeAssertions> HaveHierarchy(params string[] expectedNesting)
     {
-        if (expectedNesting.Length == 0) return new AndConstraint<SyntaxTreeAssertions>(this);
+        if (expectedNesting.Length is 0) return new AndConstraint<SyntaxTreeAssertions>(this);
 
         var indicies = new int[expectedNesting.Length];
         for (var i = 0; i < expectedNesting.Length; i++)
-            indicies[i] = _syntaxString.IndexOf($"partial class {expectedNesting[i]}", StringComparison.Ordinal);
+            indicies[i] = _syntaxString.AsSpan().IndexOf($"partial class {expectedNesting[i]}".AsSpan(), StringComparison.Ordinal);
 
         var runningResult = Contain(0, indicies[0], expectedNesting[0]);
         for (var i = 1; i < expectedNesting.Length; i++)
@@ -115,7 +115,7 @@ internal sealed class SyntaxTreeAssertions : ObjectAssertions<SyntaxTree, Syntax
     private AndConstraint<SyntaxTreeAssertions> Match(string expected, string reason)
     {
         CurrentAssertionChain
-            .ForCondition(_syntaxString.Contains(expected))
+            .ForCondition(_syntaxString.AsSpan().Contains(expected.AsSpan(), StringComparison.Ordinal))
             .BecauseOf(reason)
             .FailWith("Expected {context} to contain {0}{reason}, but it was not found. Actual syntax: {1}", expected,
                 _syntaxString);
@@ -125,7 +125,7 @@ internal sealed class SyntaxTreeAssertions : ObjectAssertions<SyntaxTree, Syntax
     private AndConstraint<SyntaxTreeAssertions> MatchAbsent(string needle, string reason)
     {
         CurrentAssertionChain
-            .ForCondition(!_syntaxString.Contains(needle))
+            .ForCondition(!_syntaxString.AsSpan().Contains(needle.AsSpan(), StringComparison.Ordinal))
             .BecauseOf(reason)
             .FailWith("Expected {context} to not contain {0}{reason}. Actual syntax: {1}", needle, _syntaxString);
         return new AndConstraint<SyntaxTreeAssertions>(this);

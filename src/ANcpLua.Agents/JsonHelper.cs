@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Agents;
 
@@ -49,7 +50,7 @@ public static class JsonHelper
     /// </remarks>
     public static T? TryDeserialize<T>(this string? json, JsonTypeInfo<T> typeInfo) where T : class
     {
-        ArgumentNullException.ThrowIfNull(typeInfo);
+        Guard.NotNull(typeInfo);
         if (string.IsNullOrWhiteSpace(json)) return null;
 
         try

@@ -1,3 +1,4 @@
+using ANcpLua.Roslyn.Utilities;
 using Microsoft.Extensions.AI;
 
 namespace ANcpLua.Agents.Governance;
@@ -17,15 +18,15 @@ public class GovernedAIFunction(
     AgentCapabilityContext capabilities) : DelegatingAIFunction(inner)
 {
     /// <summary>The metadata applied at each invocation.</summary>
-    protected AgentToolMetadata Metadata { get; } = metadata ?? throw new ArgumentNullException(nameof(metadata));
+    protected AgentToolMetadata Metadata { get; } = metadata;
 
     protected override async ValueTask<object?> InvokeCoreAsync(
         AIFunctionArguments arguments,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(budget);
-        ArgumentNullException.ThrowIfNull(concurrency);
-        ArgumentNullException.ThrowIfNull(capabilities);
+        Guard.NotNull(budget);
+        Guard.NotNull(concurrency);
+        Guard.NotNull(capabilities);
 
         if (Metadata.Policy.RequiredCapabilities.Count > 0)
             capabilities.Verify(Metadata.Policy.RequiredCapabilities);
