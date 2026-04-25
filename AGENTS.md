@@ -72,3 +72,11 @@ only if it has:
     ALC mismatch, protocol violation — not "not worth it").
 
 "Future session" / "out of scope" / "not worth the rework" do not qualify.
+
+## First-party dependencies
+
+If a blocking issue is in a library you own (any repo under your GitHub
+namespace), default to fixing it directly: patch → test → release → consume.
+Do not file issues against your own repos as a workaround for fixing them.
+External tracker (a) under "Scope of outstanding" applies only to
+genuinely-external upstreams.
