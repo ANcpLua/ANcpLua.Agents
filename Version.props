@@ -59,6 +59,6 @@
   </PropertyGroup>
 
   <PropertyGroup Label="ASP.NET Core (Microsoft.AspNetCore.Mvc.Testing — AgentTesting Hosting/ folder)">
-    <AspNetCoreVersion>10.0.6</AspNetCoreVersion>
+    <AspNetCoreVersion>10.0.7</AspNetCoreVersion>
   </PropertyGroup>
 </Project>
