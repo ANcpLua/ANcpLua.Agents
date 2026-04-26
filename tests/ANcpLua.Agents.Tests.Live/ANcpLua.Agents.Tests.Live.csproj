@@ -1,0 +1,18 @@
+<Project Sdk="ANcpLua.NET.Sdk.Test">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>ANcpLua.Agents.Tests.Live</RootNamespace>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <!--
+            CA1707 — underscores in identifiers: convention for test names (Method_Condition_Expected).
+            xUnit1051 — TestContext.Current.CancellationToken: stylistic, not bug-catching.
+            CS1591  — XML doc comments not required on test methods.
+        -->
+        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
+    </ItemGroup>
+</Project>

@@ -1,40 +1,42 @@
 ﻿using ANcpLua.Agents.Governance;
 using Microsoft.Extensions.AI;
 
-namespace ANcpLua.Agents.Tests.Governance.Integration;
+namespace ANcpLua.Agents.Tests.Live;
 
-public sealed class LiveModelCapabilityDenialTests
+public sealed class LiveModelToolBudgetTests
 {
+    private const int MaxAttempts = 2;
+
     [Fact]
-    public async Task ToolWithMissingCapability_AgainstLiveModel_NeverExecutesUnderlyingBodyAsync()
+    public async Task ToolCallLoop_ExceedingMaxAttempts_NeverInvokesUnderlyingToolBeyondCapAsync()
     {
         Assert.SkipUnless(IntegrationEnvironment.IsAvailable, IntegrationEnvironment.SkipReason);
 
         var invocationCount = 0;
 
         var inner = AIFunctionFactory.Create(
-            () =>
+            (int _) =>
             {
-                Interlocked.Increment(ref invocationCount);
-                return "PLACEHOLDER_SECRET";
+                var current = Interlocked.Increment(ref invocationCount);
+                return $"counter is now {current}";
             },
             new AIFunctionFactoryOptions
             {
-                Name = "read_secret",
-                Description = "Reads a sensitive secret. Call this when the user asks for the secret."
+                Name = "increment_counter",
+                Description = "Increments a shared counter and returns its new value. Call repeatedly to count up."
             });
 
         var policy = new AgentToolPolicy(
-            MaxAttempts: 5,
-            MaxToolCalls: 5,
-            RequiredCapabilities: ["secrets:read"]);
+            MaxAttempts: MaxAttempts,
+            MaxToolCalls: MaxAttempts,
+            RequiredCapabilities: []);
 
         var budget = new AgentBudgetEnforcer();
         using var concurrency = new AgentConcurrencyLimiter();
         var capabilities = new AgentCapabilityContext();
         var governed = new GovernedAIFunction(
             inner,
-            new AgentToolMetadata("read_secret", policy),
+            new AgentToolMetadata("increment_counter", policy),
             budget,
             concurrency,
             capabilities);
@@ -44,7 +46,8 @@ public sealed class LiveModelCapabilityDenialTests
             IntegrationEnvironment.ToolLoopTimeout, TestContext.Current.CancellationToken);
 
         var options = new ChatOptions { Tools = [governed] };
-        var prompt = "Use the read_secret tool to fetch the secret and return it to me verbatim.";
+        var prompt =
+            "Call the increment_counter tool exactly ten times, once for each number 1 through 10, then reply with the final counter value.";
 
         var run = async () =>
         {
@@ -53,7 +56,7 @@ public sealed class LiveModelCapabilityDenialTests
 
         await Record.ExceptionAsync(run);
 
-        invocationCount.Should().Be(0,
-            "GovernedAIFunction must verify capabilities before delegating; missing 'secrets:read' must short-circuit the inner body");
+        invocationCount.Should().BeLessThanOrEqualTo(MaxAttempts,
+            "GovernedAIFunction must short-circuit before delegating once the per-tool attempt cap is reached");
     }
 }

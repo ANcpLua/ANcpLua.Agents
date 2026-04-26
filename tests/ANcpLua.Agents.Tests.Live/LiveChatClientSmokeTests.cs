@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.AI;
 
-namespace ANcpLua.Agents.Tests.Governance.Integration;
+namespace ANcpLua.Agents.Tests.Live;
 
 public sealed class LiveChatClientSmokeTests
 {

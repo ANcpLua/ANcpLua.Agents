@@ -1,7 +1,7 @@
 ﻿using ANcpLua.Agents.Factory;
 using Microsoft.Extensions.AI;
 
-namespace ANcpLua.Agents.Tests.Governance.Integration;
+namespace ANcpLua.Agents.Tests.Live;
 
 internal static class IntegrationEnvironment
 {
@@ -13,7 +13,7 @@ internal static class IntegrationEnvironment
         HasValue(ApiKeyVariable) && HasValue(ModelVariable) && HasValue(EndpointVariable);
 
     public static string SkipReason =>
-        $"Live integration disabled. Set {ApiKeyVariable}, {ModelVariable}, and {EndpointVariable} to run against an OpenAI-compatible endpoint. CI wiring tracked at https://github.com/ANcpLua/ANcpLua.Agents/issues/2.";
+        $"Live integration disabled. Set {ApiKeyVariable}, {ModelVariable}, and {EndpointVariable} to run against an OpenAI-compatible endpoint.";
 
     public static IChatClient CreateClient() =>
         AgentChatClientFactory.TryCreateFromEnvironment()
