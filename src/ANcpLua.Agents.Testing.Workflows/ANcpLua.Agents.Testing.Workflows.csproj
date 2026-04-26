@@ -56,14 +56,6 @@
         See: Internals/*.cs for provenance comments per file.
     -->
 
-    <!-- DynamicPortsExecutor uses RouteBuilder.AddPortHandler which exists in upstream main
-         but hasn't shipped in the 1.1.0 NuGet. Will be unparked when MAF ships the API
-         — tracking: https://github.com/microsoft/agent-framework/pull/3142 -->
-    <ItemGroup Label="Parked (post-1.1.0 API)">
-        <Compile Remove="Runtime\DynamicPortsExecutor.cs"/>
-        <None Include="Runtime\DynamicPortsExecutor.cs"/>
-    </ItemGroup>
-
     <ItemGroup>
         <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
         <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
