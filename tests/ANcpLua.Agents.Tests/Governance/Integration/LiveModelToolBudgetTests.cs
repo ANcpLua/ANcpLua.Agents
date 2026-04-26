@@ -15,7 +15,7 @@ public sealed class LiveModelToolBudgetTests
         var invocationCount = 0;
 
         var inner = AIFunctionFactory.Create(
-            (int n) =>
+            (int _) =>
             {
                 var current = Interlocked.Increment(ref invocationCount);
                 return $"counter is now {current}";
