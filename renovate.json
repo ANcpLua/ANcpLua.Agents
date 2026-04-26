@@ -1,0 +1,79 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "schedule": ["0 */6 * * *"],
+  "timezone": "UTC",
+  "dependencyDashboard": true,
+  "commitMessagePrefix": "deps:",
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "description": "ANcpLua first-party deps (Roslyn.Utilities + NET.Sdk via msbuild-sdks, both cross-repo)",
+      "groupName": "ancplua-sdk",
+      "matchPackageNames": ["/^ANcpLua\\./"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Roslyn analyzers + reference assemblies",
+      "groupName": "roslyn",
+      "matchPackageNames": ["/^Microsoft\\.CodeAnalysis/", "/^Basic\\.Reference\\.Assemblies/"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Microsoft.Extensions / BCL / Channels / ASP.NET",
+      "groupName": "microsoft-extensions",
+      "matchPackageNames": [
+        "/^Microsoft\\.Extensions/",
+        "/^Microsoft\\.Bcl/",
+        "/^System\\.Threading\\.Channels/",
+        "/^Microsoft\\.AspNetCore/"
+      ],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Microsoft.Agents.AI (MAF) + Microsoft.Extensions.AI + OpenAI",
+      "groupName": "microsoft-agents-ai",
+      "matchPackageNames": [
+        "/^Microsoft\\.Agents\\.AI/",
+        "/^Microsoft\\.Extensions\\.AI/",
+        "/^OpenAI/"
+      ],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Meziantou framework family",
+      "groupName": "meziantou",
+      "matchPackageNames": ["/^Meziantou\\./"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Test frameworks (xUnit + AwesomeAssertions + MTP)",
+      "groupName": "testing",
+      "matchPackageNames": ["/^xunit/", "/^AwesomeAssertions/", "/^Microsoft\\.Testing/"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Major bumps require manual review (especially MAF — breaking changes common)",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["dependencies", "major"]
+    },
+    {
+      "description": "Pre-release MAF packages (preview/rc) require manual review",
+      "matchPackageNames": ["/^Microsoft\\.Agents\\.AI/"],
+      "matchCurrentVersion": "/-(preview|rc|alpha|beta)/",
+      "automerge": false
+    },
+    {
+      "description": "Block self-bumps — Agents does not auto-bump its own published packages",
+      "matchPackageNames": ["/^ANcpLua\\.Agents/"],
+      "enabled": false
+    }
+  ]
+}
