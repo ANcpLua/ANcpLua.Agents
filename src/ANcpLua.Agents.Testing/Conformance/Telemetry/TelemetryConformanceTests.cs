@@ -1,5 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 
+using ANcpLua.Agents.Testing.Diagnostics;
 using Xunit;
 
 namespace ANcpLua.Agents.Testing.Conformance.Telemetry;
@@ -15,6 +16,11 @@ namespace ANcpLua.Agents.Testing.Conformance.Telemetry;
 ///         span hierarchy, or lineage IDs belong in consumer-owned suites — those are exactly
 ///         the per-pipeline shape that this conformance layer can not assume.
 ///     </para>
+///     <para>
+///         Capture is delegated to <see cref="ActivityCollector" />, the existing
+///         test-isolation utility in this package. Per-activity assertions (tag, status,
+///         duration, kind) are available via <see cref="ActivityAssert" />.
+///     </para>
 /// </summary>
 /// <typeparam name="TFixture">Concrete fixture combining the two contracts.</typeparam>
 public abstract class TelemetryConformanceTests<TFixture>(Func<TFixture> createFixture)
@@ -29,7 +35,7 @@ public abstract class TelemetryConformanceTests<TFixture>(Func<TFixture> createF
         var ct = TestContext.Current.CancellationToken;
         var sources = Fixture.ExpectedActivitySources;
         Assert.NotEmpty(sources);
-        using var captured = CapturedTelemetry.FromSources([.. sources]);
+        using var collector = new ActivityCollector([.. sources]);
 
         var agent = Fixture.Agent;
         var session = await agent.CreateSessionAsync(ct).ConfigureAwait(false);
@@ -43,9 +49,7 @@ public abstract class TelemetryConformanceTests<TFixture>(Func<TFixture> createF
 
         // Assert
         Assert.NotNull(response);
-        Assert.True(
-            captured.StoppedActivities.Count > 0,
-            $"Expected at least one stopped Activity from sources [{string.Join(", ", sources)}], captured {captured.StoppedActivities.Count}.");
+        collector.ShouldHaveCount(1);
     }
 
     /// <summary>Conformance test.</summary>
@@ -55,7 +59,7 @@ public abstract class TelemetryConformanceTests<TFixture>(Func<TFixture> createF
         // Arrange
         var ct = TestContext.Current.CancellationToken;
         var sources = Fixture.ExpectedActivitySources;
-        using var captured = CapturedTelemetry.FromSources([.. sources]);
+        using var collector = new ActivityCollector([.. sources]);
 
         var agent = Fixture.Agent;
         var session = await agent.CreateSessionAsync(ct).ConfigureAwait(false);
@@ -66,7 +70,7 @@ public abstract class TelemetryConformanceTests<TFixture>(Func<TFixture> createF
 
         // Assert
         Assert.All(
-            captured.StoppedActivities,
+            collector.Activities,
             activity => Assert.False(string.IsNullOrEmpty(activity.OperationName)));
     }
 }

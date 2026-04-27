@@ -6,9 +6,9 @@ namespace ANcpLua.Agents.Testing.Conformance.Telemetry;
 ///     Per-provider fixture extension for telemetry conformance. A consumer fixture combines
 ///     <see cref="IAgentFixture" /> with <see cref="ITelemetryAssertingFixture" /> to declare
 ///     the <see cref="System.Diagnostics.ActivitySource" /> name(s) the provider's pipeline
-///     emits — so <see cref="TelemetryConformanceTests{TFixture}" /> can build a
-///     <see cref="CapturedTelemetry" /> scope around the agent run and assert at least one
-///     activity is observed.
+///     emits — so <see cref="TelemetryConformanceTests{TFixture}" /> can attach an
+///     <see cref="Diagnostics.ActivityCollector" /> around the agent run and assert at least
+///     one activity is observed.
 /// </summary>
 public interface ITelemetryAssertingFixture
 {

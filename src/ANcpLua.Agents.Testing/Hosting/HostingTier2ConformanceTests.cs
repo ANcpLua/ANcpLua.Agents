@@ -1,7 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 
 using ANcpLua.Agents.Testing.ChatClients;
-using ANcpLua.Agents.Testing.Conformance.Telemetry;
+using ANcpLua.Agents.Testing.Diagnostics;
 using ANcpLua.Agents.Testing.Hosting.Flavors;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +19,9 @@ namespace ANcpLua.Agents.Testing.Hosting;
 ///         consumer's decorator chain (telemetry, tool-policy, budget enforcer). The
 ///         resulting <see cref="IChatClient" /> is registered as the single
 ///         <see cref="IChatClient" /> in the host's service collection and resolved at run-time.
+///     </para>
+///     <para>
+///         Telemetry capture is delegated to <see cref="ActivityCollector" />.
 ///     </para>
 /// </summary>
 public abstract class HostingTier2ConformanceTests
@@ -97,7 +100,7 @@ public abstract class HostingTier2ConformanceTests
             AdditionalRegistrations(services);
         };
 
-        using var captured = CapturedTelemetry.FromSources([.. ExpectedActivitySources]);
+        using var collector = new ActivityCollector([.. ExpectedActivitySources]);
 
         // Act
         await using var handle = host.Build(composed);
@@ -111,7 +114,7 @@ public abstract class HostingTier2ConformanceTests
 
         // Assert
         Assert.True(
-            captured.StoppedActivities.Count > 0,
-            $"[{handle.FlavorName}] Expected ≥1 stopped Activity from sources [{string.Join(", ", ExpectedActivitySources)}], captured {captured.StoppedActivities.Count}.");
+            collector.Activities.Count > 0,
+            $"[{handle.FlavorName}] Expected ≥1 stopped Activity from sources [{string.Join(", ", ExpectedActivitySources)}], captured {collector.Activities.Count}.");
     }
 }

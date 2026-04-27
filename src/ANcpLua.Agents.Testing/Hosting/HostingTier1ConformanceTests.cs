@@ -1,6 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 
-using ANcpLua.Agents.Testing.Hosting.Asserts;
+using System.Diagnostics;
 using ANcpLua.Agents.Testing.Hosting.Flavors;
 using Xunit;
 
@@ -46,9 +46,8 @@ public abstract class HostingTier1ConformanceTests
     protected abstract IReadOnlyCollection<Type> ExpectedSingletons { get; }
 
     /// <summary>
-    ///     Optional <see cref="System.Diagnostics.ActivitySource" /> name expected to be
-    ///     registered. Override and return non-null to engage the OTel-source assert.
-    ///     Default: <c>null</c> (assert skipped).
+    ///     Optional <see cref="ActivitySource" /> name expected to be registered. Override and
+    ///     return non-null to engage the source-created assert. Default: <c>null</c> (skipped).
     /// </summary>
     protected virtual string? ExpectedActivitySource => null;
 
@@ -108,8 +107,10 @@ public abstract class HostingTier1ConformanceTests
 
     /// <summary>
     ///     If <see cref="ExpectedActivitySource" /> is set, assert that the
-    ///     <see cref="System.Diagnostics.ActivitySource" /> with that name is created and
-    ///     observable to a freshly attached <see cref="System.Diagnostics.ActivityListener" />.
+    ///     <see cref="ActivitySource" /> with that name has been created in-process by the time
+    ///     the pipeline finishes building. Verified by attaching an <see cref="ActivityListener" />
+    ///     after build — the runtime invokes <c>ShouldListenTo</c> once for every previously
+    ///     created source, so a name match flips the observed flag.
     /// </summary>
     [Theory]
     [ClassData(typeof(AllTier1HostFlavors))]
@@ -119,12 +120,25 @@ public abstract class HostingTier1ConformanceTests
         if (ExpectedActivitySource is null)
             return;
 
-        // Act
         await using var handle = host.Build(Pipeline);
-        OTelAssertions.AssertActivitySourceCreated(ExpectedActivitySource);
 
-        // Assert handled inside OTelAssertions; service-provider stays warm so the source
-        // registration cannot be torn down before the listener checks.
-        Assert.NotNull(handle.Services);
+        // Act
+        var sourceCreated = false;
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = source =>
+            {
+                if (string.Equals(source.Name, ExpectedActivitySource, StringComparison.Ordinal))
+                    sourceCreated = true;
+                return false;
+            },
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.None
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        // Assert
+        Assert.True(
+            sourceCreated,
+            $"[{handle.FlavorName}] Expected ActivitySource '{ExpectedActivitySource}' to be created during pipeline build.");
     }
 }
