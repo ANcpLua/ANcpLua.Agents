@@ -3,9 +3,14 @@
 namespace ANcpLua.Agents.Testing.Workflows.Environments;
 
 /// <summary>
-///     Fluent decorators for <see cref="IWorkflowExecutionEnvironment" /> — compose
-///     <see cref="RecordingExecutionEnvironment" /> and <see cref="DeterministicTimeExecutionEnvironment" />
-///     in the order needed for the test scenario.
+///     Fluent decorators for <see cref="IWorkflowExecutionEnvironment" />.
+///     <para>
+///         Time-discipline (<see cref="TimeProvider" />) is intentionally not exposed as a
+///         decorator: register the provider directly in DI
+///         (<c>services.AddSingleton&lt;TimeProvider&gt;(fakeTime)</c>) and let executors
+///         resolve it. <see cref="RecordingExecutionEnvironment" /> accepts a
+///         <see cref="TimeProvider" /> in its constructor for audit-timestamping.
+///     </para>
 /// </summary>
 public static class ExecutionEnvironmentExtensions
 {
@@ -13,14 +18,8 @@ public static class ExecutionEnvironmentExtensions
     public static RecordingExecutionEnvironment AsRecording(this IWorkflowExecutionEnvironment environment)
         => new(environment);
 
-    /// <summary>Wrap with a recorder using a caller-supplied <see cref="TimeProvider" /> for deterministic timestamps.</summary>
+    /// <summary>Wrap with a recorder using a caller-supplied <see cref="TimeProvider" /> for deterministic audit timestamps.</summary>
     public static RecordingExecutionEnvironment AsRecording(
-        this IWorkflowExecutionEnvironment environment,
-        TimeProvider timeProvider)
-        => new(environment, timeProvider);
-
-    /// <summary>Wrap with a deterministic <see cref="TimeProvider" /> binding.</summary>
-    public static DeterministicTimeExecutionEnvironment WithDeterministicTime(
         this IWorkflowExecutionEnvironment environment,
         TimeProvider timeProvider)
         => new(environment, timeProvider);
