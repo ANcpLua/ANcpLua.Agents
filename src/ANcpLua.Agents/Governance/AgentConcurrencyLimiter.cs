@@ -38,7 +38,7 @@ public sealed class AgentConcurrencyLimiter : IDisposable
 
     public AgentConcurrencyLimiter(int defaultLimit = 5)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(defaultLimit, 1);
+        Guard.NotLessThan(defaultLimit, 1);
         _defaultLimit = defaultLimit;
     }
 
