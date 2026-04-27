@@ -12,13 +12,13 @@ namespace ANcpLua.Agents.Tests.Hosting;
 /// </summary>
 public sealed class HostingTier2SmokeTests : HostingTier2ConformanceTests
 {
-    private static readonly ActivitySource s_source = new("test.hosting.tier2.smoke");
+    private static readonly ActivitySource SmokeSource = new("test.hosting.tier2.smoke");
 
     protected override IReadOnlyCollection<string> ExpectedActivitySources =>
         ["test.hosting.tier2.smoke"];
 
     protected override IChatClient ConfigureChatClient(FakeChatClient fake)
-        => new TracingChatClient(fake, s_source);
+        => new TracingChatClient(fake, SmokeSource);
 
     private sealed class TracingChatClient(IChatClient inner, ActivitySource source) : DelegatingChatClient(inner)
     {
@@ -27,7 +27,10 @@ public sealed class HostingTier2SmokeTests : HostingTier2ConformanceTests
             ChatOptions? options = null,
             CancellationToken cancellationToken = default)
         {
-            using var activity = source.StartActivity("smoke.get_response");
+            using var activity = source.StartActivity("smoke.chat_invocation");
+            activity?.SetTag("gen_ai.provider.name", "openai");
+            activity?.SetTag("gen_ai.operation.name", "chat");
+            activity?.SetTag("gen_ai.request.model", "fake-model");
             return await base.GetResponseAsync(messages, options, cancellationToken);
         }
     }
