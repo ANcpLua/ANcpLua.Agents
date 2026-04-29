@@ -169,7 +169,7 @@ Each of these has a clear axis where MAF doesn't ship the equivalent. The **Why*
 | `TestEchoAgent`, `TestReplayAgent`, `TestRequestAgent` | `Agents/*` | workflow-level test agents |
 | `TestRunContext` | `Runtime/TestRunContext.cs` | `IRunnerContext` test impl |
 | `ExecutionEnvironment` (enum) | `Runtime/ExecutionEnvironment.cs` | execution-mode tag |
-| 16 files in `Internals/` (`DeliveryMapping`, `ExecutorIdentity`, `ExecutorInfo`, `IExternalRequestSink`, `IRunnerContext`, `IStepTracer`, `ISuperStepJoinContext`, `ISuperStepRunner`, `MessageDelivery`, `MessageEnvelope`, `PortBinding`, `RequestHaltEvent`, `SessionCheckpointCache`, `StateManager`, `StepContext`, `WorkflowTelemetryContext`) | `Internals/*` | harvested copies of MAF 1.1 internals — **all 16 are still `internal` in MAF 1.3**; harvesting remains required |
+| 16 files in `Internals/` (`DeliveryMapping`, `ExecutorIdentity`, `ExecutorInfo`, `IExternalRequestSink`, `IRunnerContext`, `IStepTracer`, `ISuperStepJoinContext`, `ISuperStepRunner`, `MessageDelivery`, `MessageEnvelope`, `PortBinding`, `RequestHaltEvent`, `SessionCheckpointCache`, `StateManager`, `StepContext`, `WorkflowTelemetryContext`) | `Internals/*` | harvested copies of MAF internals — **all 16 are still `internal` as of MAF 1.3.0**; harvesting remains required |
 
 ---
 
