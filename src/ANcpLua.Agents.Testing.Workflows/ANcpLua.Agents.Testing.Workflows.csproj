@@ -14,7 +14,7 @@
                 CA1816 — Dispose should call GC.SuppressFinalize (upstream pattern)
                 CA1826 — Enumerable on indexable collections (performance hint, not a bug)
                 CS1591 — missing XML doc comment on public members (harvest files are partially documented)
-                RS0030 — banned ArgumentNullException.ThrowIfNull in Internals/ copies of MAF 1.1.0 internal types
+                RS0030 — banned ArgumentNullException.ThrowIfNull in Internals/ copies of MAF 1.3.0 internal types
         -->
         <NoWarn>$(NoWarn);CA1707;CA1816;CA1822;CA1826;CA1852;CA1305;CA2249;CS1591;MEAI001;RS0030</NoWarn>
     </PropertyGroup>
