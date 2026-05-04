@@ -98,3 +98,53 @@ namespace), default to fixing it directly: patch → test → release → consum
 Do not file issues against your own repos as a workaround for fixing them.
 External tracker (a) under "Scope of outstanding" applies only to
 genuinely-external upstreams.
+
+## ANcpLua Ecosystem
+
+| Repo | Purpose | NuGet | CI checks required |
+|---|---|---|---|
+| [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) | Opinionated MSBuild SDK — standardized defaults, policy enforcement, analyzer injection | [nuget.org](https://www.nuget.org/packages/ANcpLua.NET.Sdk) | `compute_version`, `lint_config`, `test (ubuntu/windows/macos)`, `create_nuget` |
+| [ANcpLua.Analyzers](https://github.com/ANcpLua/ANcpLua.Analyzers) | Custom Roslyn analyzers (auto-injected by the SDK) | [nuget.org](https://www.nuget.org/packages/ANcpLua.Analyzers) | `build`, `test (ubuntu/windows/macos)` |
+| [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) | Source generator utilities, TryParse extensions, polyfills | [nuget.org](https://www.nuget.org/packages/ANcpLua.Roslyn.Utilities) | `build (ubuntu/windows)`, `version` |
+| [ANcpLua.Agents](https://github.com/ANcpLua/ANcpLua.Agents) | MAF runtime helpers + agent test infrastructure | [nuget.org](https://www.nuget.org/packages/ANcpLua.Agents) | `build (ubuntu/windows/macos)`, `version` |
+
+### Branch protection (all 4 repos)
+
+- PR required to merge into `main` (0 approvals, squash preferred)
+- Required status checks must pass (CI jobs listed above)
+- Branch must be up-to-date with `main` before merge
+- Force push and branch deletion blocked on `main`
+- Optional checks (CodeRabbit, GitGuardian, Copilot review, auto-merge) do not block merges
+
+### Dependency graph
+
+```
+ANcpLua.NET.Sdk
+  ├── injects ANcpLua.Analyzers (compile-time)
+  └── ships Version.props (version truth for all consumers)
+
+ANcpLua.Analyzers
+  └── consumes ANcpLua.Roslyn.Utilities.Sources (source-only, internal)
+
+ANcpLua.Roslyn.Utilities
+  └── standalone (no first-party deps)
+
+ANcpLua.Agents
+  └── standalone (no first-party deps)
+```
+
+### Release flow
+
+Auto-bump-on-merge (matches ANcpLua.NET.Sdk pattern):
+
+1. PR to `main` via squash merge — workflow runs build + pack on every push
+2. On merge, the publish job:
+   - `version` reads the latest `v*` tag and bumps the patch (`v0.6.0` → `0.6.1`); reuses the tag's version when HEAD is exactly the tag
+   - `Must Publish Packages` gate diffs against the previous tag for `src/**` and `tests/**` — docs-only PRs skip publish
+   - Pushes packages to NuGet via trusted publishing (the `nuget` environment), then `gh release create v$VERSION` creates the GH release **and the tag** in one step
+   - Test packages (`ANcpLua.Agents.Testing`, `.Workflows`) ship with the `-preview.1` suffix because they pull MAF prereleases (NU5104 forbids stable→prerelease deps)
+3. NuGet indexes in ~4-8 minutes — downstream repos pick up via Renovate
+
+Manual override: `workflow_dispatch` accepts an explicit version (without the `v` prefix) — use this to force a minor/major bump or re-run a release.
+
+Note: ANcpLua.Analyzers still uses manual-tag-triggers-publish (the workflow runs only on `push: tags v*`).
