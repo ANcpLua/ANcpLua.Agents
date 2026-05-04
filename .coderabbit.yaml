@@ -1,0 +1,336 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# ANcpLua.Agents — Microsoft Agent Framework (MAF) helpers + agent test infra
+# Stack: C# / .NET, MAF (preview), preview API surface markers (MEAI001, OPENAI002)
+# Packages: ANcpLua.Agents (stable), .Testing (preview-only),
+#           .Testing.Workflows (preview-only)
+# Auto-bump pattern (compute_version on push to main).
+#
+# Schema-validated against: https://coderabbit.ai/integrations/schema.v2.json
+#
+
+language: en-US
+tone_instructions: >-
+  Principal-engineer review. Direct, concise. Flag structural violations as blocking.
+  Focus: MAF preview API discipline (suppressions allowed only for MEAI001/OPENAI002),
+  agent test infrastructure correctness, no leak of preview types into stable surface.
+early_access: true
+enable_free_tier: false
+
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  high_level_summary: true
+  high_level_summary_in_walkthrough: false
+  review_status: true
+  review_details: true
+  commit_status: true
+  fail_commit_status: true
+  collapse_walkthrough: true
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  assess_linked_issues: true
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  auto_assign_reviewers: false
+  in_progress_fortune: false
+  poem: false
+  enable_prompt_for_ai_agents: true
+
+  labeling_instructions:
+    - label: 'area:agents'
+      instructions: 'Apply when the PR modifies src/ANcpLua.Agents/ (stable package).'
+    - label: 'area:testing'
+      instructions: 'Apply when the PR modifies src/ANcpLua.Agents.Testing/ (preview-only).'
+    - label: 'area:workflows'
+      instructions: 'Apply when the PR modifies src/ANcpLua.Agents.Testing.Workflows/ (preview-only).'
+    - label: 'area:tests'
+      instructions: 'Apply when the PR modifies tests/.'
+    - label: 'area:tests-live'
+      instructions: 'Apply when the PR modifies tests/ANcpLua.Agents.Tests.Live/ (live-API tests).'
+    - label: 'area:infra'
+      instructions: 'Apply when the PR modifies .github/, eng/, or root build infrastructure.'
+    - label: 'breaking'
+      instructions: >-
+        Apply when the PR introduces breaking changes to the stable Agents
+        package surface — preview packages get a lower bar.
+  auto_apply_labels: true
+
+  path_filters:
+    - 'src/**'
+    - 'tests/**'
+    - 'eng/**'
+    - '.github/**'
+    - '*.props'
+    - '*.targets'
+    - '*.slnx'
+    - 'global.json'
+    - 'Directory.*.props'
+    - 'Directory.*.targets'
+    - 'Version.props'
+    - 'coverage.runsettings'
+    - '!**/*.g.cs'
+    - '!**/*.Designer.cs'
+    - '!**/bin/**'
+    - '!**/obj/**'
+    - '!**/artifacts/**'
+
+  path_instructions:
+    - path: 'src/ANcpLua.Agents/**/*.cs'
+      instructions: |
+        Stable package consuming Microsoft Agent Framework preview API.
+        Review for:
+        - C# 14 with preview features. File-scoped namespaces. Switch expressions.
+        - `IIncrementalGenerator` only (if any source-gen here).
+        - No `DateTime.Now` — use `TimeProvider.System`.
+        - No `.Result`/`.Wait()`/`.GetAwaiter().GetResult()` — `await` always.
+        - No null-forgiving `!` — rewrite the code.
+        - No `dynamic` — typed contracts only.
+        - CancellationToken threaded through every async public method.
+        - sealed by default for non-public classes.
+
+        ARCHITECTURAL INVARIANTS — flag violations as blocking:
+        - Preview API markers (MEAI001, OPENAI002) are the ONLY acceptable
+          suppressions in this package, and ONLY where the underlying MAF
+          API requires them. Any other suppression → flag.
+        - Preview types from MAF must NOT leak into our stable public API
+          without explicit `[Experimental]` / `[RequiresPreviewFeatures]`
+          marker on the consuming method/type.
+        - `params ReadOnlySpan<T>` over `params T[]` (C# 13+).
+
+    - path: 'src/ANcpLua.Agents.Testing/**/*.cs'
+      instructions: |
+        Preview-only package — published as X.Y.Z-preview.1 (NU5104). Lower
+        API stability bar; breaking changes acceptable across preview versions.
+        Still flag: blocking-async, DateTime.Now, null-forgiving `!`, missing
+        CancellationToken on async public methods.
+
+    - path: 'src/ANcpLua.Agents.Testing.Workflows/**/*.cs'
+      instructions: |
+        Preview-only package — same rules as ANcpLua.Agents.Testing. Workflow-
+        specific test fixtures. Review for: deterministic test setup, no
+        sleep-based synchronization, proper resource disposal in test fixtures.
+
+    - path: 'tests/**/*.cs'
+      instructions: |
+        xUnit + FluentAssertions. AAA pattern. NSubstitute for mocks.
+        Flag: blocking-async (`Task.Run(() => x.Result)`), missing
+        `async Task` (sync-void), `Thread.Sleep` instead of `await Task.Delay`,
+        tests asserting on private state via reflection.
+
+    - path: 'tests/ANcpLua.Agents.Tests.Live/**'
+      instructions: |
+        Live-API tests — hit real MAF / OpenAI / Azure endpoints.
+        Review for: tests gated behind environment variables (don't run by
+        default), API keys never logged, retries with backoff for transient
+        failures, and that test data doesn't leak PII or org-specific names.
+
+    - path: '**/*.props'
+      instructions: |
+        MSBuild property files. Multi-targeting matters here. Review for
+        correct TargetFrameworks, that preview-package csproj sets
+        `<IsPackable>true</IsPackable>` only when intended, and that
+        version override (`-preview.N` suffix) is correctly applied.
+
+    - path: 'Version.props'
+      instructions: |
+        Single source of truth for version. Auto-bump pattern:
+        compute_version bumps from latest tag on push to main.
+        Preview packages take `X.Y.Z-preview.1` (filtered out of
+        next-version.sh stable regex). Review for: matches latest tag.
+
+    - path: '.github/workflows/**'
+      instructions: |
+        Pin third-party actions to SHA. First-party (actions/*) tag-pin OK.
+        Concurrency groups required on push-triggered workflows.
+        Secrets via env: not inline. No secrets in logs.
+        Tag-with-gate pattern: nuget environment requires manual approval.
+
+    - path: 'AGENTS.md'
+      instructions: |
+        Coordination file for AI agents. Review for: consistency with actual
+        repo structure, accurate package descriptions, and the
+        MAF1.3Mapping.md reference is current.
+
+    - path: 'MAF1.3Mapping.md'
+      instructions: |
+        Mapping document between our Agents abstractions and Microsoft Agent
+        Framework 1.3 surface. Review for: accuracy against current MAF version,
+        no stale type references, and that mapping notes call out where MAF
+        preview markers (MEAI001, OPENAI002) apply.
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    auto_pause_after_reviewed_commits: 0
+    drafts: false
+    ignore_title_keywords:
+      - 'deps('
+      - '[skip ci]'
+      - '[skip review]'
+      - 'wip'
+    labels: []
+    base_branches: []
+    ignore_usernames:
+      - 'dependabot[bot]'
+      - 'renovate[bot]'
+
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+
+  pre_merge_checks:
+    docstrings:
+      mode: 'off'
+    title:
+      mode: error
+      requirements: |
+        Conventional commits: feat|fix|refactor|chore|docs|test|ci|perf|deps.
+        Under 72 chars, no trailing period.
+        Examples: feat(agents): add agent observability adapter,
+        fix(testing): correct workflow timeout default
+    description:
+      mode: warning
+    issue_assessment:
+      mode: warning
+    custom_checks:
+      - mode: error
+        name: 'No DateTime.Now/UtcNow'
+        instructions: |
+          Scan added/modified C# files for `DateTime.Now` or `DateTime.UtcNow`.
+          Pass if none. Fail if any usage — use `TimeProvider.System`.
+      - mode: error
+        name: 'No .Result/.Wait() blocking async'
+        instructions: |
+          Scan added/modified C# files for `.Result`, `.Wait()`, or
+          `.GetAwaiter().GetResult()`. Pass if none. Fail if any.
+      - mode: warning
+        name: 'No null-forgiving operator without justification'
+        instructions: |
+          Scan added/modified C# files for `!` (null-forgiving). Pass if
+          none. Fail if any `!` is added without an inline comment.
+      - mode: warning
+        name: 'Suppressions limited to MEAI001/OPENAI002'
+        instructions: |
+          Scan added/modified C# files for `#pragma warning disable` or
+          `[SuppressMessage]` attributes. Pass if none added. Fail if a
+          suppression is added for a code OTHER than MEAI001 or OPENAI002
+          (the only acceptable suppressions per repo policy — MAF preview
+          API markers). Also fail if MEAI001/OPENAI002 is suppressed on
+          code that doesn't actually call MAF preview API.
+      - mode: warning
+        name: 'No preview-type leak into stable surface'
+        instructions: |
+          Scan added/modified C# files in src/ANcpLua.Agents/ (NOT in the
+          .Testing or .Testing.Workflows packages) for public methods or
+          types whose signature includes a Microsoft Agent Framework
+          experimental type. Pass if no public surface exposes preview
+          types, OR if the consuming method/type is itself marked with
+          `[Experimental]` or `[RequiresPreviewFeatures]`. Fail otherwise —
+          preview types must not leak into stable API silently.
+
+  tools:
+    shellcheck:
+      enabled: true
+    actionlint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    github-checks:
+      enabled: true
+      timeout_ms: 180000
+    ast-grep:
+      essential_rules: true
+    eslint: { enabled: false }
+    biome: { enabled: false }
+    oxc: { enabled: false }
+    ruff: { enabled: false }
+    pylint: { enabled: false }
+    flake8: { enabled: false }
+    phpstan: { enabled: false }
+    phpmd: { enabled: false }
+    phpcs: { enabled: false }
+    swiftlint: { enabled: false }
+    detekt: { enabled: false }
+    pmd: { enabled: false }
+    semgrep: { enabled: false }
+    opengrep: { enabled: false }
+    trufflehog: { enabled: false }
+    checkov: { enabled: false }
+    tflint: { enabled: false }
+    fortitudeLint: { enabled: false }
+    rubocop: { enabled: false }
+    buf: { enabled: false }
+    regal: { enabled: false }
+    clang: { enabled: false }
+    cppcheck: { enabled: false }
+    circleci: { enabled: false }
+    clippy: { enabled: false }
+    sqlfluff: { enabled: false }
+    trivy: { enabled: false }
+    prismaLint: { enabled: false }
+    shopifyThemeCheck: { enabled: false }
+    luacheck: { enabled: false }
+    brakeman: { enabled: false }
+    dotenvLint: { enabled: false }
+    htmlhint: { enabled: false }
+    stylelint: { enabled: false }
+    checkmake: { enabled: false }
+    osvScanner: { enabled: false }
+    blinter: { enabled: false }
+    yamllint: { enabled: false }
+    psscriptanalyzer: { enabled: false }
+    languagetool: { enabled: false }
+    hadolint: { enabled: false }
+    golangci-lint: { enabled: false }
+
+chat:
+  auto_reply: true
+  art: false
+  integrations:
+    jira:
+      usage: disabled
+    linear:
+      usage: disabled
+
+knowledge_base:
+  opt_out: false
+  web_search:
+    enabled: true
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - '**/CLAUDE.md'
+      - '**/AGENTS.md'
+      - 'Directory.Build.props'
+      - 'Directory.Packages.props'
+      - 'Version.props'
+      - 'MAF1.3Mapping.md'
+  learnings:
+    scope: auto
+  issues:
+    scope: auto
+  pull_requests:
+    scope: auto
+  jira:
+    usage: disabled
+  linear:
+    usage: disabled
+  mcp:
+    usage: auto
+
+issue_enrichment:
+  auto_enrich:
+    enabled: true
+  planning:
+    auto_planning:
+      enabled: false
+  labeling:
+    auto_apply_labels: true
