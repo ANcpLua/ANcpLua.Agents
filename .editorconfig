@@ -4,6 +4,12 @@ root = true
 # Treat ALL diagnostics as errors — compiler, analyzers, IDE, style
 dotnet_analyzer_diagnostic.severity = error
 
+# Bridge until SDK bumps past PR #99 (ANcpLua/ANcpLua.NET.Sdk):
+# SDK 3.4.13 ships a stale static_readonly_fields → PascalCase rule that
+# conflicts with dotnet/runtime style (s_camelCase). Disable it locally;
+# becomes a no-op once SDK bumps and the rule no longer exists upstream.
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.severity = none
+
 # ── Brand / API-mirror naming (all projects) ──────────────────────────────────
 # AIFunction mirrors Microsoft.Extensions.AI base class; OpenAI/AzureOpenAI/AGUI
 # are product or protocol names. Renaming to AiFunction/OpenAi/Agui breaks the
