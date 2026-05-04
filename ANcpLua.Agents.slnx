@@ -1,10 +1,16 @@
 <Solution>
     <Folder Name="/src/">
-        <Project Path="src/ANcpLua.Agents/ANcpLua.Agents.csproj"/>
-        <Project Path="src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj"/>
-        <Project Path="src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj"/>
+        <Project Path="src/ANcpLua.Agents/ANcpLua.Agents.csproj" />
+        <Project Path="src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj" />
+        <Project Path="src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj" />
     </Folder>
     <Folder Name="/tests/">
-        <Project Path="tests/ANcpLua.Agents.Tests/ANcpLua.Agents.Tests.csproj"/>
+        <File Path="tests\ANcpLua.Agents.Tests.Live\ANcpLua.Agents.Tests.Live.csproj" />
+        <File Path="tests\ANcpLua.Agents.Tests.Live\IntegrationEnvironment.cs" />
+        <File Path="tests\ANcpLua.Agents.Tests.Live\LiveChatClientSmokeTests.cs" />
+        <File Path="tests\ANcpLua.Agents.Tests.Live\LiveModelCapabilityDenialTests.cs" />
+        <File Path="tests\ANcpLua.Agents.Tests.Live\LiveModelToolBudgetTests.cs" />
+        <Project Path="tests/ANcpLua.Agents.Tests.Live/ANcpLua.Agents.Tests.Live.csproj" />
+        <Project Path="tests/ANcpLua.Agents.Tests/ANcpLua.Agents.Tests.csproj" />
     </Folder>
 </Solution>
