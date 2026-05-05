@@ -1,0 +1,22 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>ANcpLua.Agents.Foundry</RootNamespace>
+        <PackageId>ANcpLua.Agents.Foundry</PackageId>
+        <Description>RC-channel Foundry facades for Microsoft Agent Framework consumers.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>maf;agents;microsoft-agents;foundry;declarative;rc</PackageTags>
+        <!-- Mirrors upstream MAF Foundry/declarative experimental boundaries; keep confined to this RC package. -->
+        <NoWarn>$(NoWarn);OPENAI001;MEAI001</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
+        <PackageReference Include="Microsoft.Agents.AI.Foundry"/>
+        <PackageReference Include="Microsoft.Agents.AI.Workflows.Declarative.Foundry"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+</Project>
