@@ -1,4 +1,4 @@
-﻿using ANcpLua.Agents.Factory;
+﻿using ANcpLua.Agents.Hosting.OpenAI;
 using Microsoft.Extensions.AI;
 
 namespace ANcpLua.Agents.Tests.Live;
