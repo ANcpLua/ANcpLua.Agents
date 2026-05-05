@@ -1,72 +1,45 @@
-# Copilot PR-review instructions for ANcpLua.Agents
+# Copilot review instructions
 
-Microsoft Agent Framework (MAF) consumer toolkit. Ships three NuGet packages:
-`ANcpLua.Agents` (governance, instrumentation, factory helpers), `ANcpLua.Agents.Testing`
-(`FakeChatClient`, scripted clients, six provider conformance fixtures, SSE parsing),
-and `ANcpLua.Agents.Testing.Workflows` (workflow fixture base, in-memory checkpoint
-manager). All target `net10.0`. Pinned to `Microsoft.Agents.AI` 1.3.0 stable +
-`Microsoft.Agents.AI.Workflows.Declarative` 1.3.0-rc1; `Microsoft.Extensions.AI` 10.5.0.
-`AllowMrtsPrerelease=true` for MAF preview consumption. CPM enforced via
-`Directory.Packages.props`. This file scopes to PR review only.
+## Reviewer focus
 
-## Flag
+- Review **changes in this PR**, not the whole repo. The diff is the assignment.
+- Skip files whose first ~3 lines contain `// Ported from <upstream>`,
+  `// Generated`, or `// Auto-generated`. Their contract is the upstream's,
+  not ours; surface a one-line note instead of line-level findings.
+- Skip files in `node_modules/`, `dist/`, `build/`, `bin/`, `obj/`, generated
+  Roslyn artifacts (`*.g.cs`), and lockfiles (`package-lock.json`,
+  `pnpm-lock.yaml`, `yarn.lock`).
+- Skip vendored fixtures under `**/fixtures/**` and `**/test-data/**` —
+  they're deliberately broken or deliberately verbatim.
 
-- `IChatClient` instances created without a `using` block. `IChatClient` is
-  `IDisposable`; OpenAI / Azure / Anthropic SDK clients hold HTTP connections,
-  forgetting `Dispose()` leaks sockets under load.
-- `AgentConcurrencyLimiter` constructed without `using` — it owns a
-  `SemaphoreSlim` dictionary; not disposing leaks handles, and acquiring after
-  dispose throws `ObjectDisposedException`.
-- Mutating `ChatOptions.Tools` (or any `ChatOptions` field) on an instance shared
-  across concurrent agent runs. `ToolDecoratingChatClient.PrepareOptions()`
-  mutates in place; sharing a `ChatOptions` across `GetResponseAsync` calls
-  produces inconsistent tool decorations or torn state.
-- `await foreach` over a streaming response (`run.WatchStreamAsync()`,
-  `agent.RunStreamingAsync()`) without a `CancellationToken` parameter or
-  `.WithCancellation(ct)` chained. Streams are long-running; missing cancellation
-  blocks shutdown.
-- Hardcoded model names (`"gpt-4o"`, `"claude-3-5-sonnet"`) without an env-var
-  override or options-driven path. The established pattern is
-  `TryCreateFromEnvironment()` reading `ANCPLUA_AGENT_MODEL`.
-- New `IChatClient` or `AIAgent` factory site missing the established telemetry
-  wrap (consumer responsibility — wrappers like `.UseQylAgentTelemetry()` live in
-  downstream consumers, but factory helpers here must not block them).
+## Coordinate with other reviewers
 
-## agents-specific
+- CodeRabbit and Claude Code Review run on the same PR. **Don't repeat
+  findings they've already raised** — read the existing review comments
+  before posting.
+- If CodeRabbit has labeled a finding `false_positive` or the human author
+  has marked it resolved, don't re-raise it.
 
-- All three packages still ship from this repo (the
-  `MAF.Advanced.Patterns` consolidation moves are paused). Don't suggest
-  redirecting users to `MAF.Advanced.Patterns` until that migration completes.
-- MAF version pin lives in `Directory.Packages.props`. Don't bump
-  `Microsoft.Agents.AI` or `Microsoft.Extensions.AI` in a feature PR — version
-  bumps are their own commits with downstream impact analysis.
-- `LangVersion=preview` is on. C# 14 features (file-scoped namespaces, primary
-  constructors, required init, `params ReadOnlySpan<T>`) are repo defaults.
-- `ANcpLua.Agents.Testing.Workflows/` includes harvested copies of MAF 1.3.0
-  internals (under `Internals/`). Don't refactor those toward "cleaner" shape —
-  they exist verbatim for upstream parity, and `RS0030` (banned
-  `ArgumentNullException.ThrowIfNull`) is suppressed there because upstream uses
-  the banned API.
+## Style
 
-## Do not flag
+- Group findings by file, not by severity, when there are >5.
+- Don't suggest renames of public exports without a clear caller-side
+  benefit. The cost of a rename is paid by every consumer.
+- Don't suggest adding tests "for completeness" — only when the changed
+  contract is uncovered by existing tests.
 
-- Allow-listed suppressions in `ANcpLua.Agents.Testing.csproj`: `CA1002`,
-  `CA1034`, `CA1305`, `CA1707`, `CA1816`, `CA1819`, `CA1826`, `CA2000`, `CS1591`,
-  `AL0014`, `AL0025`, `AL0131`, `IDE1006`, `IDE0060`, `IDE0059` — the file's own
-  comment documents these as MAF-upstream-parity concessions.
-- `MEAI001` suppression in `Testing.Workflows` (preview API marker for
-  `Workflows.Declarative` rc1).
-- `NU1604` in `Directory.Build.props` (CPM transitive-pin warning).
-- `RS0030` inside `Internals/` directories (harvested upstream code).
-- Missing XML doc comments on `internal` types or harvested upstream helpers.
+## Project conventions to respect
 
-## Project context
+- Node code: ESM, Node ≥20, no external runtime deps unless already
+  declared in `package.json`.
+- .NET code: nullable enabled, central package management
+  (`Directory.Packages.props`), `Version.props` is the single owner of
+  versions — never edit `<Version>` lines directly.
+- Don't suggest patterns that contradict `CLAUDE.md`, `AGENTS.md`, or the
+  repo's `.coderabbit.yaml` `path_instructions`.
 
-Solo-dev repo. The owner controls all known consumers (qyl primarily) and
-handles downstream fixes in the same session. Breaking changes are allowed;
-bump major and fix consumers. Don't suggest backwards-compat shims, feature
-flags, or deprecated-marker dual paths within a single PR. Test infrastructure
-(`FakeChatClient`, `MockChatClients`, `WorkflowFixture`, conformance suites for
-OpenAI / Azure / Anthropic / Ollama / Google / OpenRouter) lives here today;
-some of it is slated to migrate to `MAF.Advanced.Patterns.Testing` once the
-qyl-consumption decision unblocks the consolidation.
+## Rate-limit / failure behavior
+
+If you hit a rate limit, **surface the limit and the unblock date in your
+review body** rather than the generic "encountered an error" string. The
+human author needs the date to plan, not a vague retry hint.
