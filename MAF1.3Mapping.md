@@ -1,6 +1,6 @@
 # MAF 1.3 ↔ ANcpLua.Agents Mapping
 
-**Stand:** 2026-04-27 · **MAF version:** 1.3.0 (stable) / 1.3.0-preview.260423.1 (Hosting, AGUI AspNetCore, Anthropic) · **Repo:** `/Users/ancplua/framework/ANcpLua.Agents`
+**Stand:** 2026-05-05 · **MAF version:** 1.3.0 stable / 1.3.0-preview.260423.1 preview / 1.3.0-rc1 declarative Foundry / 1.3.0-alpha.260423.1 OpenAI hosting · **Repo:** `/Users/ancplua/framework/ANcpLua.Agents`
 
 This file maps every public type in `ANcpLua.Agents*` against MAF 1.3's public surface. Three buckets:
 
@@ -8,7 +8,7 @@ This file maps every public type in `ANcpLua.Agents*` against MAF 1.3's public s
 2. **Built in this repo** — what we add on top, with the axis that justifies it.
 3. **Removed as redundant** — past shadow APIs (intra-repo or against MAF) that have been deleted.
 
-The rule going forward: keep only the best of both. If MAF or another `ancplua/framework` sibling already ships the better surface, delete locally and consume upstream. If our surface is the better one, fix upstream where we can; otherwise document the axis.
+The rule going forward: keep only the best of both. Public packages mirror MAF's capability shape as `ANcpLua.Agents.X` while dropping the redundant `.AI` segment. Stable packages must not reference MAF preview, RC, or alpha packages.
 
 ---
 
@@ -59,12 +59,15 @@ These come from MAF NuGet packages and are consumed directly. Reimplementing any
 | `IHostedAgentBuilder` + `HostedAgentBuilderExtensions` | consumed by `WithAITool`, `WithInMemorySessionStore` etc. |
 | `WorkflowCatalog` + `IHostedWorkflowBuilder` + `HostApplicationBuilderWorkflowExtensions` | hosted workflow registration |
 | `AIHostAgent` (`DelegatingAIAgent`-based agent) | server-side hosting |
-| `Microsoft.Agents.AI.Hosting.AGUI.AspNetCore` (`AddAGUI`, `MapAGUI`) | wrapped by `AGUITestServer` for in-process AG-UI tests |
+| `DurableAgentsOptions.AddAIAgent(...)` (in `.Hosting.AzureFunctions`) | wrapped by `ANcpLua.Agents.Hosting.Azure` |
+| `Microsoft.Agents.AI.Foundry.Hosting` | wrapped by `ANcpLua.Agents.Hosting.Foundry` |
+| `Microsoft.Agents.AI.DevUI` | wrapped by `ANcpLua.Agents.Hosting.DevUI` |
+| `Microsoft.Agents.AI.Hosting.OpenAI` | wrapped by `ANcpLua.Agents.Hosting.OpenAI` alpha package |
 | `DurableAgentsOptions.AddAIAgent(...)` (in `.Hosting.AzureFunctions`) | **explicitly out of scope** — Slot C.3 SKIP per HTML decision |
 
-### Provider packages (`Microsoft.Agents.AI.OpenAI`, `.Anthropic`, `.Foundry`, ...)
+### Provider packages (`Microsoft.Agents.AI.Anthropic`, `.Foundry`, ...)
 
-`Conformance/Examples/*ChatCompletionFixture.cs` consume these as the canonical client-construction path. We never wrap a provider package.
+`ANcpLua.Agents.Hosting.Anthropic` and `ANcpLua.Agents.Foundry` expose Qyl-prefixed facade methods over the matching MAF provider surfaces. Test fixtures consume provider SDKs directly when that is the canonical client-construction path.
 
 ### `Microsoft.Extensions.AI`
 
@@ -93,8 +96,9 @@ Each of these has a clear axis where MAF doesn't ship the equivalent. The **Why*
 | `GovernedAIFunction` | `Governance/GovernedAIFunction.cs` | composes capability + budget + concurrency in front of any `AIFunction` — qyl |
 | `TracedAIFunction` | `Instrumentation/TracedAIFunction.cs` | OTel tracing decorator over `AIFunction` (GenAI semconv 1.40 tags) — **MAF has no `OpenTelemetryAIFunction`** |
 | `ToolDecoratingChatClient` | `Instrumentation/ToolDecoratingChatClient.cs` | `DelegatingChatClient` that runs a `Func<AIFunction, AIFunction>` over every tool — MAF has no cross-cut tool decorator |
-| `AgentChatClientFactory`, `AgentChatClientOptions` | `Factory/AgentChatClientFactory.cs` | OpenAI-compatible factory (Ollama, Azure-via-proxy, …) — MAF ships per-provider packages, this is a flexible env-driven construction path |
-| `AgentsHelper`, `WorkflowsHelper`, `ColorHelper`, `JsonHelper` | top-level | qyl glue (env vars, console color, null-fallback JSON parsing) |
+| `AgentsHelper`, `ColorHelper`, `JsonHelper` | top-level | qyl glue (env vars, console color, null-fallback JSON parsing) |
+| `AgentChatClientFactory`, `AgentChatClientOptions` | `ANcpLua.Agents.Hosting.OpenAI/Factory/AgentChatClientFactory.cs` | OpenAI-compatible factory (Ollama, Azure-via-proxy, …) — alpha-channel hosting boundary |
+| `WorkflowsHelper` | `ANcpLua.Agents.Workflows/WorkflowsHelper.cs` | workflow-oriented helper split out to the stable workflow package |
 
 ### `ANcpLua.Agents.Testing` — chat-clients & helpers
 
@@ -137,7 +141,7 @@ Each of these has a clear axis where MAF doesn't ship the equivalent. The **Why*
 |---|---|---|
 | `FakeHttpMessageHandler` | `Http/FakeHttpMessageHandler.cs` | request-recording + scripted response `HttpMessageHandler` — provider SDK testing |
 | `RecordedRequest` | `Http/RecordedRequest.cs` | recorded-request shape |
-| `SseResponseParser` | `Http/SseResponseParser.cs` | server-sent-events parser for AGUI/streaming-API tests |
+| `SseResponseParser` | `Http/SseResponseParser.cs` | server-sent-events parser for streaming API tests |
 
 ### `ANcpLua.Agents.Testing` — hosting (Slot C.1 + C.2)
 
@@ -150,7 +154,6 @@ Each of these has a clear axis where MAF doesn't ship the equivalent. The **Why*
 | `MiddlewareChainAssertions` (`AssertChatClientDecorators`) | `Hosting/Asserts/*` | `IChatClient.GetService(typeof(T), null)` decorator-chain asserts |
 | `HostingTier1ConformanceTests` (3 theory methods × 4 flavors = 12 rows) | `Hosting/HostingTier1ConformanceTests.cs` | DI-walk conformance |
 | `HostingTier2ConformanceTests` (2 theory methods × 4 flavors = 8 rows) | `Hosting/HostingTier2ConformanceTests.cs` | `FakeChatClient` agent-run + telemetry conformance |
-| `AGUITestServer` | `Hosting/AGUITestServer.cs` | in-process ASP.NET Core test server with AG-UI mapped — wraps `AddAGUI`/`MapAGUI` for tests |
 
 ### `ANcpLua.Agents.Testing` — BitNet integration
 

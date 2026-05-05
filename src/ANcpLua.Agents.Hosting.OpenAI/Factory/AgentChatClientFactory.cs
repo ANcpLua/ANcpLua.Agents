@@ -3,7 +3,7 @@ using ANcpLua.Roslyn.Utilities;
 using Microsoft.Extensions.AI;
 using OpenAI;
 
-namespace ANcpLua.Agents.Factory;
+namespace ANcpLua.Agents.Hosting.OpenAI;
 
 /// <summary>
 ///     Configuration for <see cref="AgentChatClientFactory.TryCreate"/>.

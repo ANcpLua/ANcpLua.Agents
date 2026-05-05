@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
+using ANcpLua.Agents;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 
-namespace ANcpLua.Agents;
+namespace ANcpLua.Agents.Workflows;
 
 public static class WorkflowsHelper
 {
