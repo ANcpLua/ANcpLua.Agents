@@ -1,6 +1,7 @@
 using System.ClientModel;
 using System.ClientModel.Primitives;
 using System.Text.Json.Nodes;
+using ANcpLua.Roslyn.Utilities;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using Xunit;
@@ -69,22 +70,17 @@ public sealed class BitNetFixture : IAsyncLifetime
             ? configuredModel
             : DefaultModel;
 
-        var options = new OpenAIClientOptions { Endpoint = new Uri(endpoint, apiPath) };
-        var client = new OpenAIClient(new ApiKeyCredential(UnusedApiKey), options);
-        ChatClient = client.GetChatClient(model).AsIChatClient();
-
         // Defensive shim for older OpenAI-compat servers: OpenAI deprecated
         // `max_tokens` in favor of `max_completion_tokens` (Sept 2024, alongside
         // o1 reasoning models), and the .NET SDK only emits the new field. Any
         // llama-server build older than ggml-org/llama.cpp PR #19831 (merged
         // 2026-02-23) silently ignores `max_completion_tokens` and runs to the
-        // context limit. Mirror it so both fields are present on the wire.
-#pragma warning disable MEAI001 // OpenAIRequestPolicies is experimental — supported MEAI hook for body rewrite.
-        if (ChatClient.GetService(typeof(OpenAIRequestPolicies)) is OpenAIRequestPolicies policies)
-        {
-            policies.AddPolicy(new LegacyMaxTokensPolicy(), PipelinePosition.PerCall);
-        }
-#pragma warning restore MEAI001
+        // context limit. Register a per-call policy on the inherited
+        // ClientPipelineOptions so both fields end up on the wire.
+        var options = new OpenAIClientOptions { Endpoint = new Uri(endpoint, apiPath) };
+        options.AddPolicy(new LegacyMaxTokensPolicy(), PipelinePosition.PerCall);
+        var client = new OpenAIClient(new ApiKeyCredential(UnusedApiKey), options);
+        ChatClient = client.GetChatClient(model).AsIChatClient();
     }
 
     /// <inheritdoc />
@@ -104,11 +100,13 @@ public sealed class BitNetFixture : IAsyncLifetime
 ///     mirror the server ignores the cap and generates until the context fills.
 /// </summary>
 /// <remarks>
-///     Registered via <see cref="OpenAIRequestPolicies" />, the supported MEAI
-///     extension hook, so the policy runs *after* the SDK has serialized the
-///     <see cref="PipelineRequest.Content" /> — we parse the final JSON body,
-///     copy the field, and rewrite the content. Self-deleting: once the target
-///     server accepts <c>max_completion_tokens</c> natively, this becomes a no-op.
+///     Registered on <see cref="OpenAIClientOptions" /> via the inherited
+///     <c>ClientPipelineOptions.AddPolicy</c> hook so the policy runs after the
+///     SDK has serialized the <see cref="PipelineRequest.Content" /> — we parse
+///     the final JSON body, copy the field, and rewrite the content. The async
+///     path uses <c>WriteToAsync</c> end-to-end so the pipeline never blocks on
+///     sync I/O. Self-deleting: once the target server accepts
+///     <c>max_completion_tokens</c> natively, this becomes a no-op.
 /// </remarks>
 internal sealed class LegacyMaxTokensPolicy : PipelinePolicy
 {
@@ -120,21 +118,40 @@ internal sealed class LegacyMaxTokensPolicy : PipelinePolicy
 
     public override async ValueTask ProcessAsync(PipelineMessage message, IReadOnlyList<PipelinePolicy> pipeline, int currentIndex)
     {
-        Mirror(message);
+        await MirrorAsync(message).ConfigureAwait(false);
         await ProcessNextAsync(message, pipeline, currentIndex).ConfigureAwait(false);
     }
 
     private static void Mirror(PipelineMessage message)
     {
-        if (message.Request?.Content is not { } content) return;
-#pragma warning disable AL0039 // EndsWithIgnoreCase suggestion — BCL EndsWith with explicit comparer is fine here.
-        if (message.Request.Uri?.AbsolutePath?.EndsWith("/chat/completions", StringComparison.OrdinalIgnoreCase) is not true) return;
-#pragma warning restore AL0039
-
+        if (!ShouldMirror(message, out var content)) return;
         using var buffer = new MemoryStream();
         content.WriteTo(buffer, default);
-        buffer.Position = 0;
+        Apply(message, buffer);
+    }
 
+    private static async ValueTask MirrorAsync(PipelineMessage message)
+    {
+        if (!ShouldMirror(message, out var content)) return;
+        await using var buffer = new MemoryStream();
+        await content.WriteToAsync(buffer, message.CancellationToken).ConfigureAwait(false);
+        Apply(message, buffer);
+    }
+
+    private static bool ShouldMirror(PipelineMessage message, out BinaryContent content)
+    {
+        content = null!;
+        if (message.Request?.Content is not { } c) return false;
+        // OpenAI's spec defines the path as `/v1/chat/completions` (lowercase),
+        // and llama-server preserves casing; an ordinal compare is sufficient.
+        if (message.Request.Uri?.AbsolutePath?.EndsWithOrdinal("/chat/completions") is not true) return false;
+        content = c;
+        return true;
+    }
+
+    private static void Apply(PipelineMessage message, MemoryStream buffer)
+    {
+        buffer.Position = 0;
         if (JsonNode.Parse(buffer) is not JsonObject body) return;
         if (body["max_tokens"] is null && body["max_completion_tokens"] is { } mct)
         {
