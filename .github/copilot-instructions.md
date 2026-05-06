@@ -39,11 +39,15 @@ preview hosting (`.Hosting.Azure`, `.Hosting.Foundry`, `.Hosting.Anthropic`,
   bumps are their own commits with downstream impact analysis.
 - `LangVersion=preview` is on. C# 14 features (file-scoped namespaces, primary
   constructors, required init, `params ReadOnlySpan<T>`) are repo defaults.
-- `ANcpLua.Agents.Testing.Workflows/` includes harvested copies of MAF 1.4.0
-  internals (under `Internals/`). Don't refactor those toward "cleaner" shape —
-  they exist verbatim for upstream parity, and `RS0030` (banned
-  `ArgumentNullException.ThrowIfNull`) is suppressed there because upstream uses
-  the banned API.
+- `ANcpLua.Agents.Testing.Workflows/Internals/` bridges MAF Workflows concepts
+  that upstream marks `internal` (no InternalsVisibleTo grant). **Design intent
+  is facade / decorator / railway / fluent / extension methods** over those
+  concepts — expressive, cohesive, loosely coupled. This is *not* a 1:1 mirror
+  of upstream sources; verbatim parity is acceptable only where the upstream
+  contract is genuinely structural. The current shape still has surface area
+  that mirrors upstream conventions; refactoring it toward idiomatic ANcpLua
+  facades is welcome and expected. `RS0030` is suppressed transitionally until
+  the migration to `Guard.NotNull`-style facades is complete.
 
 ## Style
 
@@ -58,14 +62,16 @@ preview hosting (`.Hosting.Azure`, `.Hosting.Foundry`, `.Hosting.Anthropic`,
 - Allow-listed suppressions in `ANcpLua.Agents.Testing.csproj`: `CA1002`,
   `CA1034`, `CA1305`, `CA1707`, `CA1816`, `CA1819`, `CA1826`, `CA2000`, `CS1591`,
   `AL0014`, `AL0025`, `AL0131`, `IDE1006`, `IDE0060`, `IDE0059` — the file's own
-  comment documents these as MAF-upstream-parity concessions.
+  comment documents these as transitional concessions while the test surface
+  still mirrors upstream conventions; lift them per-rule as facades land.
 - `MEAI001` suppression in `Testing.Workflows` when it mirrors MAF workflow
   experimental API diagnostics.
 - `OPENAI001` / `MEAI001` suppressions in Foundry and hosting boundary projects
   when they mirror upstream MAF experimental API diagnostics.
 - `NU1604` in `Directory.Build.props` (CPM transitive-pin warning).
-- `RS0030` inside `Internals/` directories (harvested upstream code).
-- Missing XML doc comments on `internal` types or harvested upstream helpers.
+- `RS0030` inside `Internals/` directories (transitional facade layer; lift
+  per-file as `Guard.NotNull` adoption progresses).
+- Missing XML doc comments on `internal` types or transitional bridging helpers.
 
 ## Project conventions to respect
 

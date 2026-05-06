@@ -10,6 +10,8 @@ This file maps every public type in `ANcpLua.Agents*` against MAF 1.4's public s
 
 The rule going forward: keep only the best of both. Public packages mirror MAF's capability shape as `ANcpLua.Agents.X` while dropping the redundant `.AI` segment. Stable packages must not reference MAF preview, RC, or alpha packages.
 
+**Design philosophy** — bridges over MAF internals (`Internals/`, `Conformance/`, related testing surface) are intentionally *facade / decorator / railway / fluent / extension* layers, not 1:1 mirrors of upstream code. Verbatim parity is reserved for cases where the upstream contract is genuinely structural (interface shape, record layout, types upstream marks `internal` without an InternalsVisibleTo grant, or projects upstream does not package). Where this doc says "harvested" below, treat it as a description of the *current transitional state*, not a future direction; the migration target is expressive, cohesive, loosely coupled ANcpLua-authored API surface.
+
 ---
 
 ## 1 · Borrowed from MAF (we don't reimplement)

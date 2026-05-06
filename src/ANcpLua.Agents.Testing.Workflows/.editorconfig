@@ -1,7 +1,11 @@
-; ANcpLua.Agents.Testing.Workflows — harvested from microsoft/agent-framework test tree.
-; Headers in each file document the upstream source path. Design goal: zero-drift
-; merges on every MAF version bump. Any stylistic Rider/ReSharper inspection that
-; would push this tree away from upstream spelling or shape is disabled here.
+; ANcpLua.Agents.Testing.Workflows — ANcpLua-authored test infrastructure
+; over Microsoft Agent Framework Workflows. Internals/ bridges MAF concepts
+; that upstream marks `internal` (no InternalsVisibleTo grant); the design
+; intent is facade / decorator / railway / fluent / extension layers, not a
+; 1:1 mirror of upstream. Some types still carry upstream spellings/shape as
+; a transitional state — the inspection silences below cover that surface
+; until the facade migration is complete; lift them per-rule as types are
+; replaced.
 ;
 ; Compiler warnings stay honest — that's `dotnet build`. This file targets ONLY
 ; ReSharper inspections that Rider surfaces in-IDE.
@@ -14,9 +18,11 @@ resharper_inconsistent_naming_highlighting = none
 ; Flat project namespace is a consumer-API contract ("single import").
 resharper_check_namespace_highlighting = none
 
-; ── Upstream dead code (unused methods / fields / ctors / type params) ─────────
-; Upstream test helpers expose surface we do not call from our samples yet;
-; deleting them would diverge from the harvest source.
+; ── Transitional unused surface ────────────────────────────────────────────────
+; Some bridging types expose surface we do not call from samples yet; trimming
+; is welcome as facades replace transitional types, but Rider's local-unused
+; inspections create churn during the migration. Re-enable per-file once the
+; type has been refactored to its facade form.
 resharper_unused_member_local_highlighting = none
 resharper_unused_member_global_highlighting = none
 resharper_unused_type_parameter_highlighting = none
