@@ -5,6 +5,7 @@
 - Target repo: `/Users/ancplua/framework/ANcpLua.Agents`
 - Owner action: inventory only (no source edits)
 - Methodology: map each public type/member to an ANcpLua destination as **Keep**, **Migrate**, or **Drop**.
+- **Pattern criteria (relaxed 2026-05-06):** facade-only is too strict. Patterns that earn keep: railway, fluent API, builder, factory, extension, strategy, decorator. The original "logic-heavy / not facade" Drop reasons were re-evaluated against this list and several entries flipped to Migrate.
 - Channel risk labels are based on ANcpLua package metadata:
   - stable packages: `ANcpLua.Agents`, `ANcpLua.Agents.Workflows`, `ANcpLua.Agents.Testing`, `ANcpLua.Agents.Testing.Workflows`
   - preview packages: `ANcpLua.Agents.Hosting.OpenAI`, `ANcpLua.Agents.Hosting.Anthropic`, `ANcpLua.Agents.Hosting.Azure`, `ANcpLua.Agents.Hosting.DevUI`, `ANcpLua.Agents.Hosting.Foundry`
@@ -196,11 +197,11 @@
 |---|---|---|---|---|---|
 | `QylOpenAIClientExtensions` | ANcpLua has only hosting package and no OpenAI client extension facade | Migrate cautiously (preview-only if kept) | `ANcpLua.Agents.Hosting.OpenAI` | alpha | Many APIs are client-return-value wrappers and run helpers; only thin `AsQylOpenAIAgent` conversions are likely facade candidates |
 | `AsQylOpenAIAgent(...)` x5 | no exact method names in ANcpLua | Migrate/align | `ANcpLua.Agents.Hosting.OpenAI` | alpha | method names/overloads may require compatibility wrapper decision |
-| `AsQylOpenAIChatClientWithStoredOutputDisabled(...)` | same | Drop | N/A | deletion | OpenAI client wrapper helper; logic-heavy |
-| `RunQylOpenAIAsync(...)` x2 | same | Drop | N/A | deletion | execution helper, not facade |
-| `RunQylOpenAIStreamingAsync(...)` x2 | same | Drop | N/A | deletion | execution helper |
-| `AsQylOpenAIChatCompletion(...)` | same | Drop | N/A | deletion | response conversion helper |
-| `AsQylResponseResult(...)` | same | Drop | N/A | deletion | response conversion helper |
+| `AsQylOpenAIChatClientWithStoredOutputDisabled(...)` | exists at `ANcpLua.Agents.Hosting.OpenAI/Facades/QylOpenAIClientExtensions.cs` | Migrate/align | `ANcpLua.Agents.Hosting.OpenAI` | alpha | clean extension over `OpenAIResponseClientExtensions.AsIChatClientWithStoredOutputDisabled`; original "logic-heavy" rationale was wrong (it is one-line guard-and-delegate) |
+| `RunQylOpenAIAsync(...)` x2 | exists | Migrate/align | `ANcpLua.Agents.Hosting.OpenAI` | alpha | extension over `AIAgentWithOpenAIExtensions.RunAsync` (ChatMessage and ResponseItem overloads) |
+| `RunQylOpenAIStreamingAsync(...)` x2 | exists | Migrate/align | `ANcpLua.Agents.Hosting.OpenAI` | alpha | extension over `AIAgentWithOpenAIExtensions.RunStreamingAsync` |
+| `AsQylOpenAIChatCompletion(...)` | exists | Migrate/align | `ANcpLua.Agents.Hosting.OpenAI` | alpha | extension over `AgentResponseExtensions.AsOpenAIChatCompletion` |
+| `AsQylResponseResult(...)` | exists | Migrate/align | `ANcpLua.Agents.Hosting.OpenAI` | alpha | extension over `AgentResponseExtensions.AsOpenAIResponse` |
 
 ### `QylPurviewExtensions` (`src/MAF.Advanced.Patterns/QylPurviewExtensions.cs`)
 | API | Evidence | Recommendation | Destination | Channel risk | Notes |
@@ -225,22 +226,22 @@
 ### `QylWorkflowBuilderExtensions` (`src/MAF.Advanced.Patterns/QylWorkflowBuilderExtensions.cs`)
 | API | Evidence | Recommendation | Destination | Channel risk | Notes |
 |---|---|---|---|---|---|
-| `QylWorkflowBuilderExtensions` | no ANcpLua equivalent | Drop | N/A | deletion | builder helper APIs currently absent in toolkit |
-| `AddQylChain(...)` | same | Drop | N/A | deletion | builder composition helper without matching ANcpLua API |
-| `AddQylSwitch(...)` | same | Drop | N/A | deletion | same |
-| `AddQylHumanInTheLoop(...)` | same | Drop | N/A | deletion | same |
-| `ForwardQyl(...)` x3 | same | Drop | N/A | deletion | same |
-| `ForwardQylExcept(...)` | same | Drop | N/A | deletion | same |
+| `QylWorkflowBuilderExtensions` | exists at `ANcpLua.Agents.Workflows/Facades/QylWorkflowBuilderExtensions.cs` | Migrate/align | `ANcpLua.Agents.Workflows` | stable | clean extension facades over `WorkflowBuilder` |
+| `AddQylChain(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
+| `AddQylSwitch(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
+| `AddQylHumanInTheLoop(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
+| `ForwardQyl(...)` x3 | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists (incl. conditional overload) |
+| `ForwardQylExcept(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
 
 ### `QylWorkflowContextExtensions` (`src/MAF.Advanced.Patterns/QylWorkflowContextExtensions.cs`)
 | API | Evidence | Recommendation | Destination | Channel risk | Notes |
 |---|---|---|---|---|---|
-| `QylWorkflowContextExtensions` | no ANcpLua equivalent | Drop | N/A | deletion | context IO helpers are workflow-runtime implementation details |
-| `SendQylAsync(...)` | same | Drop | N/A | deletion | same |
-| `SendQylToAsync(...)` | same | Drop | N/A | deletion | same |
-| `YieldQylAsync(...)` | same | Drop | N/A | deletion | same |
-| `ReadQylAsync<T>()` | same | Drop | N/A | deletion | same |
-| `PersistQylAsync<T>(...)` | same | Drop | N/A | deletion | same |
+| `QylWorkflowContextExtensions` | exists at `ANcpLua.Agents.Workflows/Context/QylWorkflowContextExtensions.cs` | Migrate/align | `ANcpLua.Agents.Workflows` | stable | clean extension facades over `IWorkflowContext` |
+| `SendQylAsync(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
+| `SendQylToAsync(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
+| `YieldQylAsync(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
+| `ReadQylAsync<T>()` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
+| `PersistQylAsync<T>(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | wraps `QueueStateUpdateAsync` with the ergonomic name |
 
 ### `QylWorkflowExecutionExtensions` (`src/MAF.Advanced.Patterns/QylWorkflowExecutionExtensions.cs`)
 | API | Evidence | Recommendation | Destination | Channel risk | Notes |
@@ -260,10 +261,10 @@
 ### `QylWorkflowFactoryExtensions` (`src/MAF.Advanced.Patterns/QylWorkflowFactoryExtensions.cs`)
 | API | Evidence | Recommendation | Destination | Channel risk | Notes |
 |---|---|---|---|---|---|
-| `IQylWorkflowFactory` | no ANcpLua interface | Drop | N/A | deletion | contract + implementation helper not suitable for migration |
-| `QylWorkflowFactoryExtensions` | no ANcpLua equivalent | Drop | N/A | deletion | service registration pattern absent in toolkit |
-| `AddQylWorkflow<TFactory>(...)` | same | Drop | N/A | deletion | same |
-| `GetQylWorkflow(...)` | same | Drop | N/A | deletion | same |
+| `IQylWorkflowFactory` | exists at `ANcpLua.Agents.Workflows/Facades/QylWorkflowFactoryExtensions.cs` | Migrate/align | `ANcpLua.Agents.Workflows` | stable | factory contract |
+| `QylWorkflowFactoryExtensions` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | DI registration helpers |
+| `AddQylWorkflow<TFactory>(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
+| `GetQylWorkflow(...)` | exists | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
 
 ### `QylWorkflowVisualizationExtensions` (`src/MAF.Advanced.Patterns/QylWorkflowVisualizationExtensions.cs`)
 | API | Evidence | Recommendation | Destination | Channel risk | Notes |
@@ -272,3 +273,12 @@
 | `ToQylDot(this Workflow)` | same | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
 | `ToQylMermaid(this Workflow)` | same | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
 | `SaveQylDiagramsAsync(...)` | same | Migrate/align | `ANcpLua.Agents.Workflows` | stable | exists |
+
+### Sub-package facades (`MAF.Advanced.Patterns.Foundry/*.cs`)
+Originally not inventoried; re-evaluated 2026-05-06 under the relaxed pattern criteria.
+| API | Evidence | Recommendation | Destination | Channel risk | Notes |
+|---|---|---|---|---|---|
+| `QylFoundryEvalExtensions.EvaluateQylTracesAsync(...)` | exists at `ANcpLua.Agents.Foundry/Facades/QylFoundryEvalExtensions.cs` | Migrate/align | `ANcpLua.Agents.Foundry` | rc | extension over `FoundryEvals.EvaluateTracesAsync` |
+| `QylFoundryEvalExtensions.EvaluateQylFoundryTargetAsync(...)` | exists | Migrate/align | `ANcpLua.Agents.Foundry` | rc | extension over `FoundryEvals.EvaluateFoundryTargetAsync` |
+| `QylFoundryMemoryExtensions.AsQylFoundryMemoryProviderAsync(...)` x2 | exists at `ANcpLua.Agents.Foundry/Facades/QylFoundryMemoryExtensions.cs` | Migrate/align | `ANcpLua.Agents.Foundry` | rc | factory + `EnsureMemoryStoreCreatedAsync` bundle (scope and stateInitializer overloads) |
+| `QylFoundryDeclarativeWorkflowExtensions.BuildQylFoundryDeclarativeWorkflowOptions(...)` | exists at `ANcpLua.Agents.Foundry/Facades/QylFoundryDeclarativeWorkflowExtensions.cs` | Migrate/align | `ANcpLua.Agents.Foundry` | rc | factory wrapping `AzureAgentProvider` + `DeclarativeWorkflowOptions` |

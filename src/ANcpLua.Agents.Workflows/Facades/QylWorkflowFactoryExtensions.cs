@@ -33,6 +33,11 @@ public static class QylWorkflowFactoryExtensions
         Guard.NotNull(services);
         Guard.NotNullOrWhiteSpace(name);
 
+        if (services.Any(descriptor => descriptor.ServiceType == typeof(Workflow) && Equals(descriptor.ServiceKey, name)))
+        {
+            throw new InvalidOperationException($"A workflow named '{name}' is already registered.");
+        }
+
         services.AddSingleton<TFactory>();
         services.AddKeyedSingleton<Workflow>(name, static (serviceProvider, _) =>
             serviceProvider.GetRequiredService<TFactory>().Build());

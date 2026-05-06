@@ -11,9 +11,9 @@
 
 language: en-US
 tone_instructions: >-
-  Principal-engineer review. Direct, concise. Flag structural violations as blocking.
-  Focus: MAF preview API discipline (suppressions allowed only for MEAI001/OPENAI002),
-  agent test infrastructure correctness, no leak of preview types into stable surface.
+  Principal-engineer review. Be direct. Block channel leaks, wrong MAF preview suppressions,
+  stale MAF mapping, sync-over-async, DateTime.Now/UtcNow, and missing CancellationToken on
+  public async APIs.
 early_access: true
 enable_free_tier: false
 
@@ -158,9 +158,10 @@ reviews:
     - path: 'MAF1.4Mapping.md'
       instructions: |
         Mapping document between our Agents abstractions and Microsoft Agent
-        Framework 1.3 surface. Review for: accuracy against current MAF version,
-        no stale type references, and that mapping notes call out where MAF
-        preview markers (MEAI001, OPENAI002) apply.
+        Framework's current public surface. Review for: accuracy against the
+        currently-pinned MAF version (Version.props), no stale type references,
+        and that mapping notes call out where MAF preview markers (MEAI001,
+        OPENAI002) apply.
 
   auto_review:
     enabled: true

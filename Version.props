@@ -33,6 +33,7 @@
     <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.4.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
     <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.4.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
     <!-- Alpha train: OpenAI hosting -->
+    <MicrosoftAgentsAIOpenAIVersion>1.4.0</MicrosoftAgentsAIOpenAIVersion>
     <MicrosoftAgentsAIHostingOpenAIVersion>1.4.0-alpha.260505.1</MicrosoftAgentsAIHostingOpenAIVersion>
   </PropertyGroup>
 

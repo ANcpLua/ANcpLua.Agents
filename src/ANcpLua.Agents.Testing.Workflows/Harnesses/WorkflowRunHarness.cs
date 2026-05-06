@@ -102,18 +102,25 @@ public sealed class WorkflowRunHarnessResult
     /// <summary>The underlying workflow run result used by existing workflow assertions.</summary>
     public WorkflowRunResult Result { get; }
 
+    /// <summary>All workflow events produced by the run.</summary>
     public IReadOnlyList<WorkflowEvent> Events => Result.Events;
 
+    /// <summary>Workflow output events produced by the run.</summary>
     public IReadOnlyList<WorkflowOutputEvent> Outputs => Result.Outputs;
 
+    /// <summary>Executor completion events produced by the run.</summary>
     public IReadOnlyList<ExecutorCompletedEvent> CompletedExecutors => Result.CompletedExecutors;
 
+    /// <summary>Completed super-step events produced by the run.</summary>
     public IReadOnlyList<SuperStepCompletedEvent> SuperSteps => Result.SuperSteps;
 
+    /// <summary>Workflow error events produced by the run.</summary>
     public IReadOnlyList<WorkflowErrorEvent> Errors => Result.Errors;
 
+    /// <summary>Pending external requests captured at the end of the run.</summary>
     public IReadOnlyList<ExternalRequest> PendingRequests => Result.PendingRequests;
 
+    /// <summary>The last checkpoint emitted by the run, or <see langword="null"/> when no checkpoint was emitted.</summary>
     public CheckpointInfo? LastCheckpoint => Result.LastCheckpoint;
 
     /// <summary>Starts the existing fluent assertions over the underlying result.</summary>
@@ -172,7 +179,7 @@ internal static class WorkflowRunHarnessRunner
         CancellationToken cancellationToken)
     {
         List<WorkflowEvent> collected = [];
-        await foreach (var evt in run.WatchStreamAsync(cancellationToken).WithCancellation(cancellationToken))
+        await foreach (var evt in run.WatchStreamAsync(cancellationToken))
             collected.Add(evt);
 
         return collected;

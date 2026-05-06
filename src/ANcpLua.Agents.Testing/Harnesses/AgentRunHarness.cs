@@ -69,7 +69,12 @@ public sealed class AgentRunHarnessBuilder
     public AgentRunHarnessBuilder WithMessages(IEnumerable<ChatMessage> messages)
     {
         Guard.NotNull(messages);
-        _messages.AddRange(messages);
+        foreach (var message in messages)
+        {
+            Guard.NotNull(message);
+            _messages.Add(message);
+        }
+
         return this;
     }
 
@@ -138,20 +143,30 @@ public sealed record AgentStreamingRunHarnessResult(
 /// <summary>Small xUnit-backed assertion wrapper for <see cref="AgentRunHarnessResult" />.</summary>
 public readonly struct AgentRunHarnessAssertions(AgentRunHarnessResult result)
 {
+    /// <summary>Allows fluent assertion chaining.</summary>
     public AgentRunHarnessAssertions And => this;
 
+    /// <summary>Asserts that the response text contains <paramref name="expected"/>.</summary>
+    /// <param name="expected">Expected text fragment.</param>
+    /// <returns>The same assertion wrapper for chaining.</returns>
     public AgentRunHarnessAssertions HaveTextContaining(string expected)
     {
         Assert.Contains(expected, result.Response.Text, StringComparison.Ordinal);
         return this;
     }
 
+    /// <summary>Asserts the response message count.</summary>
+    /// <param name="expected">Expected message count.</param>
+    /// <returns>The same assertion wrapper for chaining.</returns>
     public AgentRunHarnessAssertions HaveMessageCount(int expected)
     {
         Assert.Equal(expected, result.Response.Messages.Count);
         return this;
     }
 
+    /// <summary>Asserts the response agent identifier.</summary>
+    /// <param name="expected">Expected agent identifier.</param>
+    /// <returns>The same assertion wrapper for chaining.</returns>
     public AgentRunHarnessAssertions HaveAgentId(string? expected)
     {
         Assert.Equal(expected, result.Response.AgentId);
@@ -162,20 +177,29 @@ public readonly struct AgentRunHarnessAssertions(AgentRunHarnessResult result)
 /// <summary>Small xUnit-backed assertion wrapper for <see cref="AgentStreamingRunHarnessResult" />.</summary>
 public readonly struct AgentStreamingRunHarnessAssertions(AgentStreamingRunHarnessResult result)
 {
+    /// <summary>Allows fluent assertion chaining.</summary>
     public AgentStreamingRunHarnessAssertions And => this;
 
+    /// <summary>Asserts that the materialized stream text contains <paramref name="expected"/>.</summary>
+    /// <param name="expected">Expected text fragment.</param>
+    /// <returns>The same assertion wrapper for chaining.</returns>
     public AgentStreamingRunHarnessAssertions HaveTextContaining(string expected)
     {
         Assert.Contains(expected, result.Text, StringComparison.Ordinal);
         return this;
     }
 
+    /// <summary>Asserts the number of materialized streaming updates.</summary>
+    /// <param name="expected">Expected update count.</param>
+    /// <returns>The same assertion wrapper for chaining.</returns>
     public AgentStreamingRunHarnessAssertions HaveUpdateCount(int expected)
     {
         Assert.Equal(expected, result.Updates.Count);
         return this;
     }
 
+    /// <summary>Asserts that the stream produced at least one update.</summary>
+    /// <returns>The same assertion wrapper for chaining.</returns>
     public AgentStreamingRunHarnessAssertions HaveAnyUpdates()
     {
         Assert.NotEmpty(result.Updates);

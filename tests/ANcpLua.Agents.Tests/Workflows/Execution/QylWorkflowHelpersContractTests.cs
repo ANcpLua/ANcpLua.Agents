@@ -21,7 +21,7 @@ public sealed class QylWorkflowHelpersContractTests
         AssertPublicMethodByName(agentExtensions, "BuildQylSequential", 2);
         AssertPublicMethodByName(agentExtensions, "BuildQylSequential", 1);
         AssertPublicMethodByName(agentExtensions, "BuildQylConcurrent", 1);
-        AssertPublicMethodByName(agentExtensions, "BuildQylGroupChat", 1);
+        AssertPublicMethodByName(agentExtensions, "BuildQylGroupChat", 2);
         AssertPublicMethodByName(agentExtensions, "AsQylSequentialAgent", 2);
         AssertPublicMethodByName(agentExtensions, "AsQylConcurrentAgent", 2);
         AssertPublicMethodByName(agentExtensions, "StreamQylSequentialAsync", 5);

@@ -8,8 +8,16 @@ using Microsoft.Extensions.Hosting;
 
 namespace ANcpLua.Agents.Hosting.OpenAI;
 
+/// <summary>
+/// Qyl-prefixed facades over MAF OpenAI hosting APIs.
+/// </summary>
 public static class QylOpenAIHostingExtensions
 {
+    /// <summary>
+    /// Adds OpenAI chat-completion hosting services to the application builder.
+    /// </summary>
+    /// <param name="builder">The host application builder.</param>
+    /// <returns>The same host application builder for chaining.</returns>
     public static IHostApplicationBuilder AddQylOpenAIChatCompletions(this IHostApplicationBuilder builder)
     {
         Guard.NotNull(builder);
@@ -17,6 +25,11 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIHostApplicationBuilderExtensions.AddOpenAIChatCompletions(builder);
     }
 
+    /// <summary>
+    /// Adds OpenAI Responses hosting services to the application builder.
+    /// </summary>
+    /// <param name="builder">The host application builder.</param>
+    /// <returns>The same host application builder for chaining.</returns>
     public static IHostApplicationBuilder AddQylOpenAIResponses(this IHostApplicationBuilder builder)
     {
         Guard.NotNull(builder);
@@ -24,6 +37,11 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIHostApplicationBuilderExtensions.AddOpenAIResponses(builder);
     }
 
+    /// <summary>
+    /// Adds OpenAI Conversations hosting services to the application builder.
+    /// </summary>
+    /// <param name="builder">The host application builder.</param>
+    /// <returns>The same host application builder for chaining.</returns>
     public static IHostApplicationBuilder AddQylOpenAIConversations(this IHostApplicationBuilder builder)
     {
         Guard.NotNull(builder);
@@ -31,6 +49,11 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIHostApplicationBuilderExtensions.AddOpenAIConversations(builder);
     }
 
+    /// <summary>
+    /// Adds all OpenAI hosting service surfaces to the application builder.
+    /// </summary>
+    /// <param name="builder">The host application builder.</param>
+    /// <returns>The same host application builder for chaining.</returns>
     public static IHostApplicationBuilder AddQylOpenAISurfaces(this IHostApplicationBuilder builder)
     {
         Guard.NotNull(builder);
@@ -41,6 +64,11 @@ public static class QylOpenAIHostingExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Adds OpenAI chat-completion hosting services to the service collection.
+    /// </summary>
+    /// <param name="services">The DI service collection.</param>
+    /// <returns>The same service collection for chaining.</returns>
     public static IServiceCollection AddQylOpenAIChatCompletions(this IServiceCollection services)
     {
         Guard.NotNull(services);
@@ -48,6 +76,11 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIServiceCollectionExtensions.AddOpenAIChatCompletions(services);
     }
 
+    /// <summary>
+    /// Adds OpenAI Responses hosting services to the service collection.
+    /// </summary>
+    /// <param name="services">The DI service collection.</param>
+    /// <returns>The same service collection for chaining.</returns>
     public static IServiceCollection AddQylOpenAIResponses(this IServiceCollection services)
     {
         Guard.NotNull(services);
@@ -55,6 +88,11 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIServiceCollectionExtensions.AddOpenAIResponses(services);
     }
 
+    /// <summary>
+    /// Adds OpenAI Conversations hosting services to the service collection.
+    /// </summary>
+    /// <param name="services">The DI service collection.</param>
+    /// <returns>The same service collection for chaining.</returns>
     public static IServiceCollection AddQylOpenAIConversations(this IServiceCollection services)
     {
         Guard.NotNull(services);
@@ -62,6 +100,11 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIServiceCollectionExtensions.AddOpenAIConversations(services);
     }
 
+    /// <summary>
+    /// Adds all OpenAI hosting service surfaces to the service collection.
+    /// </summary>
+    /// <param name="services">The DI service collection.</param>
+    /// <returns>The same service collection for chaining.</returns>
     public static IServiceCollection AddQylOpenAISurfaces(this IServiceCollection services)
     {
         Guard.NotNull(services);
@@ -72,6 +115,12 @@ public static class QylOpenAIHostingExtensions
         return services;
     }
 
+    /// <summary>
+    /// Maps OpenAI chat-completion endpoints for an agent instance.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="agent">The agent to expose.</param>
+    /// <returns>The endpoint convention builder for the mapped route.</returns>
     public static IEndpointConventionBuilder MapQylOpenAIChatCompletions(
         this IEndpointRouteBuilder endpoints,
         AIAgent agent)
@@ -82,6 +131,13 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIEndpointRouteBuilderExtensions.MapOpenAIChatCompletions(endpoints, agent);
     }
 
+    /// <summary>
+    /// Maps OpenAI chat-completion endpoints for an agent instance at <paramref name="path"/>.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="agent">The agent to expose.</param>
+    /// <param name="path">The endpoint path.</param>
+    /// <returns>The endpoint convention builder for the mapped route.</returns>
     public static IEndpointConventionBuilder MapQylOpenAIChatCompletions(
         this IEndpointRouteBuilder endpoints,
         AIAgent agent,
@@ -97,6 +153,12 @@ public static class QylOpenAIHostingExtensions
             path);
     }
 
+    /// <summary>
+    /// Maps OpenAI chat-completion endpoints for a hosted-agent builder.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="agentBuilder">The hosted-agent builder to expose.</param>
+    /// <returns>The endpoint convention builder for the mapped route.</returns>
     public static IEndpointConventionBuilder MapQylOpenAIChatCompletions(
         this IEndpointRouteBuilder endpoints,
         IHostedAgentBuilder agentBuilder)
@@ -107,6 +169,12 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIEndpointRouteBuilderExtensions.MapOpenAIChatCompletions(endpoints, agentBuilder);
     }
 
+    /// <summary>
+    /// Maps OpenAI Responses endpoints for a hosted-agent builder.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="agentBuilder">The hosted-agent builder to expose.</param>
+    /// <returns>The endpoint convention builder for the mapped route.</returns>
     public static IEndpointConventionBuilder MapQylOpenAIResponses(
         this IEndpointRouteBuilder endpoints,
         IHostedAgentBuilder agentBuilder)
@@ -117,6 +185,12 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIEndpointRouteBuilderExtensions.MapOpenAIResponses(endpoints, agentBuilder);
     }
 
+    /// <summary>
+    /// Maps OpenAI Responses endpoints for an agent instance.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="agent">The agent to expose.</param>
+    /// <returns>The endpoint convention builder for the mapped route.</returns>
     public static IEndpointConventionBuilder MapQylOpenAIResponses(
         this IEndpointRouteBuilder endpoints,
         AIAgent agent)
@@ -127,6 +201,11 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIEndpointRouteBuilderExtensions.MapOpenAIResponses(endpoints, agent);
     }
 
+    /// <summary>
+    /// Maps OpenAI Responses endpoints using hosted-agent services already registered in DI.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <returns>The endpoint convention builder for the mapped route.</returns>
     public static IEndpointConventionBuilder MapQylOpenAIResponses(this IEndpointRouteBuilder endpoints)
     {
         Guard.NotNull(endpoints);
@@ -134,6 +213,11 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIEndpointRouteBuilderExtensions.MapOpenAIResponses(endpoints);
     }
 
+    /// <summary>
+    /// Maps OpenAI Conversations endpoints.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <returns>The endpoint convention builder for the mapped route.</returns>
     public static IEndpointConventionBuilder MapQylOpenAIConversations(this IEndpointRouteBuilder endpoints)
     {
         Guard.NotNull(endpoints);
@@ -141,6 +225,12 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIEndpointRouteBuilderExtensions.MapOpenAIConversations(endpoints);
     }
 
+    /// <summary>
+    /// Maps all OpenAI endpoint surfaces for an agent instance.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="agent">The agent to expose.</param>
+    /// <returns>The same endpoint route builder for chaining.</returns>
     public static IEndpointRouteBuilder MapQylOpenAISurfaces(
         this IEndpointRouteBuilder endpoints,
         AIAgent agent)
@@ -154,6 +244,12 @@ public static class QylOpenAIHostingExtensions
         return endpoints;
     }
 
+    /// <summary>
+    /// Maps all OpenAI endpoint surfaces for a hosted-agent builder.
+    /// </summary>
+    /// <param name="endpoints">The endpoint route builder.</param>
+    /// <param name="agentBuilder">The hosted-agent builder to expose.</param>
+    /// <returns>The same endpoint route builder for chaining.</returns>
     public static IEndpointRouteBuilder MapQylOpenAISurfaces(
         this IEndpointRouteBuilder endpoints,
         IHostedAgentBuilder agentBuilder)

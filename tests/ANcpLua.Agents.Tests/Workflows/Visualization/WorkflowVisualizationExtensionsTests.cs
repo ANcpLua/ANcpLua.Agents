@@ -11,18 +11,28 @@ public sealed class WorkflowVisualizationExtensionsTests
         var workflow = CreateWorkflow();
         var outputDir = Path.Combine(Path.GetTempPath(), $"ancp-workflow-diagrams-{Guid.NewGuid()}");
 
-        await workflow.WriteQylWorkflowDiagramsAsync(outputDir);
+        try
+        {
+            await workflow.WriteQylWorkflowDiagramsAsync(outputDir);
 
-        File.Exists(Path.Combine(outputDir, "workflow.dot")).Should().BeTrue();
-        File.Exists(Path.Combine(outputDir, "workflow.mmd")).Should().BeTrue();
+            File.Exists(Path.Combine(outputDir, "workflow.dot")).Should().BeTrue();
+            File.Exists(Path.Combine(outputDir, "workflow.mmd")).Should().BeTrue();
 
-        var dot = await File.ReadAllTextAsync(Path.Combine(outputDir, "workflow.dot"));
-        var mermaid = await File.ReadAllTextAsync(Path.Combine(outputDir, "workflow.mmd"));
+            var dot = await File.ReadAllTextAsync(Path.Combine(outputDir, "workflow.dot"));
+            var mermaid = await File.ReadAllTextAsync(Path.Combine(outputDir, "workflow.mmd"));
 
-        dot.Should().NotBeNullOrWhiteSpace();
-        mermaid.Should().NotBeNullOrWhiteSpace();
-        dot.Should().Contain("digraph");
-        mermaid.Should().Contain("flowchart");
+            dot.Should().NotBeNullOrWhiteSpace();
+            mermaid.Should().NotBeNullOrWhiteSpace();
+            dot.Should().Contain("digraph");
+            mermaid.Should().Contain("flowchart");
+        }
+        finally
+        {
+            if (Directory.Exists(outputDir))
+            {
+                Directory.Delete(outputDir, recursive: true);
+            }
+        }
     }
 
     [Fact]

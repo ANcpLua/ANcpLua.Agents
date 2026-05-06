@@ -2,9 +2,9 @@
     <PropertyGroup>
         <RootNamespace>ANcpLua.Agents.Testing</RootNamespace>
         <PackageId>ANcpLua.Agents.Testing</PackageId>
-        <Description>Test infrastructure for Microsoft Agent Framework. Fake agents, scripted chat clients, SSE parsing, mock HTTP handlers, AG-UI integration, and IChatClientAgentFixture reference implementations for OpenAI, Azure OpenAI, Anthropic, Ollama, Google Gemini, and OpenRouter.</Description>
+        <Description>Test infrastructure for Microsoft Agent Framework. Fake agents, scripted chat clients, SSE parsing, mock HTTP handlers, and IChatClientAgentFixture reference implementations for OpenAI, Azure OpenAI, Anthropic, Ollama, Google Gemini, and OpenRouter.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>agent;agui;testing;sse;mock;streaming;microsoft-agents;conformance</PackageTags>
+        <PackageTags>agent;testing;sse;mock;streaming;microsoft-agents;conformance</PackageTags>
         <!--
             Harvested upstream exception (~/.claude/CLAUDE.md "upstream sample repos" clause):
             ChatClients/ChatClientAgentTestHelper.cs + ChatClients/FakeChatClient.cs +

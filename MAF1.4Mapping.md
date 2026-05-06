@@ -1,6 +1,6 @@
 # MAF 1.4 ↔ ANcpLua.Agents Mapping
 
-**Stand:** 2026-05-05 · **MAF version:** 1.4.0 stable / 1.4.0-preview.260505.1 preview / 1.4.0-rc1 declarative Foundry / 1.4.0-alpha.260505.1 OpenAI hosting · **Repo:** `/Users/ancplua/framework/ANcpLua.Agents`
+**Stand:** 2026-05-06 · **MAF version:** 1.4.0 stable / 1.4.0-preview.260505.1 preview / 1.4.0-rc1 declarative Foundry / 1.4.0-alpha.260505.1 OpenAI hosting · **Repo:** `/Users/ancplua/framework/ANcpLua.Agents`
 
 This file maps every public type in `ANcpLua.Agents*` against MAF 1.4's public surface. Three buckets:
 
