@@ -59,6 +59,6 @@ jobs:
                a comment and stop.
             3. **Clean** → post a single approval-style comment and stop.
 
-            Read AGENTS.md / CLAUDE.md / MAF1.3Mapping.md / .coderabbit.yaml — the
+            Read AGENTS.md / CLAUDE.md / MAF1.4Mapping.md / .coderabbit.yaml — the
             ARCHITECTURAL INVARIANTS sections under src/ANcpLua.Agents/ are
             authoritative, especially around MEAI001/OPENAI002 suppressions.

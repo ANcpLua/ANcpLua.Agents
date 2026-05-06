@@ -5,7 +5,7 @@ stable spine (`ANcpLua.Agents`, `.Workflows`, `.Testing`, `.Testing.Workflows`),
 preview hosting (`.Hosting.Azure`, `.Hosting.Foundry`, `.Hosting.Anthropic`,
 `.Hosting.DevUI`), RC1 Foundry (`.Foundry`), and alpha OpenAI hosting
 (`.Hosting.OpenAI`). All target `net10.0`. Pinned to `Microsoft.Agents.AI`
-1.3.0 stable with package-specific preview, rc1, and alpha MAF dependencies in
+1.4.0 stable with package-specific preview, rc1, and alpha MAF dependencies in
 `Directory.Packages.props`. `Microsoft.Extensions.AI` is 10.5.0. CPM enforced.
 
 ## Reviewer focus
@@ -39,7 +39,7 @@ preview hosting (`.Hosting.Azure`, `.Hosting.Foundry`, `.Hosting.Anthropic`,
   bumps are their own commits with downstream impact analysis.
 - `LangVersion=preview` is on. C# 14 features (file-scoped namespaces, primary
   constructors, required init, `params ReadOnlySpan<T>`) are repo defaults.
-- `ANcpLua.Agents.Testing.Workflows/` includes harvested copies of MAF 1.3.0
+- `ANcpLua.Agents.Testing.Workflows/` includes harvested copies of MAF 1.4.0
   internals (under `Internals/`). Don't refactor those toward "cleaner" shape —
   they exist verbatim for upstream parity, and `RS0030` (banned
   `ArgumentNullException.ThrowIfNull`) is suppressed there because upstream uses

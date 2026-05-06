@@ -20,8 +20,8 @@ internal static class MessageDeliveryValidation
 
             foreach (var delivery in grouping)
             {
-                // PortableValue.IsDelayedDeserialization and .Value are internal in MAF 1.3.0
-                // (still internal as of the harvest; see ANcpLua.Agents/MAF1.3Mapping.md).
+                // PortableValue.IsDelayedDeserialization and .Value are internal in MAF 1.4.0
+                // (still internal as of the harvest; see ANcpLua.Agents/MAF1.4Mapping.md).
                 // Simplified: just use the envelope message directly.
                 var messageValue = delivery.Envelope.Message;
 

@@ -14,7 +14,7 @@
                 CA1816 — Dispose should call GC.SuppressFinalize (upstream pattern)
                 CA1826 — Enumerable on indexable collections (performance hint, not a bug)
                 CS1591 — missing XML doc comment on public members (harvest files are partially documented)
-                RS0030 — banned ArgumentNullException.ThrowIfNull in Internals/ copies of MAF 1.3.0 internal types
+                RS0030 — banned ArgumentNullException.ThrowIfNull in Internals/ copies of MAF 1.4.0 internal types
                 AL0137 — same site as RS0030; ANcpLua.Analyzers prefers Guard.NotNull, but Internals/ is harvested upstream
         -->
         <NoWarn>$(NoWarn);AL0137;CA1707;CA1816;CA1822;CA1826;CA1852;CA1305;CA2249;CS1591;MEAI001;RS0030</NoWarn>
@@ -49,9 +49,9 @@
     </ItemGroup>
 
     <!--
-        Internals/ contains copies of internal types from Microsoft.Agents.AI.Workflows 1.3.0
+        Internals/ contains copies of internal types from Microsoft.Agents.AI.Workflows 1.4.0
         that are only accessible upstream via InternalsVisibleTo. These copies are version-pinned
-        to 1.3.0 — diff against upstream on version bump.
+        to 1.4.0 — diff against upstream on version bump.
         See: Internals/*.cs for provenance comments per file.
     -->
 
