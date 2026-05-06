@@ -38,9 +38,9 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions.AI">
-    <MicrosoftExtensionsAIVersion>10.5.0</MicrosoftExtensionsAIVersion>
-    <MicrosoftExtensionsAIAbstractionsVersion>10.5.0</MicrosoftExtensionsAIAbstractionsVersion>
-    <MicrosoftExtensionsAIOpenAIVersion>10.5.0</MicrosoftExtensionsAIOpenAIVersion>
+    <MicrosoftExtensionsAIVersion>10.5.2</MicrosoftExtensionsAIVersion>
+    <MicrosoftExtensionsAIAbstractionsVersion>10.5.2</MicrosoftExtensionsAIAbstractionsVersion>
+    <MicrosoftExtensionsAIOpenAIVersion>10.5.2</MicrosoftExtensionsAIOpenAIVersion>
     <MicrosoftBclAsyncInterfacesVersion>10.0.7</MicrosoftBclAsyncInterfacesVersion>
   </PropertyGroup>
 
