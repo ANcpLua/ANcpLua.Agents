@@ -31,6 +31,16 @@ public static class QylOpenAIHostingExtensions
         return MicrosoftAgentAIHostingOpenAIHostApplicationBuilderExtensions.AddOpenAIConversations(builder);
     }
 
+    public static IHostApplicationBuilder AddQylOpenAISurfaces(this IHostApplicationBuilder builder)
+    {
+        Guard.NotNull(builder);
+
+        builder.AddQylOpenAIChatCompletions();
+        builder.AddQylOpenAIResponses();
+        builder.AddQylOpenAIConversations();
+        return builder;
+    }
+
     public static IServiceCollection AddQylOpenAIChatCompletions(this IServiceCollection services)
     {
         Guard.NotNull(services);
@@ -50,6 +60,16 @@ public static class QylOpenAIHostingExtensions
         Guard.NotNull(services);
 
         return MicrosoftAgentAIHostingOpenAIServiceCollectionExtensions.AddOpenAIConversations(services);
+    }
+
+    public static IServiceCollection AddQylOpenAISurfaces(this IServiceCollection services)
+    {
+        Guard.NotNull(services);
+
+        services.AddQylOpenAIChatCompletions();
+        services.AddQylOpenAIResponses();
+        services.AddQylOpenAIConversations();
+        return services;
     }
 
     public static IEndpointConventionBuilder MapQylOpenAIChatCompletions(
@@ -75,6 +95,16 @@ public static class QylOpenAIHostingExtensions
             endpoints,
             agent,
             path);
+    }
+
+    public static IEndpointConventionBuilder MapQylOpenAIChatCompletions(
+        this IEndpointRouteBuilder endpoints,
+        IHostedAgentBuilder agentBuilder)
+    {
+        Guard.NotNull(endpoints);
+        Guard.NotNull(agentBuilder);
+
+        return MicrosoftAgentAIHostingOpenAIEndpointRouteBuilderExtensions.MapOpenAIChatCompletions(endpoints, agentBuilder);
     }
 
     public static IEndpointConventionBuilder MapQylOpenAIResponses(
@@ -109,5 +139,31 @@ public static class QylOpenAIHostingExtensions
         Guard.NotNull(endpoints);
 
         return MicrosoftAgentAIHostingOpenAIEndpointRouteBuilderExtensions.MapOpenAIConversations(endpoints);
+    }
+
+    public static IEndpointRouteBuilder MapQylOpenAISurfaces(
+        this IEndpointRouteBuilder endpoints,
+        AIAgent agent)
+    {
+        Guard.NotNull(endpoints);
+        Guard.NotNull(agent);
+
+        endpoints.MapQylOpenAIChatCompletions(agent);
+        endpoints.MapQylOpenAIResponses(agent);
+        endpoints.MapQylOpenAIConversations();
+        return endpoints;
+    }
+
+    public static IEndpointRouteBuilder MapQylOpenAISurfaces(
+        this IEndpointRouteBuilder endpoints,
+        IHostedAgentBuilder agentBuilder)
+    {
+        Guard.NotNull(endpoints);
+        Guard.NotNull(agentBuilder);
+
+        endpoints.MapQylOpenAIChatCompletions(agentBuilder);
+        endpoints.MapQylOpenAIResponses(agentBuilder);
+        endpoints.MapQylOpenAIConversations();
+        return endpoints;
     }
 }
