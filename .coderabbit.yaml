@@ -153,9 +153,9 @@ reviews:
       instructions: |
         Coordination file for AI agents. Review for: consistency with actual
         repo structure, accurate package descriptions, and the
-        MAF1.3Mapping.md reference is current.
+        MAF1.4Mapping.md reference is current.
 
-    - path: 'MAF1.3Mapping.md'
+    - path: 'MAF1.4Mapping.md'
       instructions: |
         Mapping document between our Agents abstractions and Microsoft Agent
         Framework 1.3 surface. Review for: accuracy against current MAF version,
@@ -312,7 +312,7 @@ knowledge_base:
       - 'Directory.Build.props'
       - 'Directory.Packages.props'
       - 'Version.props'
-      - 'MAF1.3Mapping.md'
+      - 'MAF1.4Mapping.md'
   learnings:
     scope: auto
   issues:

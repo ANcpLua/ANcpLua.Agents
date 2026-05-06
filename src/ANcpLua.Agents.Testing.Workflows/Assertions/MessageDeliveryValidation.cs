@@ -20,9 +20,12 @@ internal static class MessageDeliveryValidation
 
             foreach (var delivery in grouping)
             {
-                // PortableValue.IsDelayedDeserialization and .Value are internal in MAF 1.3.0
-                // (still internal as of the harvest; see ANcpLua.Agents/MAF1.3Mapping.md).
-                // Simplified: just use the envelope message directly.
+                // PortableValue.IsDelayedDeserialization and .Value are `internal` in MAF 1.4.0
+                // (no InternalsVisibleTo grant). The Internals/ facade layer brokers access
+                // rather than mirroring upstream verbatim — see the project csproj for the
+                // full design intent; ANcpLua.Agents/MAF1.4Mapping.md tracks per-type drift
+                // on MAF version bumps. Here we keep the assertion path narrow by reading the
+                // envelope message directly through the facade.
                 var messageValue = delivery.Envelope.Message;
 
                 messages.Should().Contain(messageValue);

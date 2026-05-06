@@ -1,14 +1,16 @@
-# MAF 1.3 ↔ ANcpLua.Agents Mapping
+# MAF 1.4 ↔ ANcpLua.Agents Mapping
 
-**Stand:** 2026-05-05 · **MAF version:** 1.3.0 stable / 1.3.0-preview.260423.1 preview / 1.3.0-rc1 declarative Foundry / 1.3.0-alpha.260423.1 OpenAI hosting · **Repo:** `/Users/ancplua/framework/ANcpLua.Agents`
+**Stand:** 2026-05-05 · **MAF version:** 1.4.0 stable / 1.4.0-preview.260505.1 preview / 1.4.0-rc1 declarative Foundry / 1.4.0-alpha.260505.1 OpenAI hosting · **Repo:** `/Users/ancplua/framework/ANcpLua.Agents`
 
-This file maps every public type in `ANcpLua.Agents*` against MAF 1.3's public surface. Three buckets:
+This file maps every public type in `ANcpLua.Agents*` against MAF 1.4's public surface. Three buckets:
 
 1. **Borrowed from MAF** — what we get for free; do not reimplement.
 2. **Built in this repo** — what we add on top, with the axis that justifies it.
 3. **Removed as redundant** — past shadow APIs (intra-repo or against MAF) that have been deleted.
 
 The rule going forward: keep only the best of both. Public packages mirror MAF's capability shape as `ANcpLua.Agents.X` while dropping the redundant `.AI` segment. Stable packages must not reference MAF preview, RC, or alpha packages.
+
+**Design philosophy** — bridges over MAF internals (`Internals/`, `Conformance/`, related testing surface) are intentionally *facade / decorator / railway / fluent / extension* layers, not 1:1 mirrors of upstream code. Verbatim parity is reserved for cases where the upstream contract is genuinely structural (interface shape, record layout, types upstream marks `internal` without an InternalsVisibleTo grant, or projects upstream does not package). Where this doc says "harvested" below, treat it as a description of the *current transitional state*, not a future direction; the migration target is expressive, cohesive, loosely coupled ANcpLua-authored API surface.
 
 ---
 
@@ -172,7 +174,7 @@ Each of these has a clear axis where MAF doesn't ship the equivalent. The **Why*
 | `TestEchoAgent`, `TestReplayAgent`, `TestRequestAgent` | `Agents/*` | workflow-level test agents |
 | `TestRunContext` | `Runtime/TestRunContext.cs` | `IRunnerContext` test impl |
 | `ExecutionEnvironment` (enum) | `Runtime/ExecutionEnvironment.cs` | execution-mode tag |
-| 16 files in `Internals/` (`DeliveryMapping`, `ExecutorIdentity`, `ExecutorInfo`, `IExternalRequestSink`, `IRunnerContext`, `IStepTracer`, `ISuperStepJoinContext`, `ISuperStepRunner`, `MessageDelivery`, `MessageEnvelope`, `PortBinding`, `RequestHaltEvent`, `SessionCheckpointCache`, `StateManager`, `StepContext`, `WorkflowTelemetryContext`) | `Internals/*` | harvested copies of MAF internals — **all 16 are still `internal` as of MAF 1.3.0**; harvesting remains required |
+| 16 files in `Internals/` (`DeliveryMapping`, `ExecutorIdentity`, `ExecutorInfo`, `IExternalRequestSink`, `IRunnerContext`, `IStepTracer`, `ISuperStepJoinContext`, `ISuperStepRunner`, `MessageDelivery`, `MessageEnvelope`, `PortBinding`, `RequestHaltEvent`, `SessionCheckpointCache`, `StateManager`, `StepContext`, `WorkflowTelemetryContext`) | `Internals/*` | harvested copies of MAF internals — **all 16 are still `internal` as of MAF 1.4.0**; harvesting remains required |
 
 ---
 

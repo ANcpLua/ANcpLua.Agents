@@ -6,7 +6,7 @@ Stable test infrastructure for Microsoft Agent Framework consumers: fake chat cl
 Run harnesses for focused, non-inherited assertions are available via `Harnesses/AgentRunHarness`.
 
 Compatible with: Microsoft.Agents.AI 1.3.x
-Tested against: Microsoft.Agents.AI 1.3.0
+Tested against: Microsoft.Agents.AI 1.4.0
 
 Channel: stable. This package keeps provider fixtures free of Microsoft Agent Framework preview, RC, and alpha dependencies.
 
