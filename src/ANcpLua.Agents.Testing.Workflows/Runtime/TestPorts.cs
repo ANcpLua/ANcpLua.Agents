@@ -1,4 +1,6 @@
-﻿namespace ANcpLua.Agents.Testing.Workflows;
+﻿using ANcpLua.Roslyn.Utilities;
+
+namespace ANcpLua.Agents.Testing.Workflows;
 
 /// <summary>
 ///     Static factory for the common "create N <see cref="RequestPort" />s with the same
@@ -10,6 +12,8 @@ public static class TestPorts
     /// <returns>A dictionary keyed by port id. Iteration order matches <paramref name="portIds" />.</returns>
     public static IReadOnlyDictionary<string, RequestPort> Create<TRequest, TResponse>(params string[] portIds)
     {
+        Guard.NotNull(portIds);
+
         if (portIds.Length is 0)
         {
             throw new ArgumentException("At least one port id is required.", nameof(portIds));
@@ -18,6 +22,7 @@ public static class TestPorts
         Dictionary<string, RequestPort> ports = new(portIds.Length);
         foreach (var id in portIds)
         {
+            Guard.NotNullOrWhiteSpace(id);
             ports[id] = RequestPort.Create<TRequest, TResponse>(id);
         }
         return ports;
@@ -29,6 +34,10 @@ public static class TestPorts
         IReadOnlyDictionary<string, RequestPort> ports,
         Executor peer)
     {
+        Guard.NotNull(builder);
+        Guard.NotNull(ports);
+        Guard.NotNull(peer);
+
         foreach (var port in ports.Values)
         {
             builder.AddEdge(port, peer).AddEdge(peer, port);

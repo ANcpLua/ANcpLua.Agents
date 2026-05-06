@@ -8,6 +8,8 @@ namespace ANcpLua.Agents.Tests.Workflows.Checkpointing;
 
 public sealed class WorkflowCheckpointingExtensionsTests
 {
+    private static readonly Lock s_environmentLock = new();
+
     [Fact]
     public void AddQylFileSystemCheckpointing_AddsStoreAndManager()
     {
@@ -37,6 +39,29 @@ public sealed class WorkflowCheckpointingExtensionsTests
 
         manager.Should().NotBeNull();
         manager.Should().BeOfType<CheckpointManager>();
+    }
+
+    [Fact]
+    public void AddQylFileSystemCheckpointing_WithoutRootOrEnvironment_Throws()
+    {
+        lock (s_environmentLock)
+        {
+            var envVar = QylCheckpointStoreExtensions.CheckpointRootEnvVar;
+            var previous = Environment.GetEnvironmentVariable(envVar);
+            Environment.SetEnvironmentVariable(envVar, null);
+
+            try
+            {
+                var services = new ServiceCollection();
+                Action action = () => services.AddQylFileSystemCheckpointing();
+
+                action.Should().Throw<InvalidOperationException>().WithMessage($"*{envVar}*");
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(envVar, previous);
+            }
+        }
     }
 
     [Fact]

@@ -60,4 +60,18 @@ public sealed class OpenAIHostingExtensionsTests
         method.ReturnType.Should().Be(typeof(IEndpointRouteBuilder));
         method.GetParameters()[0].ParameterType.Should().Be(typeof(IEndpointRouteBuilder));
     }
+
+    [Fact]
+    public void MapQylOpenAIChatCompletions_WithHostedAgentBuilder_IsDefinedWithExpectedShape()
+    {
+        var method = typeof(QylOpenAIHostingExtensions)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Single(static m =>
+                m.Name == nameof(QylOpenAIHostingExtensions.MapQylOpenAIChatCompletions) &&
+                m.GetParameters().Length == 2 &&
+                m.GetParameters()[1].ParameterType == typeof(IHostedAgentBuilder));
+
+        method.ReturnType.Should().Be(typeof(IEndpointConventionBuilder));
+        method.GetParameters()[0].ParameterType.Should().Be(typeof(IEndpointRouteBuilder));
+    }
 }

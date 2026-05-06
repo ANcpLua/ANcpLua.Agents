@@ -151,7 +151,7 @@ public static class QylOpenAIClientExtensions
     }
 
     /// <summary>
-    ///     Runs the agent against native OpenAI <see cref="ChatMessage" /> inputs and returns a
+    ///     Runs the agent against native OpenAI <c>OpenAI.Chat.ChatMessage</c> inputs and returns a
     ///     native <see cref="ChatCompletion" />.
     /// </summary>
     public static Task<ChatCompletion> RunQylOpenAIAsync(
@@ -168,7 +168,7 @@ public static class QylOpenAIClientExtensions
     }
 
     /// <summary>
-    ///     Runs the agent in streaming mode against native OpenAI <see cref="ChatMessage" /> inputs
+    ///     Runs the agent in streaming mode against native OpenAI <c>OpenAI.Chat.ChatMessage</c> inputs
     ///     and yields <see cref="StreamingChatCompletionUpdate" /> chunks.
     /// </summary>
     public static AsyncCollectionResult<StreamingChatCompletionUpdate> RunQylOpenAIStreamingAsync(

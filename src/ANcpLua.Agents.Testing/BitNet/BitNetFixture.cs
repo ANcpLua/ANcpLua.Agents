@@ -13,11 +13,17 @@ namespace ANcpLua.Agents.Testing.BitNet;
 ///     <para>Configuration:</para>
 ///     <list type="bullet">
 ///         <item><c>BITNET_URL</c> env var overrides the default <c>http://localhost:8080</c> endpoint.</item>
+///         <item><c>BITNET_API_PATH</c> env var overrides the default OpenAI-compatible API path.</item>
+///         <item><c>BITNET_MODEL</c> env var overrides the default model id.</item>
 ///         <item>The fixture probes <c>/health</c> with a 3-second timeout during <see cref="InitializeAsync" />.</item>
 ///     </list>
 /// </remarks>
 public sealed class BitNetFixture : IAsyncLifetime
 {
+    private const string DefaultApiPath = "/v1";
+    private const string DefaultModel = "bitnet-b1.58-2B-4T";
+    private const string UnusedApiKey = "unused";
+
     private static readonly Uri s_defaultEndpoint = new("http://localhost:8080");
 
     private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(5) };
@@ -54,9 +60,16 @@ public sealed class BitNetFixture : IAsyncLifetime
 
         if (!IsAvailable) return;
 
-        var options = new OpenAIClientOptions { Endpoint = new Uri(endpoint, "/v1") };
-        var client = new OpenAIClient(new ApiKeyCredential("unused"), options);
-        ChatClient = client.GetChatClient("bitnet-b1.58-2B-4T").AsIChatClient();
+        var apiPath = Environment.GetEnvironmentVariable("BITNET_API_PATH") is { Length: > 0 } configuredApiPath
+            ? configuredApiPath
+            : DefaultApiPath;
+        var model = Environment.GetEnvironmentVariable("BITNET_MODEL") is { Length: > 0 } configuredModel
+            ? configuredModel
+            : DefaultModel;
+
+        var options = new OpenAIClientOptions { Endpoint = new Uri(endpoint, apiPath) };
+        var client = new OpenAIClient(new ApiKeyCredential(UnusedApiKey), options);
+        ChatClient = client.GetChatClient(model).AsIChatClient();
     }
 
     /// <inheritdoc />

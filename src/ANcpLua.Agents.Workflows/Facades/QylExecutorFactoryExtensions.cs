@@ -23,7 +23,11 @@ public static class QylExecutorFactoryExtensions
     {
         Guard.NotNullOrWhiteSpace(id);
         Guard.NotNull(handler);
-        return new FunctionExecutor<TInput, TOutput>(id, (input, _, _) => new ValueTask<TOutput>(handler(input)));
+        return new FunctionExecutor<TInput, TOutput>(id, (input, _, ct) =>
+        {
+            ct.ThrowIfCancellationRequested();
+            return new ValueTask<TOutput>(handler(input));
+        });
     }
 
     /// <summary>

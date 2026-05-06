@@ -142,10 +142,12 @@ public sealed partial class PackageBoundaryTests
             var facades = FindPublicFacadeTypeNames(Path.GetDirectoryName(project.FullPath)!);
 
             var violatingTypes = facades
-                .Where(static typeName => !StringComparisonExtensions.StartsWithOrdinal(typeName, "Qyl"));
+                .Where(static typeName =>
+                    !StringComparisonExtensions.StartsWithOrdinal(typeName, "Qyl") &&
+                    !StringComparisonExtensions.StartsWithOrdinal(typeName, "IQyl"));
 
             violatingTypes.Should().BeEmpty(
-                $"{project.RelativePath} has public façade types under a Facades folder that should retain Qyl naming");
+                $"{project.RelativePath} has public façade types under a Facades folder that should retain Qyl/IQyl naming");
         }
     }
 
@@ -284,7 +286,7 @@ public sealed partial class PackageBoundaryTests
                 .Select(static match => match.Groups["typeName"].Value));
     }
 
-    [GeneratedRegex(@"\bpublic\s+static\s+class\s+(?<typeName>[A-Za-z_][A-Za-z0-9_]*)")]
+    [GeneratedRegex(@"\bpublic\s+(?:(?:static|partial|sealed|abstract|readonly|ref)\s+)*(?:(?:class|interface|struct|enum)|record(?:\s+(?:class|struct))?)\s+(?<typeName>[A-Za-z_][A-Za-z0-9_]*)")]
     private static partial Regex PublicStaticClassNameRegex();
 
     private static string LocateRepoRoot()

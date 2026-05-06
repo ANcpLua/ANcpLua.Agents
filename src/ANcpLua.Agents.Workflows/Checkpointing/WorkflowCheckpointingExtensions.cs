@@ -17,7 +17,7 @@ internal static class WorkflowCheckpointingExtensions
     /// <summary>
     ///     Registers a JSON file-system checkpoint store and matching
     ///     <see cref="CheckpointManager"/>. Resolves the root folder from
-    ///     explicit argument, then <see cref="CheckpointRootEnvVar"/>, then temp storage.
+    ///     explicit argument, then <see cref="CheckpointRootEnvVar"/>.
     /// </summary>
     internal static IServiceCollection AddWorkflowFileSystemCheckpointing(
         this IServiceCollection services,
@@ -26,8 +26,13 @@ internal static class WorkflowCheckpointingExtensions
     {
         Guard.NotNull(services);
         var finalRoot = rootPath
-            ?? Environment.GetEnvironmentVariable(CheckpointRootEnvVar)
-            ?? Path.Combine(Path.GetTempPath(), "ancp-lua-checkpoints");
+            ?? Environment.GetEnvironmentVariable(CheckpointRootEnvVar);
+
+        if (string.IsNullOrWhiteSpace(finalRoot))
+        {
+            throw new InvalidOperationException(
+                $"Configure workflow checkpoint storage by passing a root path or setting {CheckpointRootEnvVar}.");
+        }
 
         services.AddSingleton<ICheckpointStore<JsonElement>>(
             _ => new FileSystemJsonCheckpointStore(new DirectoryInfo(finalRoot)));
