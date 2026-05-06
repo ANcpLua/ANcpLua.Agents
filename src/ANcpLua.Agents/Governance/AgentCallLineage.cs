@@ -14,7 +14,7 @@ namespace ANcpLua.Agents.Governance;
 /// </remarks>
 public sealed class AgentCallLineage
 {
-    private static readonly AsyncLocal<AgentCallLineage?> CurrentLineage = new();
+    private static readonly AsyncLocal<AgentCallLineage?> s_currentLineage = new();
 
     private readonly AgentCallLineage _root;
     private int _spawnCount;
@@ -59,7 +59,7 @@ public sealed class AgentCallLineage
     {
         var depthLimit = maxDepth ?? ReadEnvInt("ANCPLUA_AGENT_MAX_DEPTH", 3);
         var spawnLimit = maxSpawns ?? ReadEnvInt("ANCPLUA_AGENT_MAX_SPAWNS", 10);
-        var parent = CurrentLineage.Value;
+        var parent = s_currentLineage.Value;
 
         var depth = parent is null ? 0 : parent.Depth + 1;
 
@@ -98,7 +98,7 @@ public sealed class AgentCallLineage
                 $"Cycle detected: session {lineage.SessionId} already in ancestor chain.");
         }
 
-        CurrentLineage.Value = lineage;
+        s_currentLineage.Value = lineage;
         return AgentCallLineageResult.Allowed(lineage);
     }
 
@@ -107,9 +107,9 @@ public sealed class AgentCallLineage
     /// </summary>
     public void Complete()
     {
-        if (CurrentLineage.Value?.SessionId == SessionId)
+        if (s_currentLineage.Value?.SessionId == SessionId)
         {
-            CurrentLineage.Value = ParentSessionId is not null
+            s_currentLineage.Value = ParentSessionId is not null
                 ? FindParentInChain()
                 : null;
         }
@@ -118,7 +118,7 @@ public sealed class AgentCallLineage
     /// <summary>
     ///     Returns the lineage context active on the current async flow, or <c>null</c>.
     /// </summary>
-    public static AgentCallLineage? Current => CurrentLineage.Value;
+    public static AgentCallLineage? Current => s_currentLineage.Value;
 
     /// <summary>One-line diagnostic summary suitable for logs.</summary>
     public string FormatLineageSummary() =>

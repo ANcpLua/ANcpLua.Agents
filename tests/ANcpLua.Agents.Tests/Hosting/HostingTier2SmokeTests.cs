@@ -12,13 +12,13 @@ namespace ANcpLua.Agents.Tests.Hosting;
 /// </summary>
 public sealed class HostingTier2SmokeTests : HostingTier2ConformanceTests
 {
-    private static readonly ActivitySource SmokeSource = new("test.hosting.tier2.smoke");
+    private static readonly ActivitySource s_smokeSource = new("test.hosting.tier2.smoke");
 
     protected override IReadOnlyCollection<string> ExpectedActivitySources =>
         ["test.hosting.tier2.smoke"];
 
     protected override IChatClient ConfigureChatClient(FakeChatClient fake)
-        => new TracingChatClient(fake, SmokeSource);
+        => new TracingChatClient(fake, s_smokeSource);
 
     private sealed class TracingChatClient(IChatClient inner, ActivitySource source) : DelegatingChatClient(inner)
     {

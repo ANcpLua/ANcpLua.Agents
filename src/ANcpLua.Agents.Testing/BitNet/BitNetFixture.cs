@@ -18,7 +18,7 @@ namespace ANcpLua.Agents.Testing.BitNet;
 /// </remarks>
 public sealed class BitNetFixture : IAsyncLifetime
 {
-    private static readonly Uri DefaultEndpoint = new("http://localhost:8080");
+    private static readonly Uri s_defaultEndpoint = new("http://localhost:8080");
 
     private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(5) };
 
@@ -38,7 +38,7 @@ public sealed class BitNetFixture : IAsyncLifetime
     {
         var endpoint = Environment.GetEnvironmentVariable("BITNET_URL") is { Length: > 0 } url
             ? new Uri(url)
-            : DefaultEndpoint;
+            : s_defaultEndpoint;
 
         try
         {

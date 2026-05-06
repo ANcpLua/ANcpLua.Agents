@@ -22,12 +22,18 @@
     <!-- Stable: core, Workflows -->
     <MicrosoftAgentsAIVersion>1.3.0</MicrosoftAgentsAIVersion>
     <MicrosoftAgentsAIWorkflowsVersion>1.3.0</MicrosoftAgentsAIWorkflowsVersion>
-    <!-- Preview (no stable exists): Hosting, AGUI AspNetCore, Anthropic -->
+    <MicrosoftAgentsAIFoundryVersion>1.3.0</MicrosoftAgentsAIFoundryVersion>
+    <!-- Preview (no stable exists): Hosting, AzureFunctions, Foundry.Hosting, Anthropic, DevUI -->
     <MicrosoftAgentsAIHostingVersion>1.3.0-preview.260423.1</MicrosoftAgentsAIHostingVersion>
-    <MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>1.3.0-preview.260423.1</MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>
+    <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.3.0-preview.260423.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
+    <MicrosoftAgentsAIFoundryHostingVersion>1.3.0-preview.260423.1</MicrosoftAgentsAIFoundryHostingVersion>
     <MicrosoftAgentsAIAnthropicVersion>1.3.0-preview.260423.1</MicrosoftAgentsAIAnthropicVersion>
+    <MicrosoftAgentsAIDevUIVersion>1.3.0-preview.260423.1</MicrosoftAgentsAIDevUIVersion>
     <!-- rc1 train: Declarative workflows -->
     <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.3.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.3.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
+    <!-- Alpha train: OpenAI hosting -->
+    <MicrosoftAgentsAIHostingOpenAIVersion>1.3.0-alpha.260423.1</MicrosoftAgentsAIHostingOpenAIVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions.AI">

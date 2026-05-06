@@ -12,14 +12,14 @@ namespace ANcpLua.Agents.Tests.Hosting;
 /// </summary>
 public sealed class MinimalHostingConformanceSmokeTests : HostingTier1ConformanceTests
 {
-    private static readonly ActivitySource SmokeSource = new("test.hosting.smoke");
+    private static readonly ActivitySource s_smokeSource = new("test.hosting.smoke");
 
     /// <inheritdoc />
     protected override AgentHostPipeline Pipeline => static services =>
     {
         services.AddSingleton<DummySingleton>();
         // Touch the source so the runtime registers it before the listener attaches.
-        _ = SmokeSource.HasListeners();
+        _ = s_smokeSource.HasListeners();
     };
 
     /// <inheritdoc />
