@@ -1,4 +1,6 @@
 using System.ClientModel;
+using System.ClientModel.Primitives;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using Xunit;
@@ -70,6 +72,19 @@ public sealed class BitNetFixture : IAsyncLifetime
         var options = new OpenAIClientOptions { Endpoint = new Uri(endpoint, apiPath) };
         var client = new OpenAIClient(new ApiKeyCredential(UnusedApiKey), options);
         ChatClient = client.GetChatClient(model).AsIChatClient();
+
+        // Defensive shim for older OpenAI-compat servers: OpenAI deprecated
+        // `max_tokens` in favor of `max_completion_tokens` (Sept 2024, alongside
+        // o1 reasoning models), and the .NET SDK only emits the new field. Any
+        // llama-server build older than ggml-org/llama.cpp PR #19831 (merged
+        // 2026-02-23) silently ignores `max_completion_tokens` and runs to the
+        // context limit. Mirror it so both fields are present on the wire.
+#pragma warning disable MEAI001 // OpenAIRequestPolicies is experimental — supported MEAI hook for body rewrite.
+        if (ChatClient.GetService(typeof(OpenAIRequestPolicies)) is OpenAIRequestPolicies policies)
+        {
+            policies.AddPolicy(new LegacyMaxTokensPolicy(), PipelinePosition.PerCall);
+        }
+#pragma warning restore MEAI001
     }
 
     /// <inheritdoc />
@@ -78,5 +93,53 @@ public sealed class BitNetFixture : IAsyncLifetime
         _http.Dispose();
         ChatClient?.Dispose();
         return ValueTask.CompletedTask;
+    }
+}
+
+/// <summary>
+///     Mirrors <c>max_completion_tokens</c> → <c>max_tokens</c> in the outbound
+///     chat-completion JSON body. Older OpenAI-compat servers (anything before
+///     ggml-org/llama.cpp PR #19831, merged 2026-02-23) only honor the legacy
+///     <c>max_tokens</c> field; the .NET SDK only emits the new one. Without this
+///     mirror the server ignores the cap and generates until the context fills.
+/// </summary>
+/// <remarks>
+///     Registered via <see cref="OpenAIRequestPolicies" />, the supported MEAI
+///     extension hook, so the policy runs *after* the SDK has serialized the
+///     <see cref="PipelineRequest.Content" /> — we parse the final JSON body,
+///     copy the field, and rewrite the content. Self-deleting: once the target
+///     server accepts <c>max_completion_tokens</c> natively, this becomes a no-op.
+/// </remarks>
+internal sealed class LegacyMaxTokensPolicy : PipelinePolicy
+{
+    public override void Process(PipelineMessage message, IReadOnlyList<PipelinePolicy> pipeline, int currentIndex)
+    {
+        Mirror(message);
+        ProcessNext(message, pipeline, currentIndex);
+    }
+
+    public override async ValueTask ProcessAsync(PipelineMessage message, IReadOnlyList<PipelinePolicy> pipeline, int currentIndex)
+    {
+        Mirror(message);
+        await ProcessNextAsync(message, pipeline, currentIndex).ConfigureAwait(false);
+    }
+
+    private static void Mirror(PipelineMessage message)
+    {
+        if (message.Request?.Content is not { } content) return;
+#pragma warning disable AL0039 // EndsWithIgnoreCase suggestion — BCL EndsWith with explicit comparer is fine here.
+        if (message.Request.Uri?.AbsolutePath?.EndsWith("/chat/completions", StringComparison.OrdinalIgnoreCase) is not true) return;
+#pragma warning restore AL0039
+
+        using var buffer = new MemoryStream();
+        content.WriteTo(buffer, default);
+        buffer.Position = 0;
+
+        if (JsonNode.Parse(buffer) is not JsonObject body) return;
+        if (body["max_tokens"] is null && body["max_completion_tokens"] is { } mct)
+        {
+            body["max_tokens"] = mct.DeepClone();
+            message.Request.Content = BinaryContent.Create(BinaryData.FromString(body.ToJsonString()));
+        }
     }
 }

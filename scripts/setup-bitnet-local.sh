@@ -113,7 +113,32 @@ path.write_text(text.replace(needle, patch + needle))
 PYEOF
 fi
 
-# ── 3b. LUT codegen ────────────────────────────────────────────────────────
+# ── 3b. Cherry-pick max_completion_tokens parsing into the fork's server ───
+# Mirrors ggml-org/llama.cpp PR #19831 (commit 99cc2814, merged 2026-02-23).
+# OpenAI deprecated `max_tokens` in favor of `max_completion_tokens` (Sept 2024,
+# alongside o1 reasoning models) and the .NET OpenAI SDK 2.x emits only the
+# new field. The pinned BitNet fork's llama-server is older than the merge
+# and silently ignores the new field, letting generation run to context fill.
+# Single-line precedence-chain change. Idempotent: skipped on re-runs.
+SERVER_CPP="3rdparty/llama.cpp/examples/server/server.cpp"
+if ! grep -q 'max_completion_tokens' "BitNet/$SERVER_CPP"; then
+  echo "[setup-bitnet] patching BitNet/$SERVER_CPP to honor max_completion_tokens"
+  python3 - "BitNet/$SERVER_CPP" <<'PYEOF'
+import sys, pathlib
+p = pathlib.Path(sys.argv[1])
+old = '        slot.params.n_predict          = json_value(data, "n_predict",         json_value(data, "max_tokens", default_params.n_predict));'
+new = (
+    '        auto max_tokens                = json_value(data, "max_tokens",        default_params.n_predict);\n'
+    '        slot.params.n_predict          = json_value(data, "n_predict",         json_value(data, "max_completion_tokens", max_tokens));'
+)
+src = p.read_text()
+if old not in src:
+    raise SystemExit("[setup-bitnet] FATAL: anchor for server.cpp max_completion_tokens patch not found — fork drifted")
+p.write_text(src.replace(old, new))
+PYEOF
+fi
+
+# ── 3c. LUT codegen ────────────────────────────────────────────────────────
 cd BitNet
 arch=$(uname -m)
 if [[ "$arch" == "arm64" || "$arch" == "aarch64" ]]; then
