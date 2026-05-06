@@ -8,4 +8,4 @@ Compatible with: Microsoft.Agents.AI 1.4.x
 Tested against: Microsoft.Agents.AI 1.4.0
 Capability tested against: Microsoft.Agents.AI.Workflows 1.4.0
 
-Channel: stable. Internals are mirrored from Microsoft.Agents.AI.Workflows 1.3.0 and should be diffed before claiming 1.4.0 parity.
+Channel: stable. This package exposes a facade layer over Microsoft.Agents.AI.Workflows and may change internal implementations across versions, so consumers should track facade contract changes rather than diff internal internals for parity.
