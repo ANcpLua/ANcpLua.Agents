@@ -9,6 +9,66 @@ namespace ANcpLua.Agents.Hosting.Anthropic;
 
 public static class QylAnthropicAgentExtensions
 {
+    public static ChatClientAgent AsQylAnthropicAgent(
+        this IAnthropicClient client,
+        string model,
+        string? instructions = null,
+        string? name = null,
+        string? description = null,
+        IList<AITool>? tools = null,
+        int? defaultMaxTokens = null,
+        Func<IChatClient, IChatClient>? clientFactory = null,
+        ILoggerFactory? loggerFactory = null,
+        IServiceProvider? services = null)
+    {
+        Guard.NotNull(client);
+        Guard.NotNullOrWhiteSpace(model);
+
+        return client.AsQylAIAgent(
+            model,
+            instructions,
+            name,
+            description,
+            tools,
+            defaultMaxTokens,
+            clientFactory,
+            loggerFactory,
+            services);
+    }
+
+    public static ChatClientAgent AsQylAnthropicAgent(
+        this IAnthropicClient client,
+        string model,
+        IList<HostedMcpServerTool> mcpServers,
+        string? instructions = null,
+        string? name = null,
+        string? description = null,
+        IList<AITool>? tools = null,
+        int? defaultMaxTokens = null,
+        Func<IChatClient, IChatClient>? clientFactory = null,
+        ILoggerFactory? loggerFactory = null,
+        IServiceProvider? services = null)
+    {
+        Guard.NotNull(client);
+        Guard.NotNullOrWhiteSpace(model);
+        Guard.NotNull(mcpServers);
+
+        IList<AITool> allTools = tools is { Count: > 0 }
+            ? [.. tools, .. mcpServers]
+            : [.. mcpServers];
+
+        return client.AsQylAIAgent(
+            model,
+            instructions,
+            name,
+            description,
+            allTools,
+            defaultMaxTokens,
+            clientFactory,
+            loggerFactory,
+            services);
+    }
+
     public static ChatClientAgent AsQylAIAgent(
         this IAnthropicClient client,
         string model,

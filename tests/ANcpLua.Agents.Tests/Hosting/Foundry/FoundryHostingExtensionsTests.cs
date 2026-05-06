@@ -11,6 +11,7 @@ public sealed class FoundryHostingExtensionsTests
         var type = typeof(QylFoundryHostingExtensions);
 
         AssertPublicMethodByName(type, "AddQylFoundryResponses", 1);
+        AssertPublicMethodByName(type, "AddQylFoundryResponses", 2);
         AssertPublicMethodByName(type, "AddQylFoundryResponses", 3);
         AssertPublicMethodByName(type, "AddQylFoundryToolboxes", 2);
         AssertPublicMethodByName(type, "AddQylFoundryToolboxes", 3);

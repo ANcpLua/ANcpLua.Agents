@@ -183,6 +183,7 @@ public static class QylWorkflowExecutionExtensions
         where TInput : notnull
     {
         Guard.NotNull(workflow);
+        Guard.NotNull(input);
         Guard.NotNull(checkpointManager);
 
         return InProcessExecution.RunStreamingAsync(workflow, input, checkpointManager, runId, cancellationToken);

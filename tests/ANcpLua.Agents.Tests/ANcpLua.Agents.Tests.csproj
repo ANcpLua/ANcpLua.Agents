@@ -7,14 +7,18 @@
             CA1707 — underscores in identifiers: convention for test names (Method_Condition_Expected).
             xUnit1051 — TestContext.Current.CancellationToken: stylistic, not bug-catching.
             CS1591  — XML doc comments not required on test methods.
+            OPENAI001 / MEAI001 / MAAI001 — upstream MAF/MEAI/OpenAI experimental API markers
+            referenced by hosting-surface reflection tests; mirrors the alpha hosting csproj.
         -->
-        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051</NoWarn>
+        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051;OPENAI001;MEAI001;MAAI001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Foundry\ANcpLua.Agents.Foundry.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Anthropic\ANcpLua.Agents.Hosting.Anthropic.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Azure\ANcpLua.Agents.Hosting.Azure.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.DevUI\ANcpLua.Agents.Hosting.DevUI.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Foundry\ANcpLua.Agents.Hosting.Foundry.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.OpenAI\ANcpLua.Agents.Hosting.OpenAI.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>

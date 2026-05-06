@@ -1,8 +1,8 @@
-# MAF 1.3 ↔ ANcpLua.Agents Mapping
+# MAF ↔ ANcpLua.Agents Mapping
 
-**Stand:** 2026-05-05 · **MAF version:** 1.3.0 stable / 1.3.0-preview.260423.1 preview / 1.3.0-rc1 declarative Foundry / 1.3.0-alpha.260423.1 OpenAI hosting · **Repo:** `/Users/ancplua/framework/ANcpLua.Agents`
+**Stand:** 2026-05-06 · **MAF version:** 1.4.0 stable / 1.4.0-preview.260505.1 preview / 1.4.0-rc1 declarative Foundry / 1.4.0-alpha.260505.1 OpenAI hosting · **Repo:** `/Users/ancplua/framework/ANcpLua.Agents`
 
-This file maps every public type in `ANcpLua.Agents*` against MAF 1.3's public surface. Three buckets:
+This file maps every public type in `ANcpLua.Agents*` against MAF's current public surface. Three buckets:
 
 1. **Borrowed from MAF** — what we get for free; do not reimplement.
 2. **Built in this repo** — what we add on top, with the axis that justifies it.
@@ -172,7 +172,7 @@ Each of these has a clear axis where MAF doesn't ship the equivalent. The **Why*
 | `TestEchoAgent`, `TestReplayAgent`, `TestRequestAgent` | `Agents/*` | workflow-level test agents |
 | `TestRunContext` | `Runtime/TestRunContext.cs` | `IRunnerContext` test impl |
 | `ExecutionEnvironment` (enum) | `Runtime/ExecutionEnvironment.cs` | execution-mode tag |
-| 16 files in `Internals/` (`DeliveryMapping`, `ExecutorIdentity`, `ExecutorInfo`, `IExternalRequestSink`, `IRunnerContext`, `IStepTracer`, `ISuperStepJoinContext`, `ISuperStepRunner`, `MessageDelivery`, `MessageEnvelope`, `PortBinding`, `RequestHaltEvent`, `SessionCheckpointCache`, `StateManager`, `StepContext`, `WorkflowTelemetryContext`) | `Internals/*` | harvested copies of MAF internals — **all 16 are still `internal` as of MAF 1.3.0**; harvesting remains required |
+| 16 files in `Internals/` (`DeliveryMapping`, `ExecutorIdentity`, `ExecutorInfo`, `IExternalRequestSink`, `IRunnerContext`, `IStepTracer`, `ISuperStepJoinContext`, `ISuperStepRunner`, `MessageDelivery`, `MessageEnvelope`, `PortBinding`, `RequestHaltEvent`, `SessionCheckpointCache`, `StateManager`, `StepContext`, `WorkflowTelemetryContext`) | `Internals/*` | harvested copies of MAF internals — **all 16 still `internal` as of MAF 1.4.0** (no changes between 1.3.0 and 1.4.0); harvesting remains required |
 
 ---
 
@@ -211,3 +211,27 @@ Before adding a new class to `ANcpLua.Agents*`:
 3. **Distinguish axis from name overlap.** `AgentSessionStore` vs `ISessionStateStore<TState>` is fine — the type parameter is the axis. `CapturedTelemetry` vs `ActivityCollector` was not — both filtered the same `ActivitySource` registry by name.
 4. **If a sibling `ancplua/framework` repo (`ANcpLua.Roslyn.Utilities`, `ANcpLua.NET.Sdk`) almost has it — fix it there**, release, and consume via `Directory.Packages.props`. Do not add a local copy to `ANcpLua.Agents*`.
 5. **Wrappers that only forward** are red flags. `DeterministicTimeExecutionEnvironment` was forwarding-only — recognize that pattern and reject it.
+
+---
+
+## 6 · MAF 1.3 → 1.4 deltas (informational)
+
+Changes upstream between `dotnet-1.3.0` and `dotnet-1.4.0` (10 commits). None forced an API change in `ANcpLua.Agents*`: the consumed signatures (`FoundryHostingExtensions.{AddFoundryResponses, MapFoundryResponses, AddFoundryToolboxes}`, `AIProjectClient.GetToolboxToolsAsync`, `DurableAgentsOptionsExtensions.{AddAIAgent, AddAIAgentFactory}`, `InMemoryChatHistoryProvider`, all 16 harvested workflow internals) are unchanged.
+
+### Behavior changes consumers should know
+- `FoundryHostingExtensions.AddFoundryResponses` now defaults to `FileSystemAgentSessionStore.CreateDefault()` (was `InMemoryAgentSessionStore`). Pass an explicit store if in-memory is required.
+- `FoundryHostingExtensions.MapFoundryResponses` no longer registers the user-agent middleware automatically; the `User-Agent` supplement now applies per-request via `UserAgentResponsesClient` wrapping the agent's underlying `ResponsesClient`.
+
+### New public surfaces (additive — safe to consume directly when needed)
+- `Microsoft.Agents.AI.Hyperlight` package — `HyperlightCodeActProvider`, `HyperlightExecuteCodeFunction`, `AllowedDomain`, `FileMount`, `CodeActApprovalMode`. **Not yet on NuGet** at the time of writing; consume from upstream sources only when published.
+- `Microsoft.Agents.AI.Compaction.ContextWindowCompactionStrategy` — context-window-aware compaction.
+- `Microsoft.Agents.AI` Harness namespace — `AgentModeProvider`, `FileAccessProvider`, `FileMemoryProvider`, `SubAgentsProvider`, `TodoProvider`, `ToolApprovalAgent` + `UseToolApproval` builder extension, `AgentFileStore` / `FileSystemAgentFileStore` / `InMemoryAgentFileStore`.
+- `Microsoft.Agents.AI.Foundry.Hosting.FileSystemAgentSessionStore` — file-system-backed session store.
+- `Microsoft.Agents.AI.Workflows.IExternalRequestEnvelope` — public envelope contract for external requests.
+- `Microsoft.Agents.AI.Workflows.Declarative.IHttpRequestHandler` + `DefaultHttpRequestHandler` + `HttpRequestExecutor` + `DeclarativeWorkflowOptions.HttpRequestHandler` — declarative `HttpRequest` action support.
+- `Microsoft.Agents.AI.Workflows.Declarative.Extensions.ChatMessageExtensions.MergeForLastMessage` — declarative chat-message merge helper.
+
+### Breaking changes upstream (no impact on this repo)
+- `AgentSkillScript.RunAsync(AgentSkill, JsonElement?, IServiceProvider?, CancellationToken)` → `RunAsync(AgentSkill, AIFunctionArguments, CancellationToken)` (#5475). Consequent changes in `AgentFileSkill`, `AgentFileSkillScript`, `AgentSkillsProvider`, `AgentInlineSkillScript`, `AgentInlineSkillContentBuilder`. ANcpLua.Agents does not consume `Microsoft.Agents.AI.Skills`, so no facade breaks.
+- `RequestOptionsExtensions.ToRequestOptions` removed from `Microsoft.Agents.AI.Foundry`. The type is `internal` — no facade breaks.
+- `Microsoft.Agents.AI.Foundry.Hosting/DelegatingResponsesClient.cs` → renamed to `UserAgentResponsesClient.cs`. The type is `internal` — no facade breaks.

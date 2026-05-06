@@ -29,5 +29,4 @@ public static class QylDevUIExtensions
 
         return DevUIExtensions.MapDevUI(endpoints);
     }
-
 }

@@ -21,6 +21,8 @@ TestResults/
 # Scratch files (project-local)
 *.png
 *.sh
+!scripts/
+!scripts/*.sh
 async-showcase.md
 watch_*
 

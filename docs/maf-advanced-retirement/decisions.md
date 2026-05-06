@@ -1,32 +1,63 @@
 # MAF.Advanced.Patterns Retirement Decisions
 
-This document records the integration decisions from the parallel retirement pass. The target repo remains `ANcpLua.Agents`; `MAF.Advanced.Patterns` is the source quarry and should not remain a standalone consumer toolkit after the gated migration is complete.
+`ANcpLua.Agents` is the migration target and authoritative successor.
+`MAF.Advanced.Patterns` is the retiring source repository and archive candidate.
 
 ## Keep In ANcpLua
 
-- Stable workflow helpers that reduce boilerplate around workflow execution, checkpoint registration, context operations, executor factories, and workflow diagrams.
-- Preview/alpha/RC hosting facades only in their existing channel-isolated packages:
+- Stable workflow helpers that reduce boilerplate around workflow execution,
+  checkpoint registration, context operations, executor factories, and workflow
+  diagrams.
+- Governance primitives and instrumentation wrappers that are domain-agnostic
+  and do not pull provider/protocol dependencies into stable packages.
+- Testing harness helpers that are generic to MAF consumers and do not require
+  preview protocol packages.
+- Preview/alpha/RC hosting facades only in existing channel-isolated packages:
   - `ANcpLua.Agents.Hosting.OpenAI`
-  - `ANcpLua.Agents.Hosting.Foundry`
+  - `ANcpLua.Agents.Hosting.Anthropic`
   - `ANcpLua.Agents.Hosting.Azure`
+  - `ANcpLua.Agents.Hosting.DevUI`
+  - `ANcpLua.Agents.Hosting.Foundry`
   - `ANcpLua.Agents.Foundry`
-- Testing harness helpers that are generic to MAF consumers and do not require preview protocols.
 
 ## Drop Or Defer
 
-- A2A and AG-UI hosting/client wrappers: defer until there is an explicit preview package design. Do not leak either surface into stable packages.
-- MCP/declarative MCP: do not migrate into stable packages. The tool handler has real lifecycle/cache logic and belongs in a future isolated package if it is kept.
-- Purview, Cosmos NoSQL, Copilot Studio, and GitHub Copilot: provider-specific future packages only. Do not add them to the current ten-package spine.
-- qyl-specific provider config and env-var behavior: do not migrate. Only generic ANcpLua options are acceptable.
-- `qyl.scope` telemetry: do not migrate as-is.
+Do not add these surfaces to the current stable package spine:
+
+| Surface | Decision | Reason |
+|---|---|---|
+| A2A | Drop/defer | Preview protocol surface; no current ANcpLua package. |
+| AG-UI | Drop/defer | Protocol hosting/client surface; no stable target ownership. |
+| MCP/declarative MCP | Drop/defer | Stateful lifecycle/cache behavior; not a thin facade. |
+| Generic declarative agents/workflows | Drop/defer | Loader/eject/compile behavior is broader than the current package spine. |
+| Standalone Durable Task Scheduler | Drop/defer | Orchestration infrastructure; keep only Azure Functions durable hosting wrappers in `ANcpLua.Agents.Hosting.Azure`. |
+| Purview | Future provider package only | Provider-specific compliance dependency surface. |
+| Cosmos NoSQL | Future provider package only | Provider-specific persistence/checkpoint surface. |
+| Copilot Studio | Future provider package only | Provider adapter with no current target package. |
+| GitHub Copilot | Future provider package only | Narrow external integration with extra provider dependency graph. |
+| qyl-specific provider config | Drop | Not normative ANcpLua behavior. |
+| `qyl.scope` telemetry | Drop | Custom qyl telemetry naming should not be preserved as ANcpLua contract. |
+
+If any deferred surface becomes necessary, create a dedicated isolated package
+and update package-boundary tests before moving code.
+
+## Extracted Local Tooling
+
+BitNet helper scripts moved from `MAF.Advanced.Patterns/scripts` to
+`ANcpLua.Agents/scripts`.
+
+They are local developer tooling, not package/runtime surface. They support the
+current probe-only `ANcpLua.Agents.Testing.BitNetFixture` contract: start an
+external server and set `BITNET_URL`.
 
 ## Documentation-Only Harvest
 
-The showcase samples are useful as architecture notes, not as production sample projects. Keep only the patterns:
+The showcase samples are useful as architecture notes, not as production sample
+projects. Keep only the patterns:
 
-- workflow-first host topology
-- guarded tool pipelines
-- checkpoint-backed run state
-- provider-specific examples clearly labeled by package channel
+- workflow-first host topology;
+- guarded tool pipelines;
+- checkpoint-backed run state;
+- provider-specific examples clearly labeled by package channel.
 
 Do not copy runnable sample projects from `MAF.Advanced.Patterns`.

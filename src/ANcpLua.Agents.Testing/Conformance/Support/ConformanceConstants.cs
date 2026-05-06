@@ -11,3 +11,16 @@ public static class ConformanceConstants
     /// <summary>Default delay between retries, in milliseconds.</summary>
     public const int RetryDelayMs = 5000;
 }
+
+/// <summary>
+///     Compatibility alias for the retired <c>MAF.Advanced.Patterns.Testing</c>
+///     conformance constants.
+/// </summary>
+public static class Constants
+{
+    /// <summary>Default retry count for provider-flakiness-tolerant tests.</summary>
+    public const int RetryCount = ConformanceConstants.RetryCount;
+
+    /// <summary>Default delay between retries, in milliseconds.</summary>
+    public const int RetryDelayMs = ConformanceConstants.RetryDelayMs;
+}

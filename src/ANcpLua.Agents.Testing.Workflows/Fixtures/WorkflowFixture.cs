@@ -125,6 +125,14 @@ public sealed record WorkflowRunResult(IReadOnlyList<WorkflowEvent> Events, Chec
     public IReadOnlyList<ExternalRequest> PendingRequests { get; }
         = [.. Events.OfType<RequestInfoEvent>().Select(static e => e.Request)];
 
+    /// <summary>Strongly-typed projection of <see cref="Outputs" />. Filters by output payload type.</summary>
+    public IReadOnlyList<TOutput> OutputsOf<TOutput>()
+        => [.. Outputs.Where(static e => e.Data is TOutput).Select(static e => (TOutput)e.Data!)];
+
+    /// <summary>Pending requests whose payload is of type <typeparamref name="TRequest" />.</summary>
+    public IReadOnlyList<ExternalRequest> PendingRequestsOf<TRequest>()
+        => [.. PendingRequests.Where(static r => r.Data is TRequest)];
+
     public WorkflowRunAssertions Should()
     {
         return new WorkflowRunAssertions(this);
@@ -175,6 +183,47 @@ public readonly struct WorkflowRunAssertions(WorkflowRunResult result)
     public WorkflowRunAssertions HaveNoErrors()
     {
         result.Errors.Should().BeEmpty("workflow emitted error events");
+        return this;
+    }
+
+    /// <summary>Asserts a checkpoint is (or isn't) present on the run.</summary>
+    public WorkflowRunAssertions HaveLastCheckpoint(bool expected = true)
+    {
+        if (expected)
+        {
+            result.LastCheckpoint.Should().NotBeNull("expected the run to have produced a checkpoint");
+        }
+        else
+        {
+            result.LastCheckpoint.Should().BeNull("expected the run to have produced no checkpoint");
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Asserts at least one pending external request whose payload is
+    ///     <typeparamref name="TRequest" />, with optional cardinality.
+    /// </summary>
+    public WorkflowRunAssertions HavePendingRequest<TRequest>(int? count = null)
+    {
+        var matches = result.PendingRequestsOf<TRequest>();
+        if (count is int expected)
+        {
+            matches.Count.Should().Be(expected, $"expected {expected} pending {typeof(TRequest).Name} request(s)");
+        }
+        else
+        {
+            matches.Should().NotBeEmpty($"expected at least one pending request carrying {typeof(TRequest).Name}");
+        }
+
+        return this;
+    }
+
+    /// <summary>Asserts an exact super-step count.</summary>
+    public WorkflowRunAssertions HaveSuperStepCount(int expected)
+    {
+        result.SuperSteps.Count.Should().Be(expected, $"expected exactly {expected} super-step(s)");
         return this;
     }
 }

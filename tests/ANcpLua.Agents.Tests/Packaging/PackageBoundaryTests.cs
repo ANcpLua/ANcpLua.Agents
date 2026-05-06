@@ -50,6 +50,7 @@ public sealed partial class PackageBoundaryTests
         ["ANcpLua.Agents.Hosting.OpenAI"] =
         [
             "Microsoft.Agents.AI",
+            "Microsoft.Agents.AI.OpenAI",
             "Microsoft.Agents.AI.Hosting.OpenAI",
         ],
     };
@@ -171,8 +172,8 @@ public sealed partial class PackageBoundaryTests
 
             var readme = File.ReadAllText(readmePath);
             readme.Should().Contain("Consumer toolkit for Microsoft Agent Framework");
-            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.3.x");
-            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.3.0");
+            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.4.x");
+            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.4.0");
         }
     }
 

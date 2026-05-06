@@ -26,7 +26,7 @@ public sealed class BitNetFixture : IAsyncLifetime
     ///     Chat client connected to the BitNet server. Only usable when <see cref="IsAvailable" /> is
     ///     <see langword="true" />.
     /// </summary>
-    public IChatClient ChatClient { get; private set; } = null!;
+    public IChatClient? ChatClient { get; private set; }
 
     /// <summary>
     ///     Whether the BitNet server responded to the health probe during initialization.
@@ -54,16 +54,16 @@ public sealed class BitNetFixture : IAsyncLifetime
 
         if (!IsAvailable) return;
 
-        var options = new OpenAIClientOptions { Endpoint = endpoint };
+        var options = new OpenAIClientOptions { Endpoint = new Uri(endpoint, "/v1") };
         var client = new OpenAIClient(new ApiKeyCredential("unused"), options);
-        ChatClient = (IChatClient)client.GetChatClient("bitnet-b1.58-2B-4T");
+        ChatClient = client.GetChatClient("bitnet-b1.58-2B-4T").AsIChatClient();
     }
 
     /// <inheritdoc />
     public ValueTask DisposeAsync()
     {
         _http.Dispose();
-        ChatClient.Dispose();
+        ChatClient?.Dispose();
         return ValueTask.CompletedTask;
     }
 }
