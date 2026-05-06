@@ -10,6 +10,9 @@
 
 Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing.
 
+Compatible with: Microsoft.Agents.AI 1.3.x
+Tested against: Microsoft.Agents.AI 1.3.0
+
 `ANcpLua.Agents` mirrors the Microsoft Agent Framework package shape without the redundant `.AI` segment:
 `Microsoft.Agents.AI.X` maps to `ANcpLua.Agents.X`.
 
