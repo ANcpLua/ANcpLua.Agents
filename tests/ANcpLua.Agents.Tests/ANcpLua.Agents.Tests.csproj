@@ -13,7 +13,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Foundry\ANcpLua.Agents.Foundry.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Azure\ANcpLua.Agents.Hosting.Azure.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Foundry\ANcpLua.Agents.Hosting.Foundry.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.OpenAI\ANcpLua.Agents.Hosting.OpenAI.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing.Workflows\ANcpLua.Agents.Testing.Workflows.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Workflows\ANcpLua.Agents.Workflows.csproj"/>
     </ItemGroup>
 </Project>

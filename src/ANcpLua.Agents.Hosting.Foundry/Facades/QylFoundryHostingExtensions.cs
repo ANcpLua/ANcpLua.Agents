@@ -1,7 +1,9 @@
 ﻿using ANcpLua.Roslyn.Utilities;
+using Azure.AI.Projects;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Foundry.Hosting;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ANcpLua.Agents.Hosting.Foundry;
@@ -55,5 +57,17 @@ public static class QylFoundryHostingExtensions
         Guard.NotNull(endpoints);
 
         return FoundryHostingExtensions.MapFoundryResponses(endpoints, prefix);
+    }
+
+    public static Task<IReadOnlyList<AITool>> GetQylToolboxToolsAsync(
+        this AIProjectClient client,
+        string name,
+        string? version = null,
+        CancellationToken cancellationToken = default)
+    {
+        Guard.NotNull(client);
+        Guard.NotNullOrWhiteSpace(name);
+
+        return client.GetToolboxToolsAsync(name, version, cancellationToken);
     }
 }
