@@ -38,3 +38,5 @@ docs/api/*.md
 .claude/elegance_pipeline/
 .LANE-*
 .worktrees/
+
+package-lock.json
