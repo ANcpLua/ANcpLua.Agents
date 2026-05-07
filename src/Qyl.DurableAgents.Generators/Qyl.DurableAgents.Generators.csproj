@@ -1,0 +1,44 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <PackageId>Qyl.DurableAgents.Generators</PackageId>
+    <RootNamespace>Qyl.DurableAgents.Generators</RootNamespace>
+
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsAotCompatible>false</IsAotCompatible>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <!-- Tiny standalone generator — opt out of SBOM and the SDK's auto-injected
+         AwesomeAssertions / Sbom packaging gear. -->
+    <IsPackable>false</IsPackable>
+    <GenerateSBOM>false</GenerateSBOM>
+
+    <!-- self-describe the Roslyn reference; SDK name-matching injection is fragile under IDE LSPs -->
+    <DisableImplicitRoslynPackageReference>true</DisableImplicitRoslynPackageReference>
+
+    <!-- RS0030: BannedApiAnalyzers fires on the ANcpLua.Roslyn.Utilities.Sources
+         polyfills (TimeProvider, ByteSize). We don't own that source — suppress here. -->
+    <NoWarn>$(NoWarn);RS0030</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ANcpLua.Roslyn.Utilities.Sources" PrivateAssets="all"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.md"/>
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="ANcpLua.Roslyn.Utilities"/>
+    <Using Include="ANcpLua.Roslyn.Utilities.Models"/>
+  </ItemGroup>
+</Project>

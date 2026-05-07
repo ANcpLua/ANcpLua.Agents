@@ -9,6 +9,7 @@
   <ItemGroup Label="Roslyn.Utilities (sibling repo)">
     <PackageVersion Include="ANcpLua.Roslyn.Utilities" Version="$(ANcpLuaRoslynUtilitiesVersion)"/>
     <PackageVersion Include="ANcpLua.Roslyn.Utilities.Testing" Version="$(ANcpLuaRoslynUtilitiesTestingVersion)"/>
+    <PackageVersion Include="ANcpLua.Roslyn.Utilities.Sources" Version="$(ANcpLuaRoslynUtilitiesSourcesVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="Microsoft.Agents (MAF)">
@@ -24,6 +25,19 @@
     <PackageVersion Include="Microsoft.Agents.AI.Foundry.Hosting" Version="$(MicrosoftAgentsAIFoundryHostingVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Anthropic" Version="$(MicrosoftAgentsAIAnthropicVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.DevUI" Version="$(MicrosoftAgentsAIDevUIVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.DurableTask" Version="$(MicrosoftAgentsAIDurableTaskVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Microsoft.DurableTask (host-agnostic worker + client; gRPC sidecar backend)">
+    <PackageVersion Include="Microsoft.DurableTask.Worker.Grpc" Version="$(MicrosoftDurableTaskGrpcVersion)"/>
+    <PackageVersion Include="Microsoft.DurableTask.Client.Grpc" Version="$(MicrosoftDurableTaskGrpcVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="ManagedAgentTelemetry.Host sample (Foundry persistent agents + Teams + RAG + AzMon)">
+    <PackageVersion Include="Azure.AI.Projects" Version="$(AzureAIProjectsVersion)"/>
+    <PackageVersion Include="Microsoft.Graph" Version="$(MicrosoftGraphVersion)"/>
+    <PackageVersion Include="Azure.Search.Documents" Version="$(AzureSearchDocumentsVersion)"/>
+    <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="$(AzureMonitorOpenTelemetryAspNetCoreVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="Microsoft.Extensions.AI">
