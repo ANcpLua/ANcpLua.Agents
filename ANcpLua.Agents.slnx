@@ -10,6 +10,11 @@
         <Project Path="src/ANcpLua.Agents.Hosting.DevUI/ANcpLua.Agents.Hosting.DevUI.csproj" />
         <Project Path="src/ANcpLua.Agents.Foundry/ANcpLua.Agents.Foundry.csproj" />
         <Project Path="src/ANcpLua.Agents.Hosting.OpenAI/ANcpLua.Agents.Hosting.OpenAI.csproj" />
+        <Project Path="src/Qyl.DurableAgents.Abstractions/Qyl.DurableAgents.Abstractions.csproj" />
+        <Project Path="src/Qyl.DurableAgents.Generators/Qyl.DurableAgents.Generators.csproj" />
+    </Folder>
+    <Folder Name="/samples/">
+        <Project Path="samples/ManagedAgentTelemetry.Host/ManagedAgentTelemetry.Host.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <File Path="tests\ANcpLua.Agents.Tests.Live\ANcpLua.Agents.Tests.Live.csproj" />

@@ -16,6 +16,7 @@
   <PropertyGroup Label="Roslyn.Utilities (consumed from sibling repo)">
     <ANcpLuaRoslynUtilitiesVersion>2.2.5</ANcpLuaRoslynUtilitiesVersion>
     <ANcpLuaRoslynUtilitiesTestingVersion>2.2.5</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.5</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Agents (MAF 1.4.0 — mirrors SDK truth, highest experimental track per package)">
@@ -35,6 +36,19 @@
     <!-- Alpha train: OpenAI hosting -->
     <MicrosoftAgentsAIOpenAIVersion>1.4.0</MicrosoftAgentsAIOpenAIVersion>
     <MicrosoftAgentsAIHostingOpenAIVersion>1.4.0-alpha.260505.1</MicrosoftAgentsAIHostingOpenAIVersion>
+    <!-- Preview train: DurableTask integration (Qyl.DurableAgents host) -->
+    <MicrosoftAgentsAIDurableTaskVersion>1.4.0-preview.260505.1</MicrosoftAgentsAIDurableTaskVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Microsoft.DurableTask (host-agnostic worker + client; gRPC sidecar backend)">
+    <MicrosoftDurableTaskGrpcVersion>1.24.1</MicrosoftDurableTaskGrpcVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="ManagedAgentTelemetry.Host sample (Foundry persistent agents + Teams + RAG + AzMon)">
+    <AzureAIProjectsVersion>2.1.0-beta.1</AzureAIProjectsVersion>
+    <MicrosoftGraphVersion>5.104.0</MicrosoftGraphVersion>
+    <AzureSearchDocumentsVersion>11.7.0</AzureSearchDocumentsVersion>
+    <AzureMonitorOpenTelemetryAspNetCoreVersion>1.4.0</AzureMonitorOpenTelemetryAspNetCoreVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions.AI">
