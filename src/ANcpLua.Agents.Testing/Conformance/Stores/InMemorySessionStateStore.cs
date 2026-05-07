@@ -1,7 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 
 using System.Collections.Concurrent;
-using ANcpLua.Roslyn.Utilities;
 
 namespace ANcpLua.Agents.Testing.Conformance.Stores;
 
@@ -19,7 +18,7 @@ public sealed class InMemorySessionStateStore<TState> : ISessionStateStore<TStat
 
     /// <inheritdoc />
     public Task<TState?> LoadAsync(string sessionId, CancellationToken cancellationToken)
-        => Task.FromResult(((IReadOnlyDictionary<string, TState>)_store).GetOrNull(sessionId));
+        => Task.FromResult(_store.TryGetValue(sessionId, out var state) ? state : null);
 
     /// <inheritdoc />
     public Task SaveAsync(string sessionId, TState state, CancellationToken cancellationToken)
