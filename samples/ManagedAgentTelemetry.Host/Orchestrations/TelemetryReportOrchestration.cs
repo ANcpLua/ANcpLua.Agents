@@ -39,11 +39,17 @@ public static class TelemetryReportOrchestration
                 $"Use the runbook search tool if any topic relates to a known incident type.",
             session: session).ConfigureAwait(false);
 
-        TelemetryReport report = response.Result;
+        TelemetryReport report = response.Result
+            ?? throw new InvalidOperationException(
+                $"TelemetryAssistant returned no structured TelemetryReport for run {input.RunId} (client {input.ClientId}).");
 
         await context.CallActivityAsync(
             nameof(PostTeamsNotification),
-            new TeamsNotificationInput(input.TeamId, input.ChannelId, report)).ConfigureAwait(false);
+            new TeamsNotificationInput(input.TeamId, input.ChannelId, report),
+            new TaskOptions(new RetryPolicy(
+                maxNumberOfAttempts: 5,
+                firstRetryInterval: TimeSpan.FromSeconds(2),
+                backoffCoefficient: 2))).ConfigureAwait(false);
 
         return report;
     }

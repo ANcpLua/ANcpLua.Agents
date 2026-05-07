@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="ANcpLua.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
+    <PackageId>Qyl.DurableAgents.Abstractions</PackageId>
     <RootNamespace>Qyl.DurableAgents</RootNamespace>
+
     <IsPackable>false</IsPackable>
+    <GenerateSBOM>false</GenerateSBOM>
   </PropertyGroup>
 </Project>

@@ -6,9 +6,7 @@ namespace ManagedAgentTelemetry.Host.Integrations;
 
 /// <summary>
 /// Posts telemetry reports as Adaptive Cards into a Microsoft Teams channel
-/// via the Microsoft Graph SDK. The tenant's Teams subscription is part of
-/// the Microsoft 365 plan the operations team already pays for, so this
-/// integration is "free" relative to the agent's per-token costs.
+/// via the Microsoft Graph SDK.
 /// </summary>
 public sealed class TeamsNotifier(GraphServiceClient graph)
 {

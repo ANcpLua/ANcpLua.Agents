@@ -70,11 +70,6 @@ internal static class DurableHostEmitter
             sb.AppendLine("    workerBuilder =>");
             using (sb.BeginBlock())
             {
-                // Use extension-method call syntax — both Microsoft.DurableTask.Worker
-                // and Microsoft.DurableTask.Worker.Grpc declare a type literally named
-                // DurableTaskWorkerBuilderExtensions, so a fully-qualified static call
-                // collides at compile time. Extension-call syntax lets the compiler
-                // pick the right assembly per method.
                 sb.AppendLine("workerBuilder.AddTasks(registry =>");
                 using (sb.BeginBlock())
                 {
@@ -106,13 +101,11 @@ internal static class DurableHostEmitter
         var inputType = orch.InputTypeFullyQualifiedName ?? "global::System.ValueTuple";
         var outputType = orch.OutputTypeFullyQualifiedName;
 
-        // registry.AddOrchestratorFunc<TInput, TOutput>(name, (ctx, input) => Task<TOutput>).
         sb.AppendLine($"registry.AddOrchestratorFunc<{inputType}, {outputType}>(");
         sb.AppendLine($"    {StringLiteral(orch.TaskName)},");
 
         if (orch.InputTypeFullyQualifiedName is null)
         {
-            // Method takes only the context — discard the registry-supplied input.
             if (orch.ReturnsTask)
                 sb.AppendLine($"    static (ctx, _) => {orch.DeclaringTypeFullyQualifiedName}.{orch.MethodName}(ctx));");
             else
@@ -139,7 +132,6 @@ internal static class DurableHostEmitter
 
         if (act.ReturnsVoid && act.ReturnsTask)
         {
-            // Task-returning activity — await it then surface unit (ValueTuple).
             sb.AppendLine("    static async (ctx, input) =>");
             using (sb.BeginBlock())
             {
@@ -150,7 +142,6 @@ internal static class DurableHostEmitter
         }
         else if (act.ReturnsVoid)
         {
-            // Synchronous void activity.
             sb.AppendLine("    static (ctx, input) =>");
             using (sb.BeginBlock())
             {

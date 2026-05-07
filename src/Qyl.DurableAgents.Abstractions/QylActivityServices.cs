@@ -1,25 +1,41 @@
 using System;
+using System.Threading;
 
 namespace Qyl.DurableAgents;
 
 /// <summary>
-/// Static accessor that lambda-form Durable Task activities use to resolve
-/// services. The host populates <see cref="Provider"/> after the application's
-/// service container is built — typically right after <c>WebApplication.Build()</c>.
+/// Static accessor that lambda-form Durable Task activities use to resolve services.
+/// Activities registered via <c>AddActivityFunc&lt;TInput, TOutput&gt;</c> have no
+/// <c>IServiceProvider</c> parameter on their delegate; this static is the
+/// documented shortcut. Activities that need richer DI should be implemented as
+/// <c>ITaskActivity&lt;TInput, TOutput&gt;</c> classes registered with
+/// <c>AddActivity&lt;TActivity&gt;</c> instead.
 ///
-/// Lambda activities (registered via <c>AddActivityFunc&lt;TInput, TOutput&gt;</c>)
-/// have no DI parameter on their delegate signature; this is the documented
-/// shortcut for getting at the host's services from inside such a lambda.
-/// Activities that require richer DI semantics should be implemented as
-/// <c>ITaskActivity&lt;TInput, TOutput&gt;</c> classes and registered with the
-/// class form of <c>AddActivity&lt;TActivity&gt;</c> instead.
+/// <para>
+/// <see cref="Provider"/> is set-once via <see cref="Interlocked.CompareExchange{T}(ref T, T, T)"/>:
+/// the first non-null assignment wins, subsequent assignments throw.
+/// </para>
 /// </summary>
 public static class QylActivityServices
 {
-    public static IServiceProvider? Provider { get; set; }
+    private static IServiceProvider? s_provider;
+
+    public static IServiceProvider? Provider
+    {
+        get => Volatile.Read(ref s_provider);
+        set
+        {
+            if (value is null)
+                throw new ArgumentNullException(nameof(value));
+
+            var previous = Interlocked.CompareExchange(ref s_provider, value, null);
+            if (previous is not null && !ReferenceEquals(previous, value))
+                throw new InvalidOperationException(
+                    "QylActivityServices.Provider has already been set. The host service provider may be assigned only once per process.");
+        }
+    }
 
     public static IServiceProvider Required =>
-        Provider ?? throw new InvalidOperationException(
-            "QylActivityServices.Provider has not been set. Assign it after building the host's "
-            + "service container (e.g. QylActivityServices.Provider = app.Services).");
+        Volatile.Read(ref s_provider) ?? throw new InvalidOperationException(
+            "QylActivityServices.Provider has not been set. Assign it after building the host's service container (e.g. QylActivityServices.Provider = app.Services).");
 }

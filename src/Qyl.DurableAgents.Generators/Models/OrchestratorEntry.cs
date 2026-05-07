@@ -1,4 +1,4 @@
-namespace Qyl.DurableAgents.Generators.Models;
+﻿namespace Qyl.DurableAgents.Generators.Models;
 
 internal sealed record OrchestratorEntry(
     string TaskName,

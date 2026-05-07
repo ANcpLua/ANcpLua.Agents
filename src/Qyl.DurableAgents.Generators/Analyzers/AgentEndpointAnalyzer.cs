@@ -35,8 +35,6 @@ internal static class AgentEndpointAnalyzer
                 orchestratorName = n;
         }
 
-        // Default the orchestrator to the method's own name when omitted —
-        // the most common case for [QylOrchestrator] + [QylAgentEndpoint] colocated.
         orchestratorName ??= method.Name;
 
         string? inputTypeFqn = null;
@@ -46,7 +44,7 @@ internal static class AgentEndpointAnalyzer
         return new AgentEndpointEntry(
             httpMethod,
             route,
-            orchestratorName!,
+            orchestratorName,
             inputTypeFqn);
     }
 

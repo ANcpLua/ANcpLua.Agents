@@ -12,8 +12,7 @@ internal static class GeneratorPipelineHelpers
     public const string TaskActivityContextMetadataName = "Microsoft.DurableTask.TaskActivityContext";
 
     /// <summary>
-    /// Gate: only emit the host class when the abstractions assembly is referenced
-    /// — guarantees the marker attributes resolve.
+    /// Gate: only emit the host class when the abstractions assembly is referenced.
     /// </summary>
     public static bool IsRuntimeReferenced(Compilation compilation, CancellationToken _) =>
         compilation.GetTypeByMetadataName(QylOrchestratorAttributeMetadataName) is not null;

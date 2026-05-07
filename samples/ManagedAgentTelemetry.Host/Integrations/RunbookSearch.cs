@@ -7,9 +7,6 @@ namespace ManagedAgentTelemetry.Host.Integrations;
 /// <summary>
 /// RAG tool exposed to the agent. The agent decides at runtime whether
 /// it needs to consult internal runbooks before producing a recommendation.
-///
-/// Backed by Azure AI Search — which is the most expensive component of
-/// this stack and the prime refactor target for the cost-down exercise.
 /// </summary>
 public sealed class RunbookSearch(SearchClient search)
 {
