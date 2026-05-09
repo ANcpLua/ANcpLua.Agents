@@ -79,6 +79,6 @@
          Pulled transitively via Microsoft.Graph / Azure.AI.Projects in the
          ManagedAgentTelemetry.Host sample. Now that the sample uses
          ANcpLua.NET.Sdk.Web, NU1903 escalates from warning to error in CI. -->
-    <PackageVersion Include="Microsoft.Kiota.Abstractions" Version="1.22.2"/>
+    <PackageVersion Include="Microsoft.Kiota.Abstractions" Version="2.0.0"/>
   </ItemGroup>
 </Project>
