@@ -1,0 +1,50 @@
+name: sdk-hardening
+
+# Audits SDK adoption + held-back surface 4x/day so drift surfaces within hours.
+
+on:
+  schedule:
+    - cron: '37 1,7,13,19 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '**/*.csproj'
+      - 'global.json'
+      - 'Directory.Packages.props'
+      - '.github/workflows/sdk-hardening.yml'
+      - '.github/scripts/sdk-hardening.sh'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sdk-hardening-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Audit SDK adoption
+        env:
+          SDK_NAME: ANcpLua.NET.Sdk
+          ALLOW_MICROSOFT_NET_SDK: ''
+          # The sample on Microsoft.NET.Sdk.Web is held back pending five
+          # behavior-decision fixes the SDK's analyzer set surfaces (CA1054 +
+          # CA1056 on RunbookHit/RunbookDocument.Url, IDE0060 on the
+          # generator-marker StartReportEndpoint param, AL0025 + AL0117 in
+          # TeamsNotifier, AL0081 missing health checks in Program). See PR #66
+          # body for the full table.
+          HELD_BACK: |
+            samples/ManagedAgentTelemetry.Host/ManagedAgentTelemetry.Host.csproj|5 analyzer violations under SDK.Web (CA1054/56, IDE0060, AL0025/0117/0081) — see PR #66
+          BANNED_PACKAGES: |
+            PolySharp
+            FluentAssertions
+            Microsoft.NET.Test.Sdk
+          SDK_PIN_PACKAGES: |
+            ANcpLua.NET.Sdk
+            ANcpLua.NET.Sdk.Web
+            ANcpLua.NET.Sdk.Test
+        run: bash .github/scripts/sdk-hardening.sh

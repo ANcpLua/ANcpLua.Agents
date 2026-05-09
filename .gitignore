@@ -23,6 +23,8 @@ TestResults/
 *.sh
 !scripts/
 !scripts/*.sh
+!.github/scripts/
+!.github/scripts/*.sh
 async-showcase.md
 watch_*
 
