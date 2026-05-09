@@ -75,5 +75,10 @@
   <ItemGroup Label="Transitive security pins (CVE-2026-40894 / GHSA-g94r-2vxg-569j)">
     <PackageVersion Include="OpenTelemetry.Api" Version="1.15.3"/>
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3"/>
+    <!-- GHSA-7j59-v9qr-6fq9: Microsoft.Kiota.Abstractions <= 1.21.1 vulnerable.
+         Pulled transitively via Microsoft.Graph / Azure.AI.Projects in the
+         ManagedAgentTelemetry.Host sample. Now that the sample uses
+         ANcpLua.NET.Sdk.Web, NU1903 escalates from warning to error in CI. -->
+    <PackageVersion Include="Microsoft.Kiota.Abstractions" Version="1.22.2"/>
   </ItemGroup>
 </Project>
