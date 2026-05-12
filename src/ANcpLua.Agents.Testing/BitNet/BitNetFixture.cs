@@ -1,5 +1,6 @@
 using System.ClientModel;
 using System.ClientModel.Primitives;
+using System.Diagnostics;
 using System.Text.Json.Nodes;
 using ANcpLua.Roslyn.Utilities;
 using Microsoft.Extensions.AI;
@@ -9,64 +10,87 @@ using Xunit;
 namespace ANcpLua.Agents.Testing.BitNet;
 
 /// <summary>
-///     Shared fixture that probes a BitNet (llama.cpp) server and exposes an <see cref="IChatClient" />.
-///     Tests should guard with <c>Skip.IfNot(bitnet.IsAvailable, "BitNet not running")</c>.
+///     Shared fixture that exposes an <see cref="IChatClient" /> wired to a BitNet
+///     <c>llama-server</c>. Tests should guard with
+///     <c>Skip.IfNot(bitnet.IsAvailable, "BitNet not running")</c>.
 /// </summary>
 /// <remarks>
-///     <para>Configuration:</para>
+///     <para>Endpoint discovery, in priority order:</para>
+///     <list type="number">
+///         <item>
+///             <c>BITNET_URL</c> environment variable — if set, the fixture probes that endpoint
+///             only. The caller is responsible for managing the server lifecycle.
+///         </item>
+///         <item>
+///             <strong>Auto-managed Docker container.</strong> When <c>BITNET_URL</c> is unset and
+///             <c>BITNET_FIXTURE_NO_DOCKER</c> is not truthy, the fixture starts Microsoft's
+///             prebuilt BitNet image (<see cref="DockerImage" />) via <c>docker run</c> on port
+///             <see cref="DockerPort" />, probes <c>/health</c>, and tears the container down in
+///             <see cref="DisposeAsync" />. The container is pinned by digest for reproducibility.
+///         </item>
+///         <item>
+///             Legacy fallback to <c>http://localhost:8080</c>. Probed only when Docker is
+///             unavailable or auto-Docker is opted out — kept so older
+///             <c>scripts/bitnet-docker.sh</c>-less setups still work if a server happens to be
+///             listening there.
+///         </item>
+///     </list>
+///     <para>Additional overrides honored once an endpoint is settled:</para>
 ///     <list type="bullet">
-///         <item><c>BITNET_URL</c> env var overrides the default <c>http://localhost:8080</c> endpoint.</item>
-///         <item><c>BITNET_API_PATH</c> env var overrides the default OpenAI-compatible API path.</item>
-///         <item><c>BITNET_MODEL</c> env var overrides the default model id.</item>
-///         <item>The fixture probes <c>/health</c> with a 3-second timeout during <see cref="InitializeAsync" />.</item>
+///         <item><c>BITNET_API_PATH</c> — overrides the default OpenAI-compatible API path (<c>/v1</c>).</item>
+///         <item><c>BITNET_MODEL</c> — overrides the default model id (<c>bitnet-b1.58-2B-4T</c>).</item>
 ///     </list>
 ///     <para>This fixture intentionally does not depend on the
-///     <c>ANcpLua.Agents.Hosting.BitNet</c> package — Testing is a stable channel and BitNet
+///     <c>ANcpLua.Agents.Hosting.BitNet</c> package — Testing is on the stable channel and BitNet
 ///     hosting is alpha, so they cannot share a runtime <c>PackageReference</c>. The private
-///     <see cref="LegacyMaxTokensPolicy" /> below is duplicated with the public policy in
-///     <c>ANcpLua.Agents.Hosting.BitNet</c>; both files are ~50 lines and never drift in lockstep
-///     because each is scoped to its own assembly boundary.</para>
+///     <see cref="LegacyMaxTokensPolicy" /> below duplicates the public policy in
+///     <c>ANcpLua.Agents.Hosting.BitNet</c> intentionally; both files are ~50 lines and never
+///     drift in lockstep because each is scoped to its own assembly boundary.</para>
 /// </remarks>
 public sealed class BitNetFixture : IAsyncLifetime
 {
+    /// <summary>
+    ///     Microsoft's prebuilt BitNet b1.58-2B-4T inference image, pinned by digest. Re-resolve
+    ///     with <c>docker buildx imagetools inspect</c> if you intentionally want a newer build.
+    /// </summary>
+    public const string DockerImage =
+        "mcr.microsoft.com/appsvc/docs/sidecars/sample-experiment@sha256:9d5f7f4e6e5a456b40582f7b00a70a5e2a4637c37f0976bfcffd1ed252cd243a";
+
+    /// <summary>Host port the auto-managed Docker container binds to. Maps to container port 11434.</summary>
+    public const int DockerPort = 11434;
+
     private const string DefaultApiPath = "/v1";
     private const string DefaultModel = "bitnet-b1.58-2B-4T";
     private const string UnusedApiKey = "unused";
+    private const string OptOutEnvironmentVariable = "BITNET_FIXTURE_NO_DOCKER";
+    private const string ContainerNamePrefix = "bitnet-fixture-";
 
-    private static readonly Uri s_defaultEndpoint = new("http://localhost:8080");
+    private static readonly Uri s_legacyFallbackEndpoint = new("http://localhost:8080");
 
     private readonly HttpClient _http = new() { Timeout = Timeout.InfiniteTimeSpan };
 
     /// <summary>
-    ///     Chat client connected to the BitNet server. Only usable when <see cref="IsAvailable" /> is
-    ///     <see langword="true" />.
+    ///     Name of the Docker container the fixture started, when applicable. <see langword="null" />
+    ///     when the user supplied <c>BITNET_URL</c> or opted out of auto-Docker.
     /// </summary>
+    private string? _ownedContainerName;
+
+    /// <summary>Chat client connected to the BitNet server. Only usable when <see cref="IsAvailable" /> is <see langword="true" />.</summary>
     public IChatClient? ChatClient { get; private set; }
 
-    /// <summary>
-    ///     Whether the BitNet server responded to the health probe during initialization.
-    /// </summary>
+    /// <summary>Whether the BitNet server responded to the health probe during initialization.</summary>
     public bool IsAvailable { get; private set; }
+
+    /// <summary>Endpoint the fixture probed and (when available) built <see cref="ChatClient" /> against.</summary>
+    public Uri? Endpoint { get; private set; }
 
     /// <inheritdoc />
     public async ValueTask InitializeAsync()
     {
-        var endpoint = Environment.GetEnvironmentVariable("BITNET_URL") is { Length: > 0 } url
-            ? new Uri(url)
-            : s_defaultEndpoint;
+        Endpoint = await ResolveEndpointAsync().ConfigureAwait(false);
+        if (Endpoint is null) return;
 
-        try
-        {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-            using var response = await _http.GetAsync(new Uri(endpoint, "/health"), cts.Token)
-                .ConfigureAwait(false);
-            IsAvailable = response.IsSuccessStatusCode;
-        }
-        catch
-        {
-            IsAvailable = false;
-        }
-
+        IsAvailable = await ProbeHealthAsync(Endpoint).ConfigureAwait(false);
         if (!IsAvailable) return;
 
         var apiPath = Environment.GetEnvironmentVariable("BITNET_API_PATH") is { Length: > 0 } configuredApiPath
@@ -76,19 +100,168 @@ public sealed class BitNetFixture : IAsyncLifetime
             ? configuredModel
             : DefaultModel;
 
-        var options = new OpenAIClientOptions { Endpoint = new Uri(endpoint, apiPath) };
+        var options = new OpenAIClientOptions { Endpoint = new Uri(Endpoint, apiPath) };
         options.AddPolicy(new LegacyMaxTokensPolicy(), PipelinePosition.PerCall);
         var client = new OpenAIClient(new ApiKeyCredential(UnusedApiKey), options);
         ChatClient = client.GetChatClient(model).AsIChatClient();
     }
 
     /// <inheritdoc />
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
+        if (_ownedContainerName is not null)
+        {
+            // Best-effort stop — never throw out of teardown.
+            await RunDockerAsync(["stop", _ownedContainerName], TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+        }
+
         _http.Dispose();
         ChatClient?.Dispose();
-        return ValueTask.CompletedTask;
     }
+
+    private async ValueTask<Uri?> ResolveEndpointAsync()
+    {
+        // Priority 1: caller-supplied BITNET_URL — we never touch Docker in this mode.
+        if (Environment.GetEnvironmentVariable("BITNET_URL") is { Length: > 0 } url)
+        {
+            return new Uri(url);
+        }
+
+        // Priority 2: auto-managed Docker container, unless explicitly opted out.
+        if (!IsTruthy(Environment.GetEnvironmentVariable(OptOutEnvironmentVariable))
+            && await IsDockerAvailableAsync().ConfigureAwait(false))
+        {
+            _ownedContainerName = await StartContainerAsync().ConfigureAwait(false);
+            if (_ownedContainerName is not null)
+            {
+                return new Uri($"http://localhost:{DockerPort}");
+            }
+        }
+
+        // Priority 3: historical default. Probed in case a manually-run server happens to be there.
+        return s_legacyFallbackEndpoint;
+    }
+
+    private async ValueTask<bool> ProbeHealthAsync(Uri endpoint)
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            using var response = await _http.GetAsync(new Uri(endpoint, "/health"), cts.Token).ConfigureAwait(false);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private async ValueTask<string?> StartContainerAsync()
+    {
+        var containerName = ContainerNamePrefix + Guid.NewGuid().ToString("N")[..8];
+
+        var run = await RunDockerAsync(
+            ["run", "-d", "--rm", "--name", containerName, "-p", $"{DockerPort}:11434", DockerImage],
+            TimeSpan.FromMinutes(5)).ConfigureAwait(false);
+
+        if (run.ExitCode != 0)
+        {
+            // Most likely: port conflict, image pull failure offline, or rate-limit. Caller falls
+            // through to the legacy fallback and ultimately reports IsAvailable=false.
+            return null;
+        }
+
+        // Wait up to 60 s for /health — first model load on emulated hosts can be slow.
+        var endpoint = new Uri($"http://localhost:{DockerPort}");
+        for (var i = 0; i < 60; i++)
+        {
+            if (await ProbeHealthAsync(endpoint).ConfigureAwait(false))
+            {
+                return containerName;
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+        }
+
+        // Container never reached ready — clean up so we don't leak it.
+        await RunDockerAsync(["stop", containerName], TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+        return null;
+    }
+
+    private static async ValueTask<bool> IsDockerAvailableAsync()
+    {
+        var result = await RunDockerAsync(
+            ["version", "--format", "{{.Server.Version}}"],
+            TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+
+        return result.ExitCode == 0;
+    }
+
+    private static async ValueTask<(int ExitCode, string Stdout, string Stderr)> RunDockerAsync(
+        IReadOnlyList<string> args,
+        TimeSpan timeout)
+    {
+        using var process = new Process
+        {
+            StartInfo = BuildStartInfo(args)
+        };
+
+        try
+        {
+            if (!process.Start())
+            {
+                return (-1, string.Empty, "docker process failed to start");
+            }
+        }
+        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            // docker binary not on PATH, or fork failed. Treat as unavailable, not fatal.
+            return (-1, string.Empty, ex.Message);
+        }
+
+        using var cts = new CancellationTokenSource(timeout);
+        try
+        {
+            await process.WaitForExitAsync(cts.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            try { process.Kill(entireProcessTree: true); } catch { /* best-effort */ }
+            return (-1, string.Empty, $"docker timed out after {timeout}");
+        }
+
+        var stdout = await process.StandardOutput.ReadToEndAsync().ConfigureAwait(false);
+        var stderr = await process.StandardError.ReadToEndAsync().ConfigureAwait(false);
+        return (process.ExitCode, stdout, stderr);
+    }
+
+    private static ProcessStartInfo BuildStartInfo(IReadOnlyList<string> args)
+    {
+        var startInfo = new ProcessStartInfo("docker")
+        {
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
+        };
+
+        foreach (var arg in args)
+        {
+            startInfo.ArgumentList.Add(arg);
+        }
+
+        return startInfo;
+    }
+
+    private static bool IsTruthy(string? value) =>
+        value is { Length: > 0 } && value switch
+        {
+            "1" => true,
+            _ when string.Equals(value, "true", StringComparison.OrdinalIgnoreCase) => true,
+            _ when string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase) => true,
+            _ when string.Equals(value, "on", StringComparison.OrdinalIgnoreCase) => true,
+            _ => false
+        };
 }
 
 /// <summary>
