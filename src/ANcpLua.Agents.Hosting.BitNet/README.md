@@ -56,7 +56,7 @@ public sealed class MyAgent([FromKeyedServices("bitnet")] IChatClient chat) { ..
 
 ## Environment overrides
 
-For test scenarios and the [BitNetFixture](../ANcpLua.Agents.Testing/BitNet/BitNetFixture.cs) contract:
+For test scenarios and the [BitNetFixture](https://github.com/ANcpLua/ANcpLua.Agents/blob/main/src/ANcpLua.Agents.Testing/BitNet/BitNetFixture.cs) contract:
 
 - `BITNET_URL` — overrides `Endpoint`
 - `BITNET_API_PATH` — overrides `ApiPath` (default `/v1`)

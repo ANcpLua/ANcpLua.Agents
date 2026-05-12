@@ -43,10 +43,18 @@ public sealed class BitNetFixture : IAsyncLifetime
     {
         var options = new QylBitNetClientOptions { Endpoint = s_defaultEndpoint }.ApplyEnvironmentOverrides();
 
+        if (options.Endpoint is null)
+        {
+            IsAvailable = false;
+            return;
+        }
+
+        var endpoint = options.Endpoint;
+
         try
         {
             using var cts = new CancellationTokenSource(options.HealthProbeTimeout);
-            using var response = await _http.GetAsync(new Uri(options.Endpoint!, "/health"), cts.Token)
+            using var response = await _http.GetAsync(new Uri(endpoint, "/health"), cts.Token)
                 .ConfigureAwait(false);
             IsAvailable = response.IsSuccessStatusCode;
         }

@@ -50,7 +50,13 @@ public sealed class QylBitNetHealthCheck : IHealthCheck
                 ? HealthCheckResult.Healthy($"BitNet '{_connectionName}' responded {(int)response.StatusCode}.")
                 : HealthCheckResult.Unhealthy($"BitNet '{_connectionName}' responded {(int)response.StatusCode}.");
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        catch (TaskCanceledException ex)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                throw;
+            return HealthCheckResult.Unhealthy($"BitNet '{_connectionName}' probe failed.", ex);
+        }
+        catch (HttpRequestException ex)
         {
             return HealthCheckResult.Unhealthy($"BitNet '{_connectionName}' probe failed.", ex);
         }
