@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 
 namespace ANcpLua.Agents;
@@ -24,18 +23,6 @@ public static class AgentsHelper
                     ColorHelper.PrintColoredLine($"TOOL RESP {toolResponse.CallId}: {toolResponse.Result}",
                         ConsoleColor.Blue);
                     break;
-            }
-    }
-
-    public static async Task PrintChatMessagesAsync(AgentSession session)
-    {
-        if (session.StateBag.TryGetValue<InMemoryChatHistoryProvider.State>(nameof(InMemoryChatHistoryProvider),
-                out var state))
-            foreach (var message in state!.Messages)
-            {
-                var source = message.GetAgentRequestMessageSourceType();
-                ColorHelper.PrintColoredLine($"[{source.Value}] {message.Role}: ", ConsoleColor.Yellow);
-                ColorHelper.PrintColoredLine($"{message.Text}", ConsoleColor.White);
             }
     }
 }
