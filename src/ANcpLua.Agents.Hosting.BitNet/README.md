@@ -4,8 +4,8 @@ Consumer toolkit for Microsoft Agent Framework — local-LLM hosting via Microso
 
 Alpha-channel package. Keep isolated from stable/preview consumers unless explicitly intended.
 
-- Compatible with: `Microsoft.Agents.AI` 1.4.x
-- Tested against: `Microsoft.Agents.AI` 1.4.0 + `Microsoft.Extensions.AI` 10.5.x
+- Compatible with: Microsoft.Agents.AI 1.4.x
+- Tested against: Microsoft.Agents.AI 1.4.0 + Microsoft.Extensions.AI 10.5.x
 - Capability tested against: BitNet b1.58 2B-4T weights served by `bitnet.cpp`'s `llama-server`
 
 ## Standing up a BitNet server (pick one)
