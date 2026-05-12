@@ -44,6 +44,10 @@
         <PackageReference Include="Moq"/>
     </ItemGroup>
 
+    <ItemGroup Label="BitNetFixture delegates to the runtime Hosting.BitNet factory + LegacyMaxTokensPolicy">
+        <ProjectReference Include="..\ANcpLua.Agents.Hosting.BitNet\ANcpLua.Agents.Hosting.BitNet.csproj"/>
+    </ItemGroup>
+
     <ItemGroup Label="Conformance provider SDKs">
         <PackageReference Include="Azure.AI.OpenAI"/>
         <PackageReference Include="Azure.Identity"/>
