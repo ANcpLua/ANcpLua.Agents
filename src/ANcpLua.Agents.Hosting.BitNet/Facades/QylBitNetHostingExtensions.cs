@@ -14,11 +14,22 @@ namespace ANcpLua.Agents.Hosting.BitNet;
 /// </summary>
 public static class QylBitNetHostingExtensions
 {
+    /// <summary>Default connection name used by the parameterless overloads.</summary>
+    public const string DefaultConnectionName = "bitnet";
+
     /// <summary>Health-check name prefix; the registered check is <c>bitnet:&lt;connectionName&gt;</c>.</summary>
     public const string HealthCheckNamePrefix = "bitnet:";
 
     /// <summary>Health-check tag applied to every BitNet probe so consumers can filter by tag.</summary>
     public const string HealthCheckTag = "bitnet";
+
+    /// <summary>
+    ///     Registers a keyed BitNet <see cref="IChatClient" /> under the default connection name
+    ///     (<c>"bitnet"</c>). Reads <c>BITNET_URL</c> / <c>BITNET_API_PATH</c> / <c>BITNET_MODEL</c>
+    ///     from the environment when nothing is bound from configuration.
+    /// </summary>
+    public static IHostApplicationBuilder AddQylBitNetChatClient(this IHostApplicationBuilder builder) =>
+        builder.AddQylBitNetChatClient(DefaultConnectionName, configure: null);
 
     /// <summary>
     ///     Registers a keyed BitNet <see cref="IChatClient" /> under <paramref name="connectionName" />.
@@ -65,6 +76,13 @@ public static class QylBitNetHostingExtensions
 
         return builder;
     }
+
+    /// <summary>
+    ///     Service-collection overload registering BitNet under the default connection name
+    ///     (<c>"bitnet"</c>). Reads <c>BITNET_*</c> environment variables — no configuration binding.
+    /// </summary>
+    public static IServiceCollection AddQylBitNetChatClient(this IServiceCollection services) =>
+        services.AddQylBitNetChatClient(DefaultConnectionName, configure: null);
 
     /// <summary>
     ///     Service-collection overload of <see cref="AddQylBitNetChatClient(IHostApplicationBuilder, string, Action{QylBitNetClientOptions}?)" />
