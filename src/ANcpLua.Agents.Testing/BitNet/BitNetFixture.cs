@@ -25,7 +25,7 @@ public sealed class BitNetFixture : IAsyncLifetime
 {
     private static readonly Uri s_defaultEndpoint = new("http://localhost:8080");
 
-    private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(5) };
+    private readonly HttpClient _http = new() { Timeout = Timeout.InfiniteTimeSpan };
 
     /// <summary>
     ///     Chat client connected to the BitNet server. Only usable when <see cref="IsAvailable" />
