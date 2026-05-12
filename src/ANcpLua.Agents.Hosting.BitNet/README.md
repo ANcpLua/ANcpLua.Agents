@@ -4,9 +4,11 @@ Consumer toolkit for Microsoft Agent Framework — local-LLM hosting via [bitnet
 
 Alpha-channel BitNet hosting facades and client factory for Microsoft Agent Framework consumers. Targets the OpenAI-compatible `/v1` surface that `bitnet.cpp`'s `llama-server` exposes.
 
-- Compatible with: Microsoft.Agents.AI 1.4.x, Microsoft.Extensions.AI 10.5.x
-- Tested against: bitnet.cpp built from `microsoft/BitNet` (b1.58-2B-4T weights, `ggml-model-i2_s.gguf`)
-- Channel: alpha. Keep this package isolated from stable and preview consumers unless explicitly intended.
+Compatible with: Microsoft.Agents.AI 1.4.x
+Tested against: Microsoft.Agents.AI 1.4.0
+Capability tested against: bitnet.cpp built from `microsoft/BitNet` (b1.58-2B-4T weights, `ggml-model-i2_s.gguf`) and Microsoft.Extensions.AI 10.5.x
+
+Channel: alpha. Keep this package isolated from stable and preview consumers unless explicitly intended.
 
 ## Why a dedicated hosting package
 
@@ -56,7 +58,7 @@ public sealed class MyAgent([FromKeyedServices("bitnet")] IChatClient chat) { ..
 
 ## Environment overrides
 
-For test scenarios and the [BitNetFixture](https://github.com/ANcpLua/ANcpLua.Agents/blob/main/src/ANcpLua.Agents.Testing/BitNet/BitNetFixture.cs) contract:
+For test scenarios and the `BitNetFixture` contract (`ANcpLua.Agents.Testing.BitNet.BitNetFixture`):
 
 - `BITNET_URL` — overrides `Endpoint`
 - `BITNET_API_PATH` — overrides `ApiPath` (default `/v1`)

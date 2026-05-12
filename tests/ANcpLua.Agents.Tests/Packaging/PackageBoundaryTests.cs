@@ -20,6 +20,7 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Hosting.DevUI",
         "ANcpLua.Agents.Foundry",
         "ANcpLua.Agents.Hosting.OpenAI",
+        "ANcpLua.Agents.Hosting.BitNet",
     ];
 
     private static readonly HashSet<string> s_stablePackageIds =
@@ -53,6 +54,7 @@ public sealed partial class PackageBoundaryTests
             "Microsoft.Agents.AI.OpenAI",
             "Microsoft.Agents.AI.Hosting.OpenAI",
         ],
+        ["ANcpLua.Agents.Hosting.BitNet"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Hosting"],
     };
 
     [Fact]
@@ -183,7 +185,7 @@ public sealed partial class PackageBoundaryTests
     {
         return Directory.EnumerateFiles(Path.Combine(s_repoRoot, "src"), "*.csproj", SearchOption.AllDirectories)
             .Select(ProjectInfo.Load)
-            .Where(static project => StringComparisonExtensions.StartsWithOrdinal(project.PackageId, "ANcpLua.Agents"))
+            .Where(static project => StringComparisonExtensions.StartsWithOrdinal(project.PackageId, "ANcpLua.Agents") && project.IsPackable)
             .OrderBy(static project => project.PackageId, StringComparer.Ordinal)
             .ToArray();
     }
@@ -311,6 +313,7 @@ public sealed partial class PackageBoundaryTests
         string RelativePath,
         string PackageId,
         string RootNamespace,
+        bool IsPackable,
         IReadOnlyCollection<string> PackageReferences,
         IReadOnlyCollection<string> ProjectReferences)
     {
@@ -320,6 +323,10 @@ public sealed partial class PackageBoundaryTests
             var project = document.Root ?? throw new InvalidOperationException($"Missing root element in {projectPath}.");
             var packageId = ValueOf(project, "PackageId", projectPath);
             var rootNamespace = ValueOf(project, "RootNamespace", projectPath);
+            var isPackable = !string.Equals(
+                project.Descendants("IsPackable").FirstOrDefault()?.Value,
+                "false",
+                StringComparison.OrdinalIgnoreCase);
 
             var packageReferences = project.Descendants("PackageReference")
                 .Select(static element => element.Attribute("Include")?.Value)
@@ -338,6 +345,7 @@ public sealed partial class PackageBoundaryTests
                 Path.GetRelativePath(s_repoRoot, projectPath),
                 packageId,
                 rootNamespace,
+                isPackable,
                 packageReferences,
                 projectReferences);
         }

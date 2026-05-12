@@ -40,24 +40,25 @@ public sealed class QylBitNetHealthCheck : IHealthCheck
             return HealthCheckResult.Unhealthy($"BitNet endpoint '{_connectionName}' is not configured.");
 
         using var http = new HttpClient { Timeout = options.HealthProbeTimeout };
+        using var timeoutCts = new CancellationTokenSource(options.HealthProbeTimeout);
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
         try
         {
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cts.CancelAfter(options.HealthProbeTimeout);
-            using var response = await http.GetAsync(new Uri(options.Endpoint, "/health"), cts.Token)
+            using var response = await http.GetAsync(new Uri(options.Endpoint, "/health"), linkedCts.Token)
                 .ConfigureAwait(false);
             return response.IsSuccessStatusCode
                 ? HealthCheckResult.Healthy($"BitNet '{_connectionName}' responded {(int)response.StatusCode}.")
                 : HealthCheckResult.Unhealthy($"BitNet '{_connectionName}' responded {(int)response.StatusCode}.");
         }
-        catch (TaskCanceledException ex)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            if (cancellationToken.IsCancellationRequested)
-                throw;
-            return HealthCheckResult.Unhealthy($"BitNet '{_connectionName}' probe failed.", ex);
+            // Host-driven cancellation (shutdown, request abort): re-throw so the
+            // diagnostics pipeline propagates instead of masking the signal as Unhealthy.
+            throw;
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException)
         {
+            // Probe-timeout or transport failure: map to Unhealthy so the check stays graceful.
             return HealthCheckResult.Unhealthy($"BitNet '{_connectionName}' probe failed.", ex);
         }
     }

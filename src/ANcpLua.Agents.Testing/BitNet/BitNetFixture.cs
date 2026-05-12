@@ -42,14 +42,7 @@ public sealed class BitNetFixture : IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         var options = new QylBitNetClientOptions { Endpoint = s_defaultEndpoint }.ApplyEnvironmentOverrides();
-
-        if (options.Endpoint is null)
-        {
-            IsAvailable = false;
-            return;
-        }
-
-        var endpoint = options.Endpoint;
+        var endpoint = options.Endpoint ?? s_defaultEndpoint;
 
         try
         {

@@ -13,6 +13,7 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
         <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
         <PackageReference Include="Microsoft.Agents.AI"/>
+        <PackageReference Include="Microsoft.Agents.AI.Hosting"/>
         <PackageReference Include="Microsoft.Extensions.AI"/>
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI"/>
         <PackageReference Include="OpenAI"/>
@@ -26,12 +27,26 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="$(OutputPath)\..\ANcpLua.Agents.Hosting.BitNet.Generators\$(Configuration)\netstandard2.0\ANcpLua.Agents.Hosting.BitNet.Generators.dll"
-              Pack="true"
-              PackagePath="analyzers/dotnet/cs/"
-              Visible="false"
-              Condition="Exists('$(OutputPath)\..\ANcpLua.Agents.Hosting.BitNet.Generators\$(Configuration)\netstandard2.0\ANcpLua.Agents.Hosting.BitNet.Generators.dll')"/>
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
     </ItemGroup>
+
+    <!-- Pack the bundled generator DLL into analyzers/dotnet/cs/. Resolve the output
+         path via the generator project's own GetTargetPath target so we are immune to
+         the repo's $(ArtifactsPath)bin/$(MSBuildProjectName)/ layout — earlier attempts
+         using $(OutputPath)\.. computed a sibling directory that never exists. -->
+    <PropertyGroup>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddBundledGeneratorToPackage</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+
+    <Target Name="_AddBundledGeneratorToPackage">
+        <MSBuild Projects="..\ANcpLua.Agents.Hosting.BitNet.Generators\ANcpLua.Agents.Hosting.BitNet.Generators.csproj"
+                 Targets="GetTargetPath"
+                 Properties="TargetFramework=netstandard2.0;Configuration=$(Configuration)">
+            <Output ItemName="_BundledGeneratorAssembly" TaskParameter="TargetOutputs"/>
+        </MSBuild>
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="@(_BundledGeneratorAssembly)" PackagePath="analyzers/dotnet/cs/"/>
+        </ItemGroup>
+    </Target>
 </Project>

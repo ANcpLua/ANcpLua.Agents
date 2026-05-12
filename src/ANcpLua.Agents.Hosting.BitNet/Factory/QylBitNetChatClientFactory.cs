@@ -38,18 +38,8 @@ public static class QylBitNetChatClientFactory
     public static IChatClient? TryCreateFromEnvironment()
     {
         var options = new QylBitNetClientOptions().ApplyEnvironmentOverrides();
-        if (options.Endpoint is null)
-            return null;
-
-        try
-        {
-            options.Validate();
-        }
-        catch
-        {
-            return null;
-        }
-
+        if (options.Endpoint is null) return null;
+        options.Validate();
         return BuildChatClient(options);
     }
 
