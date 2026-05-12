@@ -30,6 +30,24 @@ Health check:
 curl -fsS http://localhost:11434/health && echo ok
 ```
 
+#### Pinning by digest (production / supply-chain)
+
+The tag `bitnet-b1.58-2b-4t-gguf` is mutable — Microsoft can repoint it to a rebuilt image without warning. For reproducible deployments (production, anything with a security review, anything you'll point a CI fixture at), pin to the immutable image digest:
+
+```sh
+# 1. Resolve the current digest for the tag (no full pull required)
+docker buildx imagetools inspect \
+  mcr.microsoft.com/appsvc/docs/sidecars/sample-experiment:bitnet-b1.58-2b-4t-gguf \
+  --format '{{json .Manifest.Digest}}'
+# → "sha256:abcd1234..."
+
+# 2. Run pinned to that digest (the tag is no longer consulted)
+docker run -d --rm -p 11434:11434 --name bitnet \
+  mcr.microsoft.com/appsvc/docs/sidecars/sample-experiment@sha256:abcd1234...
+```
+
+Same image bytes every time, regardless of upstream tag movement. Re-resolve the digest only when you intentionally want to take a newer build.
+
 ### Option B — build from source via the repo script
 
 For air-gapped builds, custom kernels, or pinning to a specific `microsoft/BitNet` commit:
