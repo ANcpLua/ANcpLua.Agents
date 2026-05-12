@@ -121,14 +121,12 @@ public sealed class BitNetFixture : IAsyncLifetime
 
     private async ValueTask<Uri?> ResolveEndpointAsync()
     {
-        // Priority 1: caller-supplied BITNET_URL — we never touch Docker in this mode.
+        // Priority 1: caller-supplied BITNET_URL — we never touch Docker in this mode. A malformed
+        // URL is a user-config error, not a fallback signal: surface it via UriFormatException so
+        // the operator sees the actual cause rather than a silent switch to a different branch.
         if (Environment.GetEnvironmentVariable("BITNET_URL") is { Length: > 0 } url)
         {
-            if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            {
-                return uri;
-            }
-            // Malformed URL falls through to Docker priority.
+            return new Uri(url, UriKind.Absolute);
         }
 
         // Priority 2: auto-managed Docker container, unless explicitly opted out.
@@ -223,11 +221,13 @@ public sealed class BitNetFixture : IAsyncLifetime
             return (-1, string.Empty, ex.Message);
         }
 
-        // Start async reads before waiting for exit to prevent pipe deadlock.
-        var stdoutTask = process.StandardOutput.ReadToEndAsync();
-        var stderrTask = process.StandardError.ReadToEndAsync();
-
         using var cts = new CancellationTokenSource(timeout);
+        // Drain stdout/stderr concurrently with WaitForExitAsync. `docker pull` on a cold host
+        // emits substantial progress to stderr; if we waited on exit before reading, a full pipe
+        // would block the child process and the wait would always hit the timeout path.
+        var stdoutTask = process.StandardOutput.ReadToEndAsync(cts.Token);
+        var stderrTask = process.StandardError.ReadToEndAsync(cts.Token);
+
         try
         {
             await process.WaitForExitAsync(cts.Token).ConfigureAwait(false);
@@ -235,13 +235,10 @@ public sealed class BitNetFixture : IAsyncLifetime
         catch (OperationCanceledException)
         {
             try { process.Kill(entireProcessTree: true); } catch { /* best-effort */ }
-            // Still drain pipes to prevent leaks, even on timeout.
-            try
-            {
-                var stdout = await stdoutTask.ConfigureAwait(false);
-                var stderr = await stderrTask.ConfigureAwait(false);
-            }
-            catch { /* best-effort */ }
+            // Drain the pipes after kill so the underlying StreamReader and pipe handles release
+            // cleanly. Discard the values — the timeout message carries enough diagnostic signal.
+            try { _ = await stdoutTask.ConfigureAwait(false); } catch { /* best-effort */ }
+            try { _ = await stderrTask.ConfigureAwait(false); } catch { /* best-effort */ }
             return (-1, string.Empty, $"docker timed out after {timeout}");
         }
 
@@ -317,6 +314,8 @@ internal sealed class LegacyMaxTokensPolicy : PipelinePolicy
 
     private static bool ShouldMirror(PipelineMessage message, out BinaryContent content)
     {
+        // CS8625: `out BinaryContent` must be assigned on every return path. Callers must check
+        // the bool before reading `content`; the false-returning branches never expose the null.
         content = null!;
         if (message.Request?.Content is not { } c) return false;
         if (message.Request.Uri?.AbsolutePath?.EndsWithOrdinal("/chat/completions") is not true) return false;

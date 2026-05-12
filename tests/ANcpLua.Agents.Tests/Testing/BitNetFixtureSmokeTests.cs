@@ -15,32 +15,33 @@ public sealed class BitNetFixtureSmokeTests
     [DockerEnabledFact]
     public async Task BitNetFixture_AutoDocker_RoundtripsAChatMessageAsync()
     {
-        // Arrange
-        // Pre-conditions live entirely in the host env — see DockerEnabledFact + README.
-        // We do not mutate BITNET_URL / BITNET_FIXTURE_NO_DOCKER from inside the test to keep the
-        // test hermetic against parallel xUnit collections.
+        // Arrange — preconditions live entirely in the host env (see DockerEnabledFact + README).
+        // The gate guarantees BITNET_URL is unset and BITNET_FIXTURE_NO_DOCKER is not truthy, so
+        // BitNetFixture must take the auto-Docker branch. We do not mutate those env vars from
+        // inside the test to keep it hermetic against parallel xUnit collections.
         var fixture = new BitNetFixture();
         try
         {
+            // Act
             await fixture.InitializeAsync();
-
-            fixture.IsAvailable.Should().BeTrue("auto-Docker should have started a container and probed /health");
 
             // Narrow locally so the compiler's null-state tracker is satisfied without `!`.
             var endpoint = fixture.Endpoint;
             var chat = fixture.ChatClient;
+
+            // Assert — fixture surface
+            fixture.IsAvailable.Should().BeTrue("auto-Docker should have started a container and probed /health");
             endpoint.Should().NotBeNull();
             chat.Should().NotBeNull();
             if (endpoint is null || chat is null) return; // unreachable after asserts above, narrows for analyzer
-
             endpoint.Port.Should().Be(BitNetFixture.DockerPort);
 
-            // Act
+            // Act — round-trip a single chat message
             var response = await chat.GetResponseAsync(
                 [new ChatMessage(ChatRole.User, "Reply with the single word: pong.")],
                 new ChatOptions { MaxOutputTokens = 16 });
 
-            // Assert
+            // Assert — model produced a real, terminated response
             response.Text.Should().NotBeNullOrWhiteSpace();
             response.FinishReason.Should().Be(ChatFinishReason.Stop);
         }
@@ -69,6 +70,21 @@ internal sealed class DockerEnabledFactAttribute : FactAttribute
         if (!IsTruthy(Environment.GetEnvironmentVariable("BITNET_SMOKE_TEST")))
         {
             Skip = "Set BITNET_SMOKE_TEST=1 to opt in to the auto-Docker BitNet fixture smoke test (pulls a ~1.6 GB image on cold runs).";
+            return;
+        }
+
+        // BitNetFixture only enters the auto-Docker branch when BITNET_URL is unset AND
+        // BITNET_FIXTURE_NO_DOCKER is not truthy. If either is set, this test would silently
+        // exercise the wrong path; refuse rather than produce a false-pass.
+        if (Environment.GetEnvironmentVariable("BITNET_URL") is { Length: > 0 })
+        {
+            Skip = "BITNET_URL is set — BitNetFixture would use that endpoint instead of auto-Docker. Unset it (or run this test in a clean shell) to exercise the auto-Docker path.";
+            return;
+        }
+
+        if (IsTruthy(Environment.GetEnvironmentVariable("BITNET_FIXTURE_NO_DOCKER")))
+        {
+            Skip = "BITNET_FIXTURE_NO_DOCKER is truthy — BitNetFixture is opted out of auto-Docker. Unset it to exercise this test.";
             return;
         }
 

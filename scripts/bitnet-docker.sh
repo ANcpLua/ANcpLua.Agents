@@ -33,6 +33,14 @@ command -v docker >/dev/null 2>&1 || {
   exit 2
 }
 
+# `start` polls /health with curl; without it, every loop iteration silently fails inside the `if`
+# (set -e ignores conditional-context failures), then the script reports a misleading 60-second
+# /health timeout. Fail fast instead so the operator sees the real cause.
+if [ "${1:-start}" = "start" ] && ! command -v curl >/dev/null 2>&1; then
+  echo "[bitnet-docker] curl not found on PATH — required for /health readiness checks" >&2
+  exit 2
+fi
+
 case "$ACTION" in
   start)
     if docker inspect "$NAME" >/dev/null 2>&1; then

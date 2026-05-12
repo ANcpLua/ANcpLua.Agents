@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ANcpLua.Roslyn.Utilities;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
@@ -19,7 +20,10 @@ public static class QylBitNetClientExtensions
 
     /// <summary>
     ///     Adapts a BitNet-backed <see cref="IChatClient" /> to a <see cref="ChatClientAgent" />.
+    ///     Returns a type from <c>Microsoft.Agents.AI</c>, which is itself preview; callers on a
+    ///     stable channel must explicitly opt in to <c>ANCPLBITNET001</c>.
     /// </summary>
+    [Experimental("ANCPLBITNET001")]
     public static ChatClientAgent AsQylBitNetAgent(
         this IChatClient client,
         string? instructions = null,
@@ -39,5 +43,4 @@ public static class QylBitNetClientExtensions
         };
         return new ChatClientAgent(client, options, loggerFactory, services);
     }
-
 }
