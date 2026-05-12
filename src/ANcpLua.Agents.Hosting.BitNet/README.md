@@ -15,18 +15,14 @@ The hosting package only speaks HTTP to an OpenAI-compatible endpoint — it nev
 ### Option A — Microsoft's prebuilt Docker image (recommended)
 
 ```sh
-# Image: mcr.microsoft.com/appsvc/docs/sidecars/sample-experiment:bitnet-b1.58-2b-4t-gguf
-# Pinned by digest for reproducibility (replace with real digest — see below)
 docker run -d --rm -p 11434:11434 \
   --name bitnet \
-  mcr.microsoft.com/appsvc/docs/sidecars/sample-experiment@sha256:0000000000000000000000000000000000000000000000000000000000000000
+  mcr.microsoft.com/appsvc/docs/sidecars/sample-experiment:bitnet-b1.58-2b-4t-gguf
 
 export BITNET_URL=http://localhost:11434
 ```
 
 That's it. The image bundles `bitnet.cpp`, the `b1.58-2B-4T` GGUF weights, and the patched `llama-server`; it exposes `/v1/chat/completions` on port 11434 directly. No Python, no cmake, no LUT codegen, no `git clone`. First `docker pull` is ~2 GB and ~2 minutes; restarts are instant.
-
-**Why pin by digest?** Tags like `bitnet-b1.58-2b-4t-gguf` are mutable — the registry can repoint them to different image bytes without warning. Digest pinning (`@sha256:...`) ensures you pull the exact same image every time, which is critical for reproducible deployments, security audits, and CI stability. See below for how to obtain the real digest.
 
 Health check:
 
@@ -34,9 +30,9 @@ Health check:
 curl -fsS http://localhost:11434/health && echo ok
 ```
 
-#### Obtaining the real digest
+#### Pinning by digest (production / supply-chain)
 
-The example above uses a placeholder digest (`sha256:0000...`). To get the actual digest for the image:
+The tag `bitnet-b1.58-2b-4t-gguf` is mutable — Microsoft can repoint it to a rebuilt image without warning. For reproducible deployments (production, anything with a security review, anything you'll point a CI fixture at), pin to the immutable image digest instead.
 
 **Method 1 — Resolve without pulling (fastest):**
 
@@ -58,7 +54,16 @@ docker inspect \
 # → mcr.microsoft.com/appsvc/docs/sidecars/sample-experiment@sha256:abcd1234...
 ```
 
-Replace the `sha256:0000...` placeholder in the `docker run` command above with the real digest. Once pinned, the same image bytes are guaranteed every time, regardless of upstream tag movement. Re-resolve the digest only when you intentionally want to take a newer build.
+Then run pinned to that digest (the tag is no longer consulted):
+
+```sh
+docker run -d --rm -p 11434:11434 --name bitnet \
+  mcr.microsoft.com/appsvc/docs/sidecars/sample-experiment@sha256:<paste-the-digest-from-above>
+```
+
+Same image bytes every time, regardless of upstream tag movement. Re-resolve the digest only when you intentionally want to take a newer build.
+
+This README does not bake a hard-coded digest because Microsoft rebuilds the upstream image on its own cadence — a baked digest would silently rot. Resolve it once with the recipe above and commit the result wherever your own infrastructure pins images (Dockerfile, compose file, deployment manifest, etc.).
 
 ### Option B — build from source via the repo script
 
