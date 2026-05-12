@@ -40,21 +40,4 @@ public static class QylBitNetClientExtensions
         return new ChatClientAgent(client, options, loggerFactory, services);
     }
 
-    /// <summary>
-    ///     One-shot convenience: builds an <see cref="IChatClient" /> from <paramref name="options" />
-    ///     and wraps it in a <see cref="ChatClientAgent" />.
-    /// </summary>
-    public static ChatClientAgent AsQylBitNetAgent(
-        this QylBitNetClientOptions options,
-        string? instructions = null,
-        string? name = null,
-        string? description = null,
-        IList<AITool>? tools = null,
-        ILoggerFactory? loggerFactory = null,
-        IServiceProvider? services = null)
-    {
-        Guard.NotNull(options);
-        return options.AsQylBitNetChatClient()
-            .AsQylBitNetAgent(instructions, name, description, tools, loggerFactory, services);
-    }
 }
