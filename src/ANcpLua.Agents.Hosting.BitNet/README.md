@@ -71,7 +71,7 @@ For air-gapped builds, custom kernels, or pinning to a specific `microsoft/BitNe
 
 ```sh
 ./scripts/setup-bitnet-local.sh    # ~10–15 min first run; idempotent
-./scripts/run-bitnet-local.sh &     # foreground llama-server on :8080
+./scripts/run-bitnet-local.sh &     # background llama-server on :8080
 export BITNET_URL=http://localhost:8080
 ```
 
