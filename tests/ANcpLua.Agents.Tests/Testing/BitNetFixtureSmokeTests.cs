@@ -13,8 +13,9 @@ namespace ANcpLua.Agents.Tests.Testing;
 public sealed class BitNetFixtureSmokeTests
 {
     [DockerEnabledFact]
-    public async Task BitNetFixture_AutoDocker_RoundtripsAChatMessage()
+    public async Task BitNetFixture_AutoDocker_RoundtripsAChatMessageAsync()
     {
+        // Arrange
         // Pre-conditions live entirely in the host env — see DockerEnabledFact + README.
         // We do not mutate BITNET_URL / BITNET_FIXTURE_NO_DOCKER from inside the test to keep the
         // test hermetic against parallel xUnit collections.
@@ -34,10 +35,12 @@ public sealed class BitNetFixtureSmokeTests
 
             endpoint.Port.Should().Be(BitNetFixture.DockerPort);
 
+            // Act
             var response = await chat.GetResponseAsync(
                 [new ChatMessage(ChatRole.User, "Reply with the single word: pong.")],
                 new ChatOptions { MaxOutputTokens = 16 });
 
+            // Assert
             response.Text.Should().NotBeNullOrWhiteSpace();
             response.FinishReason.Should().Be(ChatFinishReason.Stop);
         }

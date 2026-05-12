@@ -12,6 +12,8 @@ Alpha-channel package. Keep isolated from stable/preview consumers unless explic
 
 The hosting package only speaks HTTP to an OpenAI-compatible endpoint — it never builds, downloads, or spawns the binary. You can satisfy that contract any way you like; Microsoft's prebuilt Docker image is the easiest path:
 
+**Option A — Docker (recommended):**
+
 ```sh
 scripts/bitnet-docker.sh start    # idempotent — stops any prior container first
 export BITNET_URL=http://localhost:11434
@@ -20,6 +22,10 @@ export BITNET_URL=http://localhost:11434
 The script pins the image by digest (`sha256:9d5f7f4e...cd243a` as of 2026-05-12), so byte-identical runs are guaranteed until you intentionally re-resolve.
 
 What it bundles: `bitnet.cpp`, the `b1.58-2B-4T` GGUF weights, the patched `llama-server`, all under `/v1/chat/completions` on port 11434. No Python, cmake, LUT codegen, or `git clone` involved.
+
+**Option B — Air-gapped / manual setup:**
+
+Deferred: issue [#79](https://github.com/qyl2021cn/ANcpLua.Agents/issues/79) tracks documenting the offline/manual path (pre-downloaded model weights, building `bitnet.cpp` from source, running `llama-server` directly). For now, if your environment cannot pull the Docker image, you can manually run `llama-server` on any port and point `BITNET_URL` at it — the hosting package only requires an OpenAI-compatible `/v1/chat/completions` endpoint.
 
 Health check:
 

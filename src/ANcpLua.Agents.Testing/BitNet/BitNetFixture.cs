@@ -124,7 +124,11 @@ public sealed class BitNetFixture : IAsyncLifetime
         // Priority 1: caller-supplied BITNET_URL — we never touch Docker in this mode.
         if (Environment.GetEnvironmentVariable("BITNET_URL") is { Length: > 0 } url)
         {
-            return new Uri(url);
+            if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            {
+                return uri;
+            }
+            // Malformed URL falls through to Docker priority.
         }
 
         // Priority 2: auto-managed Docker container, unless explicitly opted out.
@@ -219,6 +223,10 @@ public sealed class BitNetFixture : IAsyncLifetime
             return (-1, string.Empty, ex.Message);
         }
 
+        // Start async reads before waiting for exit to prevent pipe deadlock.
+        var stdoutTask = process.StandardOutput.ReadToEndAsync();
+        var stderrTask = process.StandardError.ReadToEndAsync();
+
         using var cts = new CancellationTokenSource(timeout);
         try
         {
@@ -227,11 +235,18 @@ public sealed class BitNetFixture : IAsyncLifetime
         catch (OperationCanceledException)
         {
             try { process.Kill(entireProcessTree: true); } catch { /* best-effort */ }
+            // Still drain pipes to prevent leaks, even on timeout.
+            try
+            {
+                var stdout = await stdoutTask.ConfigureAwait(false);
+                var stderr = await stderrTask.ConfigureAwait(false);
+            }
+            catch { /* best-effort */ }
             return (-1, string.Empty, $"docker timed out after {timeout}");
         }
 
-        var stdout = await process.StandardOutput.ReadToEndAsync().ConfigureAwait(false);
-        var stderr = await process.StandardError.ReadToEndAsync().ConfigureAwait(false);
+        var stdout = await stdoutTask.ConfigureAwait(false);
+        var stderr = await stderrTask.ConfigureAwait(false);
         return (process.ExitCode, stdout, stderr);
     }
 
