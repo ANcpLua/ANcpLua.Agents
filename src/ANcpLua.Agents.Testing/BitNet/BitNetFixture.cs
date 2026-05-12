@@ -20,6 +20,12 @@ namespace ANcpLua.Agents.Testing.BitNet;
 ///         <item><c>BITNET_MODEL</c> env var overrides the default model id.</item>
 ///         <item>The fixture probes <c>/health</c> with a 3-second timeout during <see cref="InitializeAsync" />.</item>
 ///     </list>
+///     <para>This fixture intentionally does not depend on the
+///     <c>ANcpLua.Agents.Hosting.BitNet</c> package — Testing is a stable channel and BitNet
+///     hosting is alpha, so they cannot share a runtime <c>PackageReference</c>. The private
+///     <see cref="LegacyMaxTokensPolicy" /> below is duplicated with the public policy in
+///     <c>ANcpLua.Agents.Hosting.BitNet</c>; both files are ~50 lines and never drift in lockstep
+///     because each is scoped to its own assembly boundary.</para>
 /// </remarks>
 public sealed class BitNetFixture : IAsyncLifetime
 {
@@ -29,7 +35,7 @@ public sealed class BitNetFixture : IAsyncLifetime
 
     private static readonly Uri s_defaultEndpoint = new("http://localhost:8080");
 
-    private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(5) };
+    private readonly HttpClient _http = new() { Timeout = Timeout.InfiniteTimeSpan };
 
     /// <summary>
     ///     Chat client connected to the BitNet server. Only usable when <see cref="IsAvailable" /> is
@@ -70,13 +76,6 @@ public sealed class BitNetFixture : IAsyncLifetime
             ? configuredModel
             : DefaultModel;
 
-        // Defensive shim for older OpenAI-compat servers: OpenAI deprecated
-        // `max_tokens` in favor of `max_completion_tokens` (Sept 2024, alongside
-        // o1 reasoning models), and the .NET SDK only emits the new field. Any
-        // llama-server build older than ggml-org/llama.cpp PR #19831 (merged
-        // 2026-02-23) silently ignores `max_completion_tokens` and runs to the
-        // context limit. Register a per-call policy on the inherited
-        // ClientPipelineOptions so both fields end up on the wire.
         var options = new OpenAIClientOptions { Endpoint = new Uri(endpoint, apiPath) };
         options.AddPolicy(new LegacyMaxTokensPolicy(), PipelinePosition.PerCall);
         var client = new OpenAIClient(new ApiKeyCredential(UnusedApiKey), options);
@@ -93,21 +92,11 @@ public sealed class BitNetFixture : IAsyncLifetime
 }
 
 /// <summary>
-///     Mirrors <c>max_completion_tokens</c> → <c>max_tokens</c> in the outbound
-///     chat-completion JSON body. Older OpenAI-compat servers (anything before
-///     ggml-org/llama.cpp PR #19831, merged 2026-02-23) only honor the legacy
-///     <c>max_tokens</c> field; the .NET SDK only emits the new one. Without this
-///     mirror the server ignores the cap and generates until the context fills.
+///     Mirrors <c>max_completion_tokens</c> → <c>max_tokens</c> for older llama-server builds
+///     (pre ggml-org/llama.cpp PR #19831, merged 2026-02-23). Duplicates the public policy in
+///     <c>ANcpLua.Agents.Hosting.BitNet</c> intentionally — Testing is on the stable channel and
+///     cannot take a runtime dep on alpha-channel BitNet hosting.
 /// </summary>
-/// <remarks>
-///     Registered on <see cref="OpenAIClientOptions" /> via the inherited
-///     <c>ClientPipelineOptions.AddPolicy</c> hook so the policy runs after the
-///     SDK has serialized the <see cref="PipelineRequest.Content" /> — we parse
-///     the final JSON body, copy the field, and rewrite the content. The async
-///     path uses <c>WriteToAsync</c> end-to-end so the pipeline never blocks on
-///     sync I/O. Self-deleting: once the target server accepts
-///     <c>max_completion_tokens</c> natively, this becomes a no-op.
-/// </remarks>
 internal sealed class LegacyMaxTokensPolicy : PipelinePolicy
 {
     public override void Process(PipelineMessage message, IReadOnlyList<PipelinePolicy> pipeline, int currentIndex)
@@ -142,8 +131,6 @@ internal sealed class LegacyMaxTokensPolicy : PipelinePolicy
     {
         content = null!;
         if (message.Request?.Content is not { } c) return false;
-        // OpenAI's spec defines the path as `/v1/chat/completions` (lowercase),
-        // and llama-server preserves casing; an ordinal compare is sufficient.
         if (message.Request.Uri?.AbsolutePath?.EndsWithOrdinal("/chat/completions") is not true) return false;
         content = c;
         return true;
