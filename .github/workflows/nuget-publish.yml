@@ -113,10 +113,13 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: dotnet pack src/ANcpLua.Agents.Foundry/ANcpLua.Agents.Foundry.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-rc1 --no-build
 
-      # Alpha channel: OpenAI hosting consumes MAF alpha hosting.
+      # Alpha channel: OpenAI hosting consumes MAF alpha hosting; BitNet hosting bundles a
+      # source generator that drives auto-discovery of [QylBitNetEndpoint] attributes — also alpha.
       - name: Pack (alpha channel)
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet pack src/ANcpLua.Agents.Hosting.OpenAI/ANcpLua.Agents.Hosting.OpenAI.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-alpha.1 --no-build
+        run: |
+          dotnet pack src/ANcpLua.Agents.Hosting.OpenAI/ANcpLua.Agents.Hosting.OpenAI.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-alpha.1 --no-build
+          dotnet pack src/ANcpLua.Agents.Hosting.BitNet/ANcpLua.Agents.Hosting.BitNet.csproj   -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-alpha.1 --no-build
 
       - name: Upload artifacts
         if: matrix.os == 'ubuntu-latest'
