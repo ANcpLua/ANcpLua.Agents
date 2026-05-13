@@ -10,6 +10,11 @@ on:
       version:
         description: 'Version override (without v prefix). Leave empty to auto-bump from latest tag.'
         required: false
+      force_publish:
+        description: 'Force publish even when the Must-Publish gate sees no src/tests/publish-workflow changes.'
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -152,21 +157,31 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      # Publish only when there are real release-relevant changes since LATEST_TAG. "Release-
+      # relevant" is anything under src/** or tests/**, OR the publish workflow file itself
+      # (because that file controls *which* packages get packed — a missing-pack-line fix is a
+      # legitimate publish trigger, as PR #80 → v1.4.9 demonstrated when BitNet was silently
+      # dropped from the artifact bundle).
       - name: Must Publish Packages
         id: has_changes
         run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ github.event.inputs.force_publish }}" == "true" ]; then
+            echo "Workflow dispatch with force_publish=true — bypassing gate"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [ -z "$LATEST_TAG" ]; then
             echo "No previous tag — first publish, proceeding"
             echo "has_changes=true" >> $GITHUB_OUTPUT
           else
-            CHANGES=$(git diff --name-only "$LATEST_TAG" HEAD -- 'src/**' 'tests/**' || true)
+            CHANGES=$(git diff --name-only "$LATEST_TAG" HEAD -- 'src/**' 'tests/**' '.github/workflows/nuget-publish.yml' || true)
             if [ -n "$CHANGES" ]; then
               echo "Changes since $LATEST_TAG:"
               echo "$CHANGES"
               echo "has_changes=true" >> $GITHUB_OUTPUT
             else
-              echo "No src/ or tests/ changes since $LATEST_TAG — skipping publish"
+              echo "No src/, tests/, or publish-workflow changes since $LATEST_TAG — skipping publish"
               echo "has_changes=false" >> $GITHUB_OUTPUT
             fi
           fi

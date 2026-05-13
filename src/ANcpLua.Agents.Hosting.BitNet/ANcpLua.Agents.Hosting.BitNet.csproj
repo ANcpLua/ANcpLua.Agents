@@ -3,6 +3,7 @@
         <RootNamespace>ANcpLua.Agents.Hosting.BitNet</RootNamespace>
         <PackageId>ANcpLua.Agents.Hosting.BitNet</PackageId>
         <Description>Alpha-channel BitNet (bitnet.cpp llama-server) hosting facades for Microsoft Agent Framework consumers. Reads the OpenAI-compatible /v1 surface exposed by bitnet.cpp and registers a keyed IChatClient, health-check, and legacy-max-tokens shim. Bundles a Roslyn source generator that auto-wires [assembly: QylBitNetEndpoint] attributes.</Description>
+        <PackageReleaseNotes>First publish to nuget.org. Pairs with ANcpLua.Agents.Testing's BitNetFixture which auto-manages Microsoft's prebuilt bitnet.cpp Docker image (digest-pinned) when BITNET_URL is unset and Docker is on PATH. Includes the LegacyMaxTokensPolicy shim for llama-server builds pre-ggml-org/llama.cpp#19831.</PackageReleaseNotes>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>maf;agents;microsoft-agents;bitnet;llama-cpp;local-llm;hosting;alpha</PackageTags>
         <!-- Mirrors upstream MAF + Microsoft.Extensions.AI experimental API diagnostics; keep confined to this alpha hosting package. -->
