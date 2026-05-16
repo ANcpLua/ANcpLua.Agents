@@ -6,7 +6,7 @@ Instructions for AI coding agents working in this repo.
 Branch protection, auto-merge, CodeRabbit posture, release flow, dependency
 graph, and the cross-repo bootstrap rules for the four ANcpLua framework
 repos are documented in one place at
-[ANcpLua/renovate-config](https://github.com/ANcpLua/renovate-config#ancplua-framework-conventions--renovate-config).
+[O-ANcppLua/renovate-config](https://github.com/O-ANcppLua/renovate-config#ancplua-framework-conventions--renovate-config).
 This file documents conventions specific to this repo only.
 
 
@@ -106,4 +106,3 @@ namespace), default to fixing it directly: patch → test → release → consum
 Do not file issues against your own repos as a workaround for fixing them.
 External tracker (a) under "Scope of outstanding" applies only to
 genuinely-external upstreams.
-
