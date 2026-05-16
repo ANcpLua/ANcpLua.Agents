@@ -13,11 +13,11 @@ Alpha-channel package. Keep isolated from stable/preview consumers unless explic
 The hosting package only speaks HTTP to an OpenAI-compatible endpoint — it never builds, downloads, or spawns the binary. You can satisfy that contract any way you like; Microsoft's prebuilt Docker image is the easiest path:
 
 ```sh
-scripts/bitnet-docker.sh start    # idempotent — stops any prior container first
+make bitnet-up                    # idempotent — stops any prior container first
 export BITNET_URL=http://localhost:11434
 ```
 
-The script pins the image by digest (`sha256:9d5f7f4e...cd243a` as of 2026-05-12), so byte-identical runs are guaranteed until you intentionally re-resolve.
+`make bitnet-up` wraps `scripts/bitnet-docker.sh start`. The script pins the image by digest (`sha256:9d5f7f4e...cd243a` as of 2026-05-12), so byte-identical runs are guaranteed until you intentionally re-resolve.
 
 What it bundles: `bitnet.cpp`, the `b1.58-2B-4T` GGUF weights, the patched `llama-server`, all under `/v1/chat/completions` on port 11434. No Python, cmake, LUT codegen, or `git clone` involved.
 
@@ -32,12 +32,12 @@ curl -fsS http://localhost:11434/health && echo ok
 Stop:
 
 ```sh
-scripts/bitnet-docker.sh stop
+make bitnet-down
 ```
 
 ### Pinning by digest (production / supply-chain)
 
-The `scripts/bitnet-docker.sh start` command already runs digest-pinned. If you want to re-resolve to a newer Microsoft build, the recipe is:
+`make bitnet-up` already runs digest-pinned. If you want to re-resolve to a newer Microsoft build, the recipe is:
 
 ```sh
 docker buildx imagetools inspect \
@@ -139,11 +139,13 @@ For test scenarios and the `BitNetFixture` contract (`ANcpLua.Agents.Testing.Bit
 
 Env vars win over config so existing fixture consumers keep working.
 
+Smoke-test the auto-Docker path with `make smoke` (sets `BITNET_SMOKE_TEST=1` and uses the Microsoft.Testing.Platform-correct `--filter-method` flag — `global.json` pins MTP as the runner, so legacy VSTest flags like `--filter` / `--logger` are rejected).
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `BitNet endpoint is not configured` at startup | `BITNET_URL` not set and no `ConnectionStrings:<name>` / `BitNet:<name>:Endpoint` bound | Run `scripts/bitnet-docker.sh start` then `export BITNET_URL=http://localhost:11434`, or pass `configure: o => o.Endpoint = ...` |
-| Health check `bitnet:<name>` is Unhealthy | server not listening, or wrong port | `curl $BITNET_URL/health` to confirm; check container with `scripts/bitnet-docker.sh status` |
+| `BitNet endpoint is not configured` at startup | `BITNET_URL` not set and no `ConnectionStrings:<name>` / `BitNet:<name>:Endpoint` bound | Run `make bitnet-up` then `export BITNET_URL=http://localhost:11434`, or pass `configure: o => o.Endpoint = ...` |
+| Health check `bitnet:<name>` is Unhealthy | server not listening, or wrong port | `curl $BITNET_URL/health` to confirm; check container with `make bitnet-status` |
 | Model generates until context fills, ignores token cap | running against a `llama-server` older than llama.cpp PR #19831 without our shim | confirm `Microsoft.Extensions.AI.OpenAI` is going through `QylBitNetChatClientFactory.Create` — the `LegacyMaxTokensPolicy` is applied there automatically |
 | `Unexpected end of input` / GGUF errors on stock Ollama | Ollama uses upstream llama.cpp which lacks `i2_s` | Ollama is not a target — use the Docker image |
