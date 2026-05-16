@@ -160,6 +160,22 @@ public sealed class BitNetFixture : IAsyncLifetime
 
     private async ValueTask<string?> StartContainerAsync()
     {
+        // Separate image transfer from the /health budget below: a cold 1.6 GB pull alone can
+        // exceed 60 s, exhausting the readiness loop before the model even starts loading.
+        // `docker image inspect` against the pinned digest is a fast local lookup — only pull
+        // when missing.
+        var inspect = await RunDockerAsync(
+            ["image", "inspect", DockerImage],
+            TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+
+        if (inspect.ExitCode != 0)
+        {
+            var pull = await RunDockerAsync(
+                ["pull", DockerImage],
+                TimeSpan.FromMinutes(10)).ConfigureAwait(false);
+            if (pull.ExitCode != 0) return null;
+        }
+
         var containerName = ContainerNamePrefix + Guid.NewGuid().ToString("N")[..8];
 
         var run = await RunDockerAsync(
@@ -168,8 +184,9 @@ public sealed class BitNetFixture : IAsyncLifetime
 
         if (run.ExitCode != 0)
         {
-            // Most likely: port conflict, image pull failure offline, or rate-limit. Caller falls
-            // through to the legacy fallback and ultimately reports IsAvailable=false.
+            // Most likely: port conflict, or rate-limit on a cache miss the pull above didn't
+            // cover (e.g. concurrent test runs). Caller falls through to the legacy fallback
+            // and ultimately reports IsAvailable=false.
             return null;
         }
 
