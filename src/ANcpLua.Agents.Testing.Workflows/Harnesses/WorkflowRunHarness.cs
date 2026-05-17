@@ -41,7 +41,7 @@ public sealed class WorkflowRunHarnessBuilder<TInput>
 {
     private readonly TInput _input;
     private readonly Func<Workflow> _workflowFactory;
-    private ExecutionEnvironment _environment = ExecutionEnvironment.InProcess_Lockstep;
+    private ExecutionEnvironment _environment = ExecutionEnvironment.InProcessLockstep;
     private bool _useCheckpointing;
 
     internal WorkflowRunHarnessBuilder(Func<Workflow> workflowFactory, TInput input)

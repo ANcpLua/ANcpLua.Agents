@@ -16,8 +16,8 @@ public sealed class SequentialQuickstart(ITestOutputHelper output) : WorkflowFix
     }
 
     [Theory]
-    [InlineData(ExecutionEnvironment.InProcess_Lockstep)]
-    [InlineData(ExecutionEnvironment.InProcess_OffThread)]
+    [InlineData(ExecutionEnvironment.InProcessLockstep)]
+    [InlineData(ExecutionEnvironment.InProcessOffThread)]
     internal async Task ReversesAfterUppercasingAsync(ExecutionEnvironment environment)
     {
         var run = await RunAsync("Hello, World!", environment);

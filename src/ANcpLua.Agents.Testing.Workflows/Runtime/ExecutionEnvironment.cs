@@ -7,14 +7,14 @@ namespace ANcpLua.Agents.Testing.Workflows;
 
 // Parametric [Theory] axis. Pair with:
 //   [Theory]
-//   [InlineData(ExecutionEnvironment.InProcess_OffThread)]
-//   [InlineData(ExecutionEnvironment.InProcess_Lockstep)]
+//   [InlineData(ExecutionEnvironment.InProcessOffThread)]
+//   [InlineData(ExecutionEnvironment.InProcessLockstep)]
 // so the same workflow test runs across every in-process scheduler.
 public enum ExecutionEnvironment
 {
-    InProcess_OffThread,
-    InProcess_Lockstep,
-    InProcess_Concurrent
+    InProcessOffThread,
+    InProcessLockstep,
+    InProcessConcurrent
 }
 
 internal static class ExecutionExtensions
@@ -23,9 +23,9 @@ internal static class ExecutionExtensions
     {
         return environment switch
         {
-            ExecutionEnvironment.InProcess_OffThread => InProcessExecution.OffThread,
-            ExecutionEnvironment.InProcess_Lockstep => InProcessExecution.Lockstep,
-            ExecutionEnvironment.InProcess_Concurrent => InProcessExecution.Concurrent,
+            ExecutionEnvironment.InProcessOffThread => InProcessExecution.OffThread,
+            ExecutionEnvironment.InProcessLockstep => InProcessExecution.Lockstep,
+            ExecutionEnvironment.InProcessConcurrent => InProcessExecution.Concurrent,
             _ => throw new InvalidOperationException($"Unknown execution environment {environment}")
         };
     }

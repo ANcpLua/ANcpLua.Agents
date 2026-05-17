@@ -29,7 +29,7 @@ public abstract class WorkflowFixture<TInput>(ITestOutputHelper output) : IDispo
     /// <summary>Runs the workflow to quiescence under the chosen execution environment.</summary>
     protected Task<WorkflowRunResult> RunAsync(
         TInput input,
-        ExecutionEnvironment environment = ExecutionEnvironment.InProcess_Lockstep)
+        ExecutionEnvironment environment = ExecutionEnvironment.InProcessLockstep)
     {
         return RunCoreAsync(input, environment, false);
     }
@@ -40,7 +40,7 @@ public abstract class WorkflowFixture<TInput>(ITestOutputHelper output) : IDispo
     /// </summary>
     protected Task<WorkflowRunResult> RunWithCheckpointingAsync(
         TInput input,
-        ExecutionEnvironment environment = ExecutionEnvironment.InProcess_Lockstep)
+        ExecutionEnvironment environment = ExecutionEnvironment.InProcessLockstep)
     {
         return RunCoreAsync(input, environment, true);
     }
@@ -48,7 +48,7 @@ public abstract class WorkflowFixture<TInput>(ITestOutputHelper output) : IDispo
     /// <summary>Resumes the most recent run from its last checkpoint, optionally pumping an external response.</summary>
     protected async Task<WorkflowRunResult> ResumeAsync(
         ExternalResponse? response = null,
-        ExecutionEnvironment environment = ExecutionEnvironment.InProcess_Lockstep)
+        ExecutionEnvironment environment = ExecutionEnvironment.InProcessLockstep)
     {
         if (_lastCheckpoint is null || _checkpointManager is null)
             throw new InvalidOperationException("Call RunWithCheckpointingAsync before ResumeAsync.");
@@ -67,7 +67,7 @@ public abstract class WorkflowFixture<TInput>(ITestOutputHelper output) : IDispo
     protected Task<WorkflowRunResult> AnswerRequestAsync(
         WorkflowRunResult pending,
         object data,
-        ExecutionEnvironment environment = ExecutionEnvironment.InProcess_Lockstep)
+        ExecutionEnvironment environment = ExecutionEnvironment.InProcessLockstep)
     {
         var request = pending.PendingRequests.FirstOrDefault()
                       ?? throw new InvalidOperationException("No pending RequestInfoEvent to answer.");

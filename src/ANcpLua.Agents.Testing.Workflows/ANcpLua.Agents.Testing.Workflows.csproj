@@ -5,7 +5,7 @@
         <Description>Test infrastructure for Microsoft Agent Framework Workflows. Fluent fixture base with assertion builders, an execution-environment parametric axis, and ANcpLua-authored facades over MAF Workflows internals (facade / decorator / railway / fluent / extension methods) — designed for expressiveness and loose coupling, not a 1:1 mirror of upstream.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>maf;workflows;testing;declarative;checkpointing;inproc;microsoft-agents</PackageTags>
-        <NoWarn>$(NoWarn);CA1305;CA1707;CA1816;CA1822;CA1826;CA1852;CA2249;MEAI001</NoWarn>
+        <NoWarn>$(NoWarn);CA1305;CA1816;CA1822;CA1826;CA1852;CA2249;MEAI001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
