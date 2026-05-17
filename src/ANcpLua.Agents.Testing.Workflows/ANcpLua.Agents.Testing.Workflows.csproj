@@ -5,21 +5,7 @@
         <Description>Test infrastructure for Microsoft Agent Framework Workflows. Fluent fixture base with assertion builders, an execution-environment parametric axis, and ANcpLua-authored facades over MAF Workflows internals (facade / decorator / railway / fluent / extension methods) — designed for expressiveness and loose coupling, not a 1:1 mirror of upstream.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>maf;workflows;testing;declarative;checkpointing;inproc;microsoft-agents</PackageTags>
-        <!--
-            Transitional analyzer suppressions — these CA/AL/RS rules are not bug-catchers;
-            they enforce ANcpLua-house style. Internals/ still has surface area that mirrors
-            upstream conventions (verbatim spellings, raw ThrowIfNull, etc.) until the migration
-            to ANcpLua-authored facades / decorators / railway / fluent / extension layers is
-            complete. As Internals/ types are replaced by idiomatic facades, individual entries
-            in the NoWarn list should be lifted on a per-rule basis.
-                CA1707 — underscores in identifier (matches upstream spelling, e.g. InProcess_Lockstep)
-                CA1816 — Dispose should call GC.SuppressFinalize (matches upstream pattern)
-                CA1826 — Enumerable on indexable collections (perf hint, not a bug)
-                CS1591 — missing XML doc on public members (transitional types are partially documented)
-                RS0030 — banned ArgumentNullException.ThrowIfNull (until facades adopt Guard.NotNull)
-                AL0137 — same site as RS0030 (ANcpLua.Analyzers prefers Guard.NotNull)
-        -->
-        <NoWarn>$(NoWarn);AL0137;CA1707;CA1816;CA1822;CA1826;CA1852;CA1305;CA2249;CS1591;MEAI001;RS0030</NoWarn>
+        <NoWarn>$(NoWarn);CA1305;CA1707;CA1816;CA1822;CA1826;CA1852;CA2249;MEAI001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -33,10 +19,6 @@
         <PackageReference Include="xunit.v3.assert"/>
     </ItemGroup>
 
-    <ItemGroup Label="Roslyn (for SyntaxTreeFluentExtensions)">
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp"/>
-    </ItemGroup>
-
     <ItemGroup Label="Sibling project (for 06_Concurrent sample — uses FakeEchoAgent)">
         <ProjectReference Include="..\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
     </ItemGroup>
@@ -45,27 +27,9 @@
         <Using Include="Microsoft.Agents.AI"/>
         <Using Include="Microsoft.Agents.AI.Workflows"/>
         <Using Include="Microsoft.Extensions.AI"/>
-        <Using Include="ANcpLua.Agents.Testing.Workflows.Internals"/>
         <Using Include="Xunit"/>
         <Using Include="ANcpLua.Agents.Testing.Agents"/>
     </ItemGroup>
-
-    <!--
-        Internals/ — ANcpLua-authored bridge over MAF Workflows concepts that upstream marks
-        `internal` (no InternalsVisibleTo grant for this assembly).
-
-        Design intent: facade / decorator / railway-oriented composition / fluent builders /
-        extension methods over those concepts. Loose coupling and expressive assertion surface
-        beat verbatim parity. This is NOT a rote 1:1 mirror of upstream sources — and 1:1 is
-        only acceptable where the upstream contract is genuinely structural (interface shape,
-        record layout, etc.).
-
-        On MAF version bumps: re-validate the *semantic* contract against upstream changes
-        (renames, interface drift, behaviour changes). Do not treat this folder as a sync
-        target to be mechanically diffed and re-pasted on every patch release.
-
-        See: Internals/*.cs for per-file provenance + design notes.
-    -->
 
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>

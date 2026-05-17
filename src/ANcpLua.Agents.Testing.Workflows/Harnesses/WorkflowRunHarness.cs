@@ -1,4 +1,5 @@
-﻿using Microsoft.Agents.AI.Workflows.InProc;
+﻿using ANcpLua.Roslyn.Utilities;
+using Microsoft.Agents.AI.Workflows.InProc;
 
 namespace ANcpLua.Agents.Testing.Workflows;
 
@@ -11,7 +12,7 @@ public static class WorkflowRunHarness
     /// <summary>Creates a run harness builder from a workflow factory.</summary>
     public static WorkflowRunHarnessBuilder For(Func<Workflow> workflowFactory)
     {
-        ArgumentNullException.ThrowIfNull(workflowFactory);
+        Guard.NotNull(workflowFactory);
         return new WorkflowRunHarnessBuilder(workflowFactory);
     }
 }
@@ -145,7 +146,7 @@ public sealed class WorkflowRunHarnessResult
         ExternalResponse response,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(response);
+        Guard.NotNull(response);
 
         if (_checkpointManager is null || LastCheckpoint is null)
             throw new InvalidOperationException("Run the harness with checkpointing before resuming.");
