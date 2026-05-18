@@ -16,7 +16,6 @@ public sealed class FoundryHostingExtensionsTests
         AssertPublicMethodByName(type, "AddQylFoundryToolboxes", 2);
         AssertPublicMethodByName(type, "AddQylFoundryToolboxes", 3);
         AssertPublicMethodByName(type, "MapQylFoundryResponses", 2);
-        AssertPublicMethodByName(type, "GetQylToolboxToolsAsync", 4);
     }
 
     private static void AssertPublicMethodByName(Type type, string methodName, int parameterCount)

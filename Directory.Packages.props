@@ -26,6 +26,7 @@
     <PackageVersion Include="Microsoft.Agents.AI.Anthropic" Version="$(MicrosoftAgentsAIAnthropicVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.DevUI" Version="$(MicrosoftAgentsAIDevUIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.DurableTask" Version="$(MicrosoftAgentsAIDurableTaskVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Harness" Version="$(MicrosoftAgentsAIHarnessVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="Microsoft.DurableTask (host-agnostic worker + client; gRPC sidecar backend)">

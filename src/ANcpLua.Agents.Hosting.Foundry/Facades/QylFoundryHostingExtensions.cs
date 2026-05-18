@@ -1,9 +1,7 @@
 ﻿using ANcpLua.Roslyn.Utilities;
-using Azure.AI.Projects;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Foundry.Hosting;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -118,25 +116,5 @@ public static class QylFoundryHostingExtensions
         Guard.NotNull(endpoints);
 
         return FoundryHostingExtensions.MapFoundryResponses(endpoints, prefix);
-    }
-
-    /// <summary>
-    /// Gets toolbox tools for a toolbox <paramref name="name"/>, optionally scoped to <paramref name="version"/>.
-    /// </summary>
-    /// <param name="client">The Foundry project client.</param>
-    /// <param name="name">The toolbox name.</param>
-    /// <param name="version">Optional toolbox version.</param>
-    /// <param name="cancellationToken">Cancellation token for the toolbox request.</param>
-    /// <returns>The resolved toolbox tools.</returns>
-    public static Task<IReadOnlyList<AITool>> GetQylToolboxToolsAsync(
-        this AIProjectClient client,
-        string name,
-        string? version = null,
-        CancellationToken cancellationToken = default)
-    {
-        Guard.NotNull(client);
-        Guard.NotNullOrWhiteSpace(name);
-
-        return client.GetToolboxToolsAsync(name, version, cancellationToken);
     }
 }

@@ -8,7 +8,7 @@
     file must define every $(...Version) variable that Directory.Packages.props
     references — pruning to "ahead-only" breaks restore.
 
-    Values mirror SDK truth (numeric base 1.5.0; experimental tracks where
+    Values mirror SDK truth (numeric base 1.6.1; experimental tracks where
     upstream ships them). Deviations from truth:
       - Google.GenAI (not in truth)
   -->
@@ -19,25 +19,26 @@
     <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.5</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF 1.5.0 — mirrors SDK truth, highest experimental track per package)">
-    <!-- Stable: core, Workflows, Foundry, OpenAI -->
-    <MicrosoftAgentsAIVersion>1.5.0</MicrosoftAgentsAIVersion>
-    <MicrosoftAgentsAIWorkflowsVersion>1.5.0</MicrosoftAgentsAIWorkflowsVersion>
-    <MicrosoftAgentsAIFoundryVersion>1.5.0</MicrosoftAgentsAIFoundryVersion>
-    <MicrosoftAgentsAIOpenAIVersion>1.5.0</MicrosoftAgentsAIOpenAIVersion>
-    <!-- Preview (no stable exists): Hosting, AzureFunctions, Foundry.Hosting, Anthropic, DevUI -->
-    <MicrosoftAgentsAIHostingVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIHostingVersion>
-    <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
-    <MicrosoftAgentsAIFoundryHostingVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIFoundryHostingVersion>
-    <MicrosoftAgentsAIAnthropicVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIAnthropicVersion>
-    <MicrosoftAgentsAIDevUIVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIDevUIVersion>
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.6.1 — mirrors SDK truth, highest experimental track per package)">
+    <!-- Stable: core, Workflows, OpenAI (Foundry moved to preview-only in 1.6.1) -->
+    <MicrosoftAgentsAIVersion>1.6.1</MicrosoftAgentsAIVersion>
+    <MicrosoftAgentsAIWorkflowsVersion>1.6.1</MicrosoftAgentsAIWorkflowsVersion>
+    <MicrosoftAgentsAIOpenAIVersion>1.6.1</MicrosoftAgentsAIOpenAIVersion>
+    <!-- Preview (no stable exists): Foundry, Hosting, AzureFunctions, Foundry.Hosting, Anthropic, DevUI, Harness -->
+    <MicrosoftAgentsAIFoundryVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIFoundryVersion>
+    <MicrosoftAgentsAIHostingVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingVersion>
+    <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
+    <MicrosoftAgentsAIFoundryHostingVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIFoundryHostingVersion>
+    <MicrosoftAgentsAIAnthropicVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIAnthropicVersion>
+    <MicrosoftAgentsAIDevUIVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIDevUIVersion>
+    <MicrosoftAgentsAIHarnessVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHarnessVersion>
     <!-- rc1 train: Declarative workflows -->
-    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.5.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
-    <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.5.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.6.1-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.6.1-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
     <!-- Alpha train: OpenAI hosting -->
-    <MicrosoftAgentsAIHostingOpenAIVersion>1.5.0-alpha.260507.1</MicrosoftAgentsAIHostingOpenAIVersion>
+    <MicrosoftAgentsAIHostingOpenAIVersion>1.6.1-alpha.260514.1</MicrosoftAgentsAIHostingOpenAIVersion>
     <!-- Preview train: DurableTask integration (Qyl.DurableAgents host) -->
-    <MicrosoftAgentsAIDurableTaskVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIDurableTaskVersion>
+    <MicrosoftAgentsAIDurableTaskVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIDurableTaskVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.DurableTask (host-agnostic worker + client; gRPC sidecar backend)">
