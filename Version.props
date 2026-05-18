@@ -8,7 +8,7 @@
     file must define every $(...Version) variable that Directory.Packages.props
     references — pruning to "ahead-only" breaks restore.
 
-    Values mirror SDK truth (numeric base 1.4.0; experimental tracks where
+    Values mirror SDK truth (numeric base 1.5.0; experimental tracks where
     upstream ships them). Deviations from truth:
       - Google.GenAI (not in truth)
   -->
@@ -19,25 +19,25 @@
     <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.5</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF 1.4.0 — mirrors SDK truth, highest experimental track per package)">
-    <!-- Stable: core, Workflows -->
-    <MicrosoftAgentsAIVersion>1.4.0</MicrosoftAgentsAIVersion>
-    <MicrosoftAgentsAIWorkflowsVersion>1.4.0</MicrosoftAgentsAIWorkflowsVersion>
-    <MicrosoftAgentsAIFoundryVersion>1.4.0</MicrosoftAgentsAIFoundryVersion>
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.5.0 — mirrors SDK truth, highest experimental track per package)">
+    <!-- Stable: core, Workflows, Foundry, OpenAI -->
+    <MicrosoftAgentsAIVersion>1.5.0</MicrosoftAgentsAIVersion>
+    <MicrosoftAgentsAIWorkflowsVersion>1.5.0</MicrosoftAgentsAIWorkflowsVersion>
+    <MicrosoftAgentsAIFoundryVersion>1.5.0</MicrosoftAgentsAIFoundryVersion>
+    <MicrosoftAgentsAIOpenAIVersion>1.5.0</MicrosoftAgentsAIOpenAIVersion>
     <!-- Preview (no stable exists): Hosting, AzureFunctions, Foundry.Hosting, Anthropic, DevUI -->
-    <MicrosoftAgentsAIHostingVersion>1.4.0-preview.260505.1</MicrosoftAgentsAIHostingVersion>
-    <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.4.0-preview.260505.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
-    <MicrosoftAgentsAIFoundryHostingVersion>1.4.0-preview.260505.1</MicrosoftAgentsAIFoundryHostingVersion>
-    <MicrosoftAgentsAIAnthropicVersion>1.4.0-preview.260505.1</MicrosoftAgentsAIAnthropicVersion>
-    <MicrosoftAgentsAIDevUIVersion>1.4.0-preview.260505.1</MicrosoftAgentsAIDevUIVersion>
+    <MicrosoftAgentsAIHostingVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIHostingVersion>
+    <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
+    <MicrosoftAgentsAIFoundryHostingVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIFoundryHostingVersion>
+    <MicrosoftAgentsAIAnthropicVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIAnthropicVersion>
+    <MicrosoftAgentsAIDevUIVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIDevUIVersion>
     <!-- rc1 train: Declarative workflows -->
-    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.4.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
-    <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.4.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.5.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.5.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
     <!-- Alpha train: OpenAI hosting -->
-    <MicrosoftAgentsAIOpenAIVersion>1.4.0</MicrosoftAgentsAIOpenAIVersion>
-    <MicrosoftAgentsAIHostingOpenAIVersion>1.4.0-alpha.260505.1</MicrosoftAgentsAIHostingOpenAIVersion>
+    <MicrosoftAgentsAIHostingOpenAIVersion>1.5.0-alpha.260507.1</MicrosoftAgentsAIHostingOpenAIVersion>
     <!-- Preview train: DurableTask integration (Qyl.DurableAgents host) -->
-    <MicrosoftAgentsAIDurableTaskVersion>1.4.0-preview.260505.1</MicrosoftAgentsAIDurableTaskVersion>
+    <MicrosoftAgentsAIDurableTaskVersion>1.5.0-preview.260507.1</MicrosoftAgentsAIDurableTaskVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.DurableTask (host-agnostic worker + client; gRPC sidecar backend)">
@@ -52,9 +52,9 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions.AI">
-    <MicrosoftExtensionsAIVersion>10.5.0</MicrosoftExtensionsAIVersion>
-    <MicrosoftExtensionsAIAbstractionsVersion>10.5.0</MicrosoftExtensionsAIAbstractionsVersion>
-    <MicrosoftExtensionsAIOpenAIVersion>10.5.0</MicrosoftExtensionsAIOpenAIVersion>
+    <MicrosoftExtensionsAIVersion>10.5.2</MicrosoftExtensionsAIVersion>
+    <MicrosoftExtensionsAIAbstractionsVersion>10.5.2</MicrosoftExtensionsAIAbstractionsVersion>
+    <MicrosoftExtensionsAIOpenAIVersion>10.5.2</MicrosoftExtensionsAIOpenAIVersion>
     <MicrosoftBclAsyncInterfacesVersion>10.0.7</MicrosoftBclAsyncInterfacesVersion>
   </PropertyGroup>
 
