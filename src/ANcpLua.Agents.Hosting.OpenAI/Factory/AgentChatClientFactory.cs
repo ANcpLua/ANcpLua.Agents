@@ -19,7 +19,10 @@ public sealed record AgentChatClientOptions(string? ApiKey, string? Model = null
 /// <summary>
 ///     Creates an <see cref="IChatClient"/> from <see cref="AgentChatClientOptions"/> using the
 ///     OpenAI .NET SDK. Returns <c>null</c> when no API key is configured so callers can branch
-///     on agent availability.
+///     on agent availability. The returned client always supports per-call <c>x-client-*</c>
+///     headers via <see cref="ClientHeadersScope.WithClientHeader"/> — the policy and decorator
+///     are no-ops when no headers are attached, so the feature costs nothing at the call site
+///     until used.
 /// </summary>
 public static class AgentChatClientFactory
 {
@@ -37,11 +40,13 @@ public static class AgentChatClientFactory
         var model = string.IsNullOrEmpty(options.Model) ? "gpt-4o" : options.Model;
         var credential = new ApiKeyCredential(options.ApiKey);
 
-        var openAiClient = options.Endpoint is not null
-            ? new OpenAIClient(credential, new OpenAIClientOptions { Endpoint = new Uri(options.Endpoint) })
-            : new OpenAIClient(credential);
+        var clientOptions = new OpenAIClientOptions();
+        if (options.Endpoint is not null)
+            clientOptions.Endpoint = new Uri(options.Endpoint);
+        clientOptions.AddClientHeadersPolicy();
 
-        return openAiClient.GetChatClient(model).AsIChatClient();
+        var openAiClient = new OpenAIClient(credential, clientOptions);
+        return new ClientHeadersChatClient(openAiClient.GetChatClient(model).AsIChatClient());
     }
 
     /// <summary>

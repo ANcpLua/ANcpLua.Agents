@@ -31,7 +31,7 @@ env:
 jobs:
   # Compute version by reading the latest v* tag and bumping the patch.
   # ANcpLua.Agents tracks the MAF stable major/minor, so the auto path floors
-  # new releases to 1.4.x while this repo is pinned to Microsoft.Agents.AI 1.4.0.
+  # new releases to 1.6.x now that this repo is pinned to Microsoft.Agents.AI 1.6.1.
   # If HEAD is exactly the tag, reuse the version (re-run safe).
   # workflow_dispatch with an explicit version overrides the auto-bump.
   version:
@@ -50,7 +50,7 @@ jobs:
             echo "Workflow dispatch override: $VERSION"
           else
             BASE_MAJOR=1
-            BASE_MINOR=4
+            BASE_MINOR=6
             LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
             if [[ "$LATEST_TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
               MAJOR=${BASH_REMATCH[1]}
