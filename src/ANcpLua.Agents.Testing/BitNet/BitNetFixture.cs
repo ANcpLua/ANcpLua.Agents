@@ -173,7 +173,10 @@ public sealed class BitNetFixture : IAsyncLifetime
             var pull = await RunDockerAsync(
                 ["pull", DockerImage],
                 TimeSpan.FromMinutes(10)).ConfigureAwait(false);
-            if (pull.ExitCode != 0) return null;
+            if (pull.ExitCode != 0)
+            {
+                return null;
+            }
         }
 
         var containerName = ContainerNamePrefix + Guid.NewGuid().ToString("N")[..8];
