@@ -8,6 +8,20 @@ Alpha-channel package. Keep isolated from stable/preview consumers unless explic
 - Tested against: Microsoft.Agents.AI 1.4.0 + Microsoft.Extensions.AI 10.5.x
 - Capability tested against: BitNet b1.58 2B-4T weights served by Microsoft's prebuilt `bitnet.cpp` Docker image
 
+## Install
+
+```sh
+dotnet add package ANcpLua.Agents.Hosting.BitNet
+```
+
+Or add the `PackageReference` by hand:
+
+```xml
+<PackageReference Include="ANcpLua.Agents.Hosting.BitNet" />
+```
+
+Under Central Package Management (recommended; required by `ANcpLua.NET.Sdk`), pin the version in your `Directory.Packages.props` and leave the `Version=` off the `PackageReference` itself.
+
 ## Standing up a BitNet server
 
 The hosting package only speaks HTTP to an OpenAI-compatible endpoint — it never builds, downloads, or spawns the binary. You can satisfy that contract any way you like; Microsoft's prebuilt Docker image is the easiest path:
@@ -56,29 +70,6 @@ LM Studio, vLLM with a BitNet build, a private inference gateway, your own fork 
 ## Why a dedicated hosting package
 
 Stock `Microsoft.Extensions.AI.OpenAI` works against any OpenAI-compatible endpoint — but `llama-server` builds older than [ggml-org/llama.cpp#19831](https://github.com/ggml-org/llama.cpp/pull/19831) (merged 2026-02-23) silently ignore the SDK-emitted `max_completion_tokens` field and generate to the context limit. This package promotes the `LegacyMaxTokensPolicy` shim out of test-only territory and ships it as part of the runtime path. Once Microsoft's BitNet fork picks up the upstream merge, the policy becomes a no-op self-deleting decorator.
-
-## Zero-ceremony path — `ANcpLua.NET.Sdk.BitNet`
-
-If your repo already uses an MSBuild SDK from [ANcpLua/ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk), switch the variant from `.Web` to `.BitNet` and you get this hosting package as an implicit `PackageReference` — no `<PackageReference Include="ANcpLua.Agents.Hosting.BitNet" />` line of your own needed. The pinned version lives in the SDK's `Version.props` and ships in lockstep with releases here.
-
-```json
-// global.json
-{ "msbuild-sdks": { "ANcpLua.NET.Sdk.BitNet": "3.4.31" } }
-```
-
-```xml
-<!-- consumer .csproj -->
-<Project Sdk="ANcpLua.NET.Sdk.BitNet">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <NoWarn>$(NoWarn);ANCPLBITNET001</NoWarn>
-  </PropertyGroup>
-</Project>
-```
-
-**Hard requirement — Central Package Management.** The SDK forces `ManagePackageVersionsCentrally=true` and the enforcement target errors if the consumer overrides it. Ship a `Directory.Packages.props` at or above the consumer (an empty one with `<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>` is enough); without it, restore fails with `NU1015` on the SDK-injected analyzers.
-
-Then call `builder.AddQylBitNetChatClient()` in `Program.cs` exactly as below.
 
 ## Usage — four modes
 
