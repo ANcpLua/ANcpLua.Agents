@@ -8,6 +8,20 @@ Alpha-channel package. Keep isolated from stable/preview consumers unless explic
 - Tested against: Microsoft.Agents.AI 1.4.0 + Microsoft.Extensions.AI 10.5.x
 - Capability tested against: BitNet b1.58 2B-4T weights served by Microsoft's prebuilt `bitnet.cpp` Docker image
 
+## Install
+
+```sh
+dotnet add package ANcpLua.Agents.Hosting.BitNet
+```
+
+Or add the `PackageReference` by hand:
+
+```xml
+<PackageReference Include="ANcpLua.Agents.Hosting.BitNet" />
+```
+
+Under Central Package Management (recommended; required by `ANcpLua.NET.Sdk`), pin the version in your `Directory.Packages.props` and leave the `Version=` off the `PackageReference` itself.
+
 ## Standing up a BitNet server
 
 The hosting package only speaks HTTP to an OpenAI-compatible endpoint — it never builds, downloads, or spawns the binary. You can satisfy that contract any way you like; Microsoft's prebuilt Docker image is the easiest path:
