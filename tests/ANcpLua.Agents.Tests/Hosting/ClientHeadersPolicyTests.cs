@@ -13,7 +13,7 @@ public sealed class ClientHeadersPolicyTests
 
         InvokePolicy(message);
 
-        message.Request!.Headers.TryGetValue("x-client-user", out _).Should().BeFalse();
+        message.Request.Headers.TryGetValue("x-client-user", out _).Should().BeFalse();
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public sealed class ClientHeadersPolicyTests
             InvokePolicy(message);
         }
 
-        message.Request!.Headers.TryGetValue("x-client-user", out var u).Should().BeTrue();
+        message.Request.Headers.TryGetValue("x-client-user", out var u).Should().BeTrue();
         u.Should().Be("alice");
         message.Request.Headers.TryGetValue("x-client-tenant", out var t).Should().BeTrue();
         t.Should().Be("acme");
@@ -40,7 +40,7 @@ public sealed class ClientHeadersPolicyTests
     public void Process_ExistingSameNameHeader_IsReplaced()
     {
         using var message = BuildMessage();
-        message.Request!.Headers.Set("x-client-user", "old");
+        message.Request.Headers.Set("x-client-user", "old");
 
         using (ClientHeadersScope.Push(new Dictionary<string, string> { ["x-client-user"] = "new" }))
         {
@@ -62,7 +62,7 @@ public sealed class ClientHeadersPolicyTests
             await ClientHeadersPolicy.Instance.ProcessAsync(message, policies, currentIndex: 0);
         }
 
-        message.Request!.Headers.TryGetValue("x-client-user", out var v).Should().BeTrue();
+        message.Request.Headers.TryGetValue("x-client-user", out var v).Should().BeTrue();
         v.Should().Be("alice");
     }
 

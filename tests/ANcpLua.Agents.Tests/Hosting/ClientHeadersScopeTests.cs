@@ -117,7 +117,7 @@ public sealed class ClientHeadersScopeTests
         options.WithClientHeader("x-client-user", "alice");
 
         options.AdditionalProperties.Should().NotBeNull();
-        options.AdditionalProperties!.Should().ContainKey(ClientHeadersScope.CarrierKey);
+        options.AdditionalProperties.Should().ContainKey(ClientHeadersScope.CarrierKey);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public sealed class ClientHeadersScopeTests
 
         var snapshot = options.GetClientHeaders();
         snapshot.Should().NotBeNull().And.HaveCount(1);
-        snapshot!["x-client-user"].Should().Be("bob");
+        snapshot["x-client-user"].Should().Be("bob");
     }
 
     [Fact]
@@ -187,9 +187,9 @@ public sealed class ClientHeadersScopeTests
 
         var snapshot = options.GetClientHeaders();
         snapshot.Should().NotBeNull();
-        ((IDictionary<string, string>)snapshot!).Add("x-client-mutated", "yes");
+        ((IDictionary<string, string>)snapshot).Add("x-client-mutated", "yes");
 
-        options.GetClientHeaders()!.Should().NotContainKey("x-client-mutated");
+        options.GetClientHeaders().Should().NotContainKey("x-client-mutated");
     }
 
     [Fact]

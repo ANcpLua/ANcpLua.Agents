@@ -24,7 +24,7 @@ public sealed class ClientHeadersChatClientTests
         _ = await client.GetResponseAsync([new ChatMessage(ChatRole.User, "hi")], options);
 
         observed.Should().NotBeNull();
-        observed!["x-client-user"].Should().Be("alice");
+        observed["x-client-user"].Should().Be("alice");
         ClientHeadersScope.Current.Should().BeNull();
     }
 
