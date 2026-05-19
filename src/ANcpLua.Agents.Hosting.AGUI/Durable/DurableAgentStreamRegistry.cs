@@ -22,8 +22,15 @@ namespace ANcpLua.Agents.Hosting.AGUI.Durable;
 ///     </para>
 ///     <para>
 ///         Lifecycle is at-least-once: a worker replay re-invokes the handler, which re-writes
-///         updates to the same channel. Consumers must dedupe by <see cref="AgentResponseUpdate.MessageId"/>
-///         if exactly-once delivery matters.
+///         updates to the same channel. <b>This package intentionally ships no built-in dedup</b>
+///         because <see cref="AgentResponseUpdate"/> has no stable per-chunk identity —
+///         <see cref="AgentResponseUpdate.MessageId"/> is shared across every chunk of one
+///         assistant message, and chunks can legitimately repeat <see cref="AgentResponseUpdate.Text"/>
+///         (whitespace, punctuation, identical intermediate states). Any composite key built from
+///         the public fields can either drop legitimate live chunks or fail to catch replays. If
+///         exactly-once observation matters, the consumer must layer its own identity on top —
+///         e.g. a per-session chunk-index counter, content-hash with sequence number, or
+///         orchestration-history cross-reference.
 ///     </para>
 ///     <para>
 ///         Cancellation: when the consumer (gRPC / SSE endpoint) disconnects mid-stream, it calls

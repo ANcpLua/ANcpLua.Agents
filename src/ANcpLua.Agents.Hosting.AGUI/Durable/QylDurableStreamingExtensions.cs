@@ -77,9 +77,11 @@ public static class QylDurableStreamingExtensions
     ///     <see cref="AgentResponseUpdate"/>.
     /// </summary>
     /// <remarks>
-    ///     Returns 404 if the request cancels before the channel produces its first update; this
-    ///     surfaces "no run was started for this session" without hanging the client. The channel
-    ///     is removed from the registry once its reader is naturally completed.
+    ///     The channel is removed from the registry once its reader is naturally completed
+    ///     (handler's <c>TryComplete</c> closes the writer side) or when the request cancels.
+    ///     Cancellation propagates as <see cref="OperationCanceledException"/> — wrap with your
+    ///     own middleware if you need a specific status code for "client disconnected before
+    ///     the first update."
     /// </remarks>
     public static IEndpointConventionBuilder MapQylDurableAgentStream(
         this IEndpointRouteBuilder endpoints,
@@ -121,30 +123,33 @@ public static class QylDurableStreamingExtensions
             PeriodicTimer? heartbeatTimer = heartbeatsEnabled ? new PeriodicTimer(heartbeatInterval) : null;
             try
             {
-                // Persist the WaitToReadAsync task across heartbeat iterations so we don't
-                // register a fresh channel waiter every interval (codex P2 0s6DMQPN).
+                // Both awaitables persist across iterations so neither is started twice in parallel:
+                //   - waitToRead: avoids registering a fresh channel waiter every heartbeat (codex 0s6DMQPN)
+                //   - heartbeat:  PeriodicTimer.WaitForNextTickAsync forbids concurrent pending calls
+                //                 and throws InvalidOperationException if called again while one is
+                //                 still outstanding. Persist until the tick is observed.
                 Task<bool>? waitToRead = null;
+                Task<bool>? heartbeat = null;
                 while (true)
                 {
                     waitToRead ??= channel.Reader.WaitToReadAsync(cancellationToken).AsTask();
 
                     if (heartbeatTimer is not null)
                     {
-                        // PeriodicTimer is self-disposing: each WaitForNextTickAsync call returns
-                        // a fresh awaitable that completes on the next tick (no Task.Delay timers
-                        // left scheduled — codex P2 0s6DMWfO). Combined with persistent waitToRead
-                        // across heartbeat iterations, no channel waiters accumulate either
-                        // (codex P2 0s6DMQPN).
-                        Task heartbeat = heartbeatTimer.WaitForNextTickAsync(cancellationToken).AsTask();
+                        heartbeat ??= heartbeatTimer.WaitForNextTickAsync(cancellationToken).AsTask();
                         var winner = await Task.WhenAny(waitToRead, heartbeat).ConfigureAwait(false);
                         if (winner == heartbeat)
                         {
+                            // Observe the result before nulling out, then schedule the next tick.
+                            _ = await heartbeat.ConfigureAwait(false);
+                            heartbeat = null;
                             // SSE comment frame — clients ignore it, proxies see traffic.
                             // Leave waitToRead pending; next iteration re-uses the same task.
                             await context.Response.WriteAsync(": keepalive\n\n", cancellationToken).ConfigureAwait(false);
                             await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
                             continue;
                         }
+                        // waitToRead won — leave heartbeat pending so we don't start a second one.
                     }
 
                     if (!await waitToRead.ConfigureAwait(false))
