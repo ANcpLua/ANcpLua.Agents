@@ -35,4 +35,13 @@ public sealed class DurableAgentStreamingOptions
     ///     the consumer drains a slot. Set to a <c>Drop*</c> mode only if message loss is acceptable.
     /// </summary>
     public BoundedChannelFullMode FullMode { get; init; } = BoundedChannelFullMode.Wait;
+
+    /// <summary>
+    ///     How often the SSE endpoint emits a <c>: keepalive</c> comment frame when no real
+    ///     update is available, to keep proxy idle timeouts (NGINX ~60s, Cloudflare ~100s) from
+    ///     killing the connection. Defaults to 20 seconds. Set to <see cref="Timeout.InfiniteTimeSpan"/>
+    ///     to disable heartbeats entirely. gRPC has HTTP/2 PING frames out of the box and
+    ///     ignores this setting.
+    /// </summary>
+    public TimeSpan SseHeartbeatInterval { get; init; } = TimeSpan.FromSeconds(20);
 }

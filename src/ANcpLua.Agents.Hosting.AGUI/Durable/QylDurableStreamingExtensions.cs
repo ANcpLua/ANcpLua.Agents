@@ -81,6 +81,7 @@ public static class QylDurableStreamingExtensions
         return endpoints.MapGet(pattern, async (
             string sessionKey,
             DurableAgentStreamRegistry registry,
+            DurableAgentStreamingOptions options,
             HttpContext context,
             CancellationToken cancellationToken) =>
         {
@@ -103,16 +104,46 @@ public static class QylDurableStreamingExtensions
                 StreamingTelemetry.Tags.SessionId,
                 sessionKey);
 
+            var heartbeatInterval = options.SseHeartbeatInterval;
+            var heartbeatsEnabled = heartbeatInterval > TimeSpan.Zero && heartbeatInterval != Timeout.InfiniteTimeSpan;
+
             long messageCount = 0;
             try
             {
-                await foreach (var update in channel.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
+                while (true)
                 {
-                    string json = JsonSerializer.Serialize(update);
-                    await context.Response.WriteAsync($"data: {json}\n\n", cancellationToken).ConfigureAwait(false);
-                    await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
-                    messageCount++;
-                    StreamingTelemetry.MessagesConsumed.Add(1, transportTag, sessionTag);
+                    Task<bool> waitToRead = channel.Reader.WaitToReadAsync(cancellationToken).AsTask();
+                    Task winner;
+                    if (heartbeatsEnabled)
+                    {
+                        Task heartbeat = Task.Delay(heartbeatInterval, cancellationToken);
+                        winner = await Task.WhenAny(waitToRead, heartbeat).ConfigureAwait(false);
+                        if (winner == heartbeat)
+                        {
+                            // SSE comment frame — clients ignore it, proxies see traffic.
+                            await context.Response.WriteAsync(": keepalive\n\n", cancellationToken).ConfigureAwait(false);
+                            await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        winner = waitToRead;
+                    }
+
+                    if (!await ((Task<bool>)winner).ConfigureAwait(false))
+                    {
+                        break; // channel completed
+                    }
+
+                    while (channel.Reader.TryRead(out var update))
+                    {
+                        string json = JsonSerializer.Serialize(update);
+                        await context.Response.WriteAsync($"data: {json}\n\n", cancellationToken).ConfigureAwait(false);
+                        await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
+                        messageCount++;
+                        StreamingTelemetry.MessagesConsumed.Add(1, transportTag, sessionTag);
+                    }
                 }
                 activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Completed);
             }
