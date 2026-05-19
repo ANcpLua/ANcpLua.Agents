@@ -144,6 +144,13 @@ public sealed class AgentStreamGrpcServiceTests
             this.Messages.Add(message);
             return Task.CompletedTask;
         }
+
+        public Task WriteAsync(T message, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            this.Messages.Add(message);
+            return Task.CompletedTask;
+        }
     }
 
     /// <summary>

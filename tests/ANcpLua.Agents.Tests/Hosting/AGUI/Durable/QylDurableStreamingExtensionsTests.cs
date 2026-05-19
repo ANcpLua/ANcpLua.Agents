@@ -61,6 +61,8 @@ public sealed class QylDurableStreamingExtensionsTests
         // Idempotency under double-registration: a host that copies the call between Program.cs
         // and a test harness must not accidentally produce two registries (which would split
         // writers and readers between two distinct in-memory dictionaries).
+        // TryAddSingleton ensures only one descriptor is ever added, so GetServices returns
+        // exactly one instance and GetRequiredService resolves that same instance.
         var services = new ServiceCollection();
         services.AddQylDurableAgentStreaming();
         services.AddQylDurableAgentStreaming();
@@ -68,9 +70,7 @@ public sealed class QylDurableStreamingExtensionsTests
         using var sp = services.BuildServiceProvider(validateScopes: true);
 
         var registries = sp.GetServices<DurableAgentStreamRegistry>().ToArray();
-        // Multiple descriptors but a single resolved instance via singleton semantics — the
-        // last-registered descriptor wins for GetRequiredService, but all descriptors share
-        // the same instance because Singleton is keyed by the impl type identity here.
-        sp.GetRequiredService<DurableAgentStreamRegistry>().Should().BeSameAs(registries.Last());
+        registries.Should().HaveCount(1);
+        sp.GetRequiredService<DurableAgentStreamRegistry>().Should().BeSameAs(registries[0]);
     }
 }
