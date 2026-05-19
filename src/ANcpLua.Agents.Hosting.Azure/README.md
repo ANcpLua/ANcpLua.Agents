@@ -10,6 +10,8 @@ Capability tested against: Microsoft.Agents.AI.Hosting.AzureFunctions 1.4.0-prev
 
 Channel: preview. Keep this package isolated from stable consumers.
 
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).
+
 ## Migrated durable Azure surfaces
 
 - `ConfigureQylDurableAgents(this FunctionsApplicationBuilder, Action<DurableAgentsOptions>)`

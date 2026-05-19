@@ -9,3 +9,5 @@ Tested against: Microsoft.Agents.AI 1.6.1
 Capability tested against: Microsoft.Agents.AI.Hosting.OpenAI 1.4.0-alpha.260505.1 and Microsoft.Agents.AI.OpenAI 1.4.0
 
 Channel: alpha. Keep this package isolated from stable and preview consumers unless explicitly intended.
+
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).

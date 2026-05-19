@@ -8,6 +8,8 @@ Tested against: A2A / A2A.AspNetCore 1.0.0-preview2
 
 Channel: preview. Keep this package isolated from stable consumers — the underlying MAF A2A surface ships under `MEAI001` experimental diagnostics.
 
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).
+
 ## Server — expose an `AIAgent` over A2A
 
 ```csharp

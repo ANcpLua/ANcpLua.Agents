@@ -9,3 +9,5 @@ Tested against: Microsoft.Agents.AI 1.6.1
 Capability tested against: Microsoft.Agents.AI.Foundry 1.4.0 and Microsoft.Agents.AI.Workflows.Declarative.Foundry 1.4.0-rc1
 
 Channel: rc1. Keep this package isolated from stable consumers.
+
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).

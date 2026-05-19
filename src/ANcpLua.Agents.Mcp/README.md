@@ -10,6 +10,8 @@ Compatible with: Microsoft.Agents.AI 1.6.x
 Tested against: Microsoft.Agents.AI 1.6.1
 Capability tested against: ModelContextProtocol 1.3.0
 
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).
+
 ## Quick start
 
 ```csharp

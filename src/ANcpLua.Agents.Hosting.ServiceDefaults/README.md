@@ -2,6 +2,8 @@
 
 Aspire-style service defaults pre-tuned for the Microsoft Agent Framework ActivitySource family.
 
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).
+
 ## Surface
 
 ```csharp

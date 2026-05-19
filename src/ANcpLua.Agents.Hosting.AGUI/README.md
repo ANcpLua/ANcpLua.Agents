@@ -6,6 +6,8 @@ Tested against `Microsoft.Agents.AI.AGUI` and `Microsoft.Agents.AI.Hosting.AGUI.
 
 Channel: preview. Keep this package isolated from stable consumers.
 
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).
+
 ## Server
 
 ```csharp

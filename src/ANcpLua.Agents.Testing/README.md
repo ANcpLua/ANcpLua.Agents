@@ -10,6 +10,8 @@ Tested against: Microsoft.Agents.AI 1.6.1
 
 Channel: stable. This package keeps provider fixtures free of Microsoft Agent Framework preview, RC, and alpha dependencies.
 
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).
+
 ```csharp
 var result = await AgentRunHarness.For(new FakeEchoAgent())
     .WithUserMessage("hello")

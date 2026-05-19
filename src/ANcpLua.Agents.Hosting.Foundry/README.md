@@ -13,6 +13,8 @@ and toolbox tool materialization facade helpers.
 
 Channel: preview. Keep this package isolated from stable consumers.
 
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).
+
 ## Session-store default (MAF 1.4)
 
 `AddQylFoundryResponses` mirrors MAF's `AddFoundryResponses` defaults. As of MAF 1.4

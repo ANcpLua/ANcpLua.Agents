@@ -9,3 +9,5 @@ Tested against: Microsoft.Agents.AI 1.6.1
 Capability tested against: Microsoft.Agents.AI.Workflows 1.4.0
 
 Channel: stable. This package exposes a facade layer over Microsoft.Agents.AI.Workflows and may change internal implementations across versions, so consumers should track facade contract changes rather than diff internal internals for parity.
+
+> **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).
