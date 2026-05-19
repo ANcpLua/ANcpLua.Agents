@@ -19,6 +19,7 @@
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Anthropic\ANcpLua.Agents.Hosting.Anthropic.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Azure\ANcpLua.Agents.Hosting.Azure.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.DevUI\ANcpLua.Agents.Hosting.DevUI.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.AGUI\ANcpLua.Agents.Hosting.AGUI.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Foundry\ANcpLua.Agents.Hosting.Foundry.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.GoogleGemini\ANcpLua.Agents.Hosting.GoogleGemini.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.OpenAI\ANcpLua.Agents.Hosting.OpenAI.csproj"/>

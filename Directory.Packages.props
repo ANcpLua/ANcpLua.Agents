@@ -39,6 +39,11 @@
     <PackageVersion Include="Microsoft.DurableTask.Client.Grpc" Version="$(MicrosoftDurableTaskGrpcVersion)"/>
   </ItemGroup>
 
+  <ItemGroup Label="Grpc.AspNetCore (server-streaming surface for durable agent updates)">
+    <PackageVersion Include="Grpc.AspNetCore" Version="$(GrpcAspNetCoreVersion)"/>
+    <PackageVersion Include="Grpc.Tools" Version="$(GrpcToolsVersion)"/>
+  </ItemGroup>
+
   <ItemGroup Label="ManagedAgentTelemetry.Host sample (Foundry persistent agents + Teams + RAG + AzMon)">
     <PackageVersion Include="Azure.AI.Projects" Version="$(AzureAIProjectsVersion)"/>
     <PackageVersion Include="Microsoft.Graph" Version="$(MicrosoftGraphVersion)"/>
@@ -51,6 +56,13 @@
     <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="$(MicrosoftExtensionsAIAbstractionsVersion)"/>
     <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="$(MicrosoftExtensionsAIOpenAIVersion)"/>
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(MicrosoftBclAsyncInterfacesVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="Microsoft.Extensions.DataIngestion (RAG ingestion building blocks — ANcpLua.Agents.DataIngestion facades)">
+    <PackageVersion Include="Microsoft.Extensions.DataIngestion" Version="$(MicrosoftExtensionsDataIngestionVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.DataIngestion.Markdig" Version="$(MicrosoftExtensionsDataIngestionMarkdigVersion)"/>
+    <PackageVersion Include="Microsoft.ML.Tokenizers" Version="$(MicrosoftMLTokenizersVersion)"/>
+    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.InMemory" Version="$(MicrosoftSemanticKernelConnectorsInMemoryVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="A2A (Agent2Agent protocol SDK — a2aproject/a2a-dotnet)">

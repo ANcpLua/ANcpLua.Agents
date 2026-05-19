@@ -19,7 +19,14 @@
         <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
         <PackageReference Include="Microsoft.Agents.AI"/>
         <PackageReference Include="Microsoft.Agents.AI.AGUI"/>
+        <PackageReference Include="Microsoft.Agents.AI.DurableTask"/>
         <PackageReference Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore"/>
+        <PackageReference Include="Grpc.AspNetCore"/>
+        <PackageReference Include="Grpc.Tools" PrivateAssets="All"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="Durable/Protos/agent_stream.proto" GrpcServices="Server"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -50,6 +50,11 @@
     <MicrosoftDurableTaskGrpcVersion>1.24.1</MicrosoftDurableTaskGrpcVersion>
   </PropertyGroup>
 
+  <PropertyGroup Label="Grpc.AspNetCore (server-streaming surface for durable agent updates)">
+    <GrpcAspNetCoreVersion>2.76.0</GrpcAspNetCoreVersion>
+    <GrpcToolsVersion>2.80.0</GrpcToolsVersion>
+  </PropertyGroup>
+
   <PropertyGroup Label="ManagedAgentTelemetry.Host sample (Foundry persistent agents + Teams + RAG + AzMon)">
     <AzureAIProjectsVersion>2.1.0-beta.1</AzureAIProjectsVersion>
     <MicrosoftGraphVersion>5.104.0</MicrosoftGraphVersion>
@@ -62,6 +67,13 @@
     <MicrosoftExtensionsAIAbstractionsVersion>10.5.2</MicrosoftExtensionsAIAbstractionsVersion>
     <MicrosoftExtensionsAIOpenAIVersion>10.5.2</MicrosoftExtensionsAIOpenAIVersion>
     <MicrosoftBclAsyncInterfacesVersion>10.0.7</MicrosoftBclAsyncInterfacesVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Microsoft.Extensions.DataIngestion (RAG ingestion building blocks — ANcpLua.Agents.DataIngestion facades)">
+    <MicrosoftExtensionsDataIngestionVersion>10.5.0-preview.1.26213.4</MicrosoftExtensionsDataIngestionVersion>
+    <MicrosoftExtensionsDataIngestionMarkdigVersion>10.5.0-preview.1.26213.4</MicrosoftExtensionsDataIngestionMarkdigVersion>
+    <MicrosoftMLTokenizersVersion>2.0.0</MicrosoftMLTokenizersVersion>
+    <MicrosoftSemanticKernelConnectorsInMemoryVersion>1.74.0-preview</MicrosoftSemanticKernelConnectorsInMemoryVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="A2A (Agent2Agent protocol SDK — a2aproject/a2a-dotnet)">

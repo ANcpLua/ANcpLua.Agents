@@ -58,4 +58,9 @@
                       ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
+  <!-- Side-channel streaming for managed durable agents. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.AGUI\ANcpLua.Agents.Hosting.AGUI.csproj"/>
+  </ItemGroup>
+
 </Project>

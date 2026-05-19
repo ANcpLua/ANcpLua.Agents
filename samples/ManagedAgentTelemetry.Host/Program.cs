@@ -1,3 +1,4 @@
+using ANcpLua.Agents.Hosting.AGUI.Durable;
 using Azure.AI.Projects;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Azure.Search.Documents;
@@ -50,11 +51,14 @@ builder.Services
     .WithTracing(t => t.AddSource("Microsoft.Agents.AI", "Microsoft.Agents.AI.DurableTask"));
 
 builder.Services.AddQylDurableAgents(options => options.AddAIAgent(telemetryAssistant));
+builder.Services.AddQylDurableAgentStreaming();
 
 WebApplication app = builder.Build();
 
 QylActivityServices.Provider = app.Services;
 
 app.MapQylAgentEndpoints();
+app.MapQylDurableAgentStream();
+app.MapQylDurableAgentStreamGrpc();
 
 await app.RunAsync().ConfigureAwait(false);
