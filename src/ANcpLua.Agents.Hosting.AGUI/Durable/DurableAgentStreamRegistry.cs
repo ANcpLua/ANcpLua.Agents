@@ -31,6 +31,36 @@ namespace ANcpLua.Agents.Hosting.AGUI.Durable;
 ///         returned by <see cref="GetOrCreateForProducer"/> so the orchestration stops writing
 ///         to a now-orphan channel instead of filling unbounded memory for no reader.
 ///     </para>
+///     <para>
+///         <b>Deployment constraint — single replica only.</b> The registry holds channels in an
+///         in-process <see cref="ConcurrentDictionary{TKey, TValue}"/>. Scaling horizontally
+///         breaks the rendezvous: if a load balancer routes the producer's orchestration worker
+///         to replica A and the consumer's Subscribe call to replica B, the consumer gets an
+///         empty channel on B while A's channel fills and discards no one's reads. There is no
+///         in-band detection of this misroute — the consumer simply hangs until cancellation.
+///     </para>
+///     <para>
+///         To scale beyond one replica, replace the in-process dictionary with a backplane that
+///         routes by session key. Three plausible shapes:
+///         <list type="bullet">
+///             <item><description>
+///                 <b>Redis Streams</b> — XADD on produce, XREAD on Subscribe, consumer groups
+///                 for fan-out. Lowest infra cost; weakest delivery semantics out of the box.
+///             </description></item>
+///             <item><description>
+///                 <b>NATS JetStream</b> — per-session subject (e.g. <c>agent.{key}.update</c>),
+///                 durable consumers. Better delivery semantics, slightly heavier infra.
+///             </description></item>
+///             <item><description>
+///                 <b>DurableTask state-keyed routing</b> — pull the update sequence directly
+///                 from the orchestration history. Removes the side-channel entirely (the
+///                 history IS the channel), at the cost of replay-on-every-read.
+///             </description></item>
+///         </list>
+///         For the current MVP shape (single-replica self-hosted ASP.NET, one orchestration
+///         worker), the in-process registry is sufficient. Ship a backplane only when a real
+///         workload forces it; until then, keep the deployment shape constrained.
+///     </para>
 /// </remarks>
 public sealed class DurableAgentStreamRegistry
 {
