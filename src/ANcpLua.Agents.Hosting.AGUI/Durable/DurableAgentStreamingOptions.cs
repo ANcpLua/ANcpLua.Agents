@@ -27,14 +27,14 @@ public sealed class DurableAgentStreamingOptions
     ///     per session before the producer blocks (or drops, depending on <see cref="FullMode"/>).
     ///     Defaults to <c>100</c>. Must be positive.
     /// </summary>
-    public int ChannelCapacity { get; init; } = 100;
+    public int ChannelCapacity { get; set; } = 100;
 
     /// <summary>
     ///     Policy when the bounded channel is full. Defaults to
     ///     <see cref="BoundedChannelFullMode.Wait"/> — the producer's <c>WriteAsync</c> blocks until
     ///     the consumer drains a slot. Set to a <c>Drop*</c> mode only if message loss is acceptable.
     /// </summary>
-    public BoundedChannelFullMode FullMode { get; init; } = BoundedChannelFullMode.Wait;
+    public BoundedChannelFullMode FullMode { get; set; } = BoundedChannelFullMode.Wait;
 
     /// <summary>
     ///     How often the SSE endpoint emits a <c>: keepalive</c> comment frame when no real
@@ -43,5 +43,5 @@ public sealed class DurableAgentStreamingOptions
     ///     to disable heartbeats entirely. gRPC has HTTP/2 PING frames out of the box and
     ///     ignores this setting.
     /// </summary>
-    public TimeSpan SseHeartbeatInterval { get; init; } = TimeSpan.FromSeconds(20);
+    public TimeSpan SseHeartbeatInterval { get; set; } = TimeSpan.FromSeconds(20);
 }

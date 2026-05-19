@@ -34,21 +34,30 @@ public static class QylDurableStreamingExtensions
 {
     /// <summary>
     ///     Registers the <see cref="DurableAgentStreamRegistry"/> and a side-channel
-    ///     <see cref="IAgentResponseHandler"/> implementation. Call alongside <c>AddQylDurableAgents</c>.
+    ///     <see cref="IAgentResponseHandler"/> implementation with default
+    ///     <see cref="DurableAgentStreamingOptions"/> (capacity 100, FullMode=Wait, 20s
+    ///     SSE heartbeat). Call alongside <c>AddQylDurableAgents</c>.
     /// </summary>
     /// <param name="services">Target DI container.</param>
-    /// <param name="configure">
-    ///     Optional callback to override <see cref="DurableAgentStreamingOptions"/>. Defaults apply
-    ///     when omitted (capacity 100, FullMode=Wait — backpressure, no message loss).
-    /// </param>
     /// <remarks>
     ///     Adds Grpc.AspNetCore services as well so callers can later opt in to the
     ///     <see cref="MapQylDurableAgentStreamGrpc"/> server-streaming endpoint without a second
     ///     wiring step. The gRPC server-side glue has no runtime cost when no gRPC endpoint is mapped.
     /// </remarks>
+    public static IServiceCollection AddQylDurableAgentStreaming(this IServiceCollection services)
+        => AddQylDurableAgentStreaming(services, configure: null);
+
+    /// <summary>
+    ///     Registers the durable-streaming surface with caller-supplied option overrides.
+    /// </summary>
+    /// <param name="services">Target DI container.</param>
+    /// <param name="configure">
+    ///     Callback that mutates the default <see cref="DurableAgentStreamingOptions"/> before
+    ///     the singleton is registered. Pass <see langword="null"/> for defaults.
+    /// </param>
     public static IServiceCollection AddQylDurableAgentStreaming(
         this IServiceCollection services,
-        Action<DurableAgentStreamingOptions>? configure = null)
+        Action<DurableAgentStreamingOptions>? configure)
     {
         Guard.NotNull(services);
 
@@ -112,31 +121,37 @@ public static class QylDurableStreamingExtensions
             PeriodicTimer? heartbeatTimer = heartbeatsEnabled ? new PeriodicTimer(heartbeatInterval) : null;
             try
             {
+                // Persist the WaitToReadAsync task across heartbeat iterations so we don't
+                // register a fresh channel waiter every interval (codex P2 0s6DMQPN).
+                Task<bool>? waitToRead = null;
                 while (true)
                 {
-                    Task<bool> waitToRead = channel.Reader.WaitToReadAsync(cancellationToken).AsTask();
-                    Task winner;
+                    waitToRead ??= channel.Reader.WaitToReadAsync(cancellationToken).AsTask();
+
                     if (heartbeatTimer is not null)
                     {
+                        // PeriodicTimer is self-disposing: each WaitForNextTickAsync call returns
+                        // a fresh awaitable that completes on the next tick (no Task.Delay timers
+                        // left scheduled — codex P2 0s6DMWfO). Combined with persistent waitToRead
+                        // across heartbeat iterations, no channel waiters accumulate either
+                        // (codex P2 0s6DMQPN).
                         Task heartbeat = heartbeatTimer.WaitForNextTickAsync(cancellationToken).AsTask();
-                        winner = await Task.WhenAny(waitToRead, heartbeat).ConfigureAwait(false);
+                        var winner = await Task.WhenAny(waitToRead, heartbeat).ConfigureAwait(false);
                         if (winner == heartbeat)
                         {
                             // SSE comment frame — clients ignore it, proxies see traffic.
+                            // Leave waitToRead pending; next iteration re-uses the same task.
                             await context.Response.WriteAsync(": keepalive\n\n", cancellationToken).ConfigureAwait(false);
                             await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
                             continue;
                         }
                     }
-                    else
-                    {
-                        winner = waitToRead;
-                    }
 
-                    if (!await ((Task<bool>)winner).ConfigureAwait(false))
+                    if (!await waitToRead.ConfigureAwait(false))
                     {
                         break; // channel completed
                     }
+                    waitToRead = null; // consumed — next iteration creates a fresh waiter after the drain
 
                     while (channel.Reader.TryRead(out var update))
                     {
@@ -172,7 +187,7 @@ public static class QylDurableStreamingExtensions
 
     /// <summary>
     ///     Maps the gRPC server-streaming surface for durable-agent updates. Pairs with
-    ///     <see cref="AddQylDurableAgentStreaming"/>. Clients invoke
+    ///     <see cref="AddQylDurableAgentStreaming(IServiceCollection)"/>. Clients invoke
     ///     <c>AgentStream.Subscribe(session_key)</c> and receive a server-side stream of
     ///     <c>AgentUpdateMessage</c> until the orchestration completes (or the call is cancelled).
     /// </summary>

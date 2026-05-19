@@ -37,22 +37,39 @@ public sealed class AgentResponseDedupTests
     }
 
     [Fact]
-    public async Task DuplicateMessageId_FirstOccurrenceWins_SecondDropped()
+    public async Task Replay_SameMessageIdSameText_SecondDropped()
     {
-        // Worker replay re-emits the same MessageId; the second occurrence must not reach the
-        // consumer. Preserves the "exactly once" observation contract on top of the at-least-once
-        // channel.
+        // Durable-orchestration replay re-emits the exact same chunks (same MessageId AND same
+        // Text) — the second occurrence must not reach the consumer. Preserves the "exactly once"
+        // observation contract on top of the at-least-once channel.
         var channel = Channel.CreateUnbounded<AgentResponseUpdate>();
-        await channel.Writer.WriteAsync(U("first-write", "m-1"));
+        await channel.Writer.WriteAsync(U("hello", "m-1"));
         await channel.Writer.WriteAsync(U("unique", "m-2"));
-        await channel.Writer.WriteAsync(U("replay-of-m1", "m-1"));
+        await channel.Writer.WriteAsync(U("hello", "m-1")); // exact replay of first
         channel.Writer.Complete();
 
         var drained = await DrainAsync(channel.Reader.DedupByMessageIdAsync());
 
         drained.Should().HaveCount(2);
-        drained[0].Text.Should().Be("first-write");
+        drained[0].Text.Should().Be("hello");
         drained[1].Text.Should().Be("unique");
+    }
+
+    [Fact]
+    public async Task StreamingChunks_SameMessageIdDifferentText_AllPassThrough()
+    {
+        // Normal streaming response emits multiple chunks sharing one MessageId with
+        // progressively different Text. A MessageId-only dedup would silently drop chunks
+        // 2..N of every streamed message — wrong. Composite (MessageId, Text) keeps them all.
+        var channel = Channel.CreateUnbounded<AgentResponseUpdate>();
+        await channel.Writer.WriteAsync(U("Hel", "m-1"));
+        await channel.Writer.WriteAsync(U("lo, ", "m-1"));
+        await channel.Writer.WriteAsync(U("world", "m-1"));
+        channel.Writer.Complete();
+
+        var drained = await DrainAsync(channel.Reader.DedupByMessageIdAsync());
+
+        drained.Select(u => u.Text).Should().Equal("Hel", "lo, ", "world");
     }
 
     [Fact]
@@ -85,13 +102,13 @@ public sealed class AgentResponseDedupTests
     }
 
     [Fact]
-    public async Task MixedIdAndNullId_DedupsOnlyKeyed()
+    public async Task MixedIdAndNullId_DedupsOnlyExactKeyedReplays()
     {
         var channel = Channel.CreateUnbounded<AgentResponseUpdate>();
         await channel.Writer.WriteAsync(U("a", "m-1"));
-        await channel.Writer.WriteAsync(U("b"));        // null id
-        await channel.Writer.WriteAsync(U("c", "m-1")); // duplicate of "a"
-        await channel.Writer.WriteAsync(U("d"));        // another null id
+        await channel.Writer.WriteAsync(U("b"));        // null id — passthrough
+        await channel.Writer.WriteAsync(U("a", "m-1")); // exact replay of first — dropped
+        await channel.Writer.WriteAsync(U("d"));        // another null id — passthrough
         await channel.Writer.WriteAsync(U("e", "m-2"));
         channel.Writer.Complete();
 
