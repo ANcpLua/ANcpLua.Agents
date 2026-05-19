@@ -25,8 +25,4 @@
         <ProjectReference Include="..\ANcpLua.Agents.Mcp\ANcpLua.Agents.Mcp.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\"/>
-        <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
-    </ItemGroup>
 </Project>
