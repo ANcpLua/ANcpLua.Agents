@@ -73,7 +73,7 @@ public sealed class DurableAgentStreamRegistry
     public Channel<AgentResponseUpdate> GetOrCreate(string sessionKey)
     {
         Guard.NotNullOrWhiteSpace(sessionKey);
-        return this._sessions.GetOrAdd(sessionKey, static _ => CreateState()).Channel;
+        return this.GetOrCreateState(sessionKey).Channel;
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public sealed class DurableAgentStreamRegistry
     public Channel<AgentResponseUpdate> GetOrCreateForProducer(string sessionKey, out CancellationToken producerToken)
     {
         Guard.NotNullOrWhiteSpace(sessionKey);
-        var state = this._sessions.GetOrAdd(sessionKey, static _ => CreateState());
+        var state = this.GetOrCreateState(sessionKey);
         producerToken = state.Cts.Token;
         return state.Channel;
     }
@@ -110,7 +110,30 @@ public sealed class DurableAgentStreamRegistry
         // CTS throw. CancellationTokenSource has no unmanaged resources by default, so the GC
         // reclaims it once all token references drop.
         state.Cts.Cancel();
+        StreamingTelemetry.ActiveSessions.Add(-1);
         return true;
+    }
+
+    /// <summary>
+    ///     Atomically resolves the per-session state, creating it on first access. Increments the
+    ///     <see cref="StreamingTelemetry.ActiveSessions"/> counter exactly once per session, even
+    ///     under concurrent first-access from producer and consumer.
+    /// </summary>
+    private SessionState GetOrCreateState(string sessionKey)
+    {
+        var candidate = CreateState();
+        var actual = this._sessions.GetOrAdd(sessionKey, candidate);
+        if (ReferenceEquals(candidate, actual))
+        {
+            StreamingTelemetry.ActiveSessions.Add(1);
+        }
+        else
+        {
+            // Lost the race — another caller's state is in the dictionary. Dispose ours so its
+            // unused CancellationTokenSource doesn't sit alive until GC.
+            candidate.Cts.Dispose();
+        }
+        return actual;
     }
 
     private static SessionState CreateState() => new(

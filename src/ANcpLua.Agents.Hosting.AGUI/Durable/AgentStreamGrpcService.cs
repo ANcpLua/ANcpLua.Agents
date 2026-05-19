@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ANcpLua.Agents.Hosting.AGUI.Durable.Grpc;
 using ANcpLua.Roslyn.Utilities;
 using Grpc.Core;
@@ -36,6 +37,20 @@ internal sealed class AgentStreamGrpcService(DurableAgentStreamRegistry registry
 
         var channel = this._registry.GetOrCreate(request.SessionKey);
 
+        using var activity = StreamingTelemetry.ActivitySource.StartActivity(
+            StreamingTelemetry.Spans.Subscribe,
+            ActivityKind.Server);
+        activity?.SetTag(StreamingTelemetry.Tags.SessionKey, request.SessionKey);
+        activity?.SetTag(StreamingTelemetry.Tags.Transport, StreamingTelemetry.Transports.Grpc);
+
+        var transportTag = new KeyValuePair<string, object?>(
+            StreamingTelemetry.Tags.Transport,
+            StreamingTelemetry.Transports.Grpc);
+        var sessionTag = new KeyValuePair<string, object?>(
+            StreamingTelemetry.Tags.SessionKey,
+            request.SessionKey);
+
+        long messageCount = 0;
         try
         {
             await foreach (var update in channel.Reader.ReadAllAsync(context.CancellationToken).ConfigureAwait(false))
@@ -49,10 +64,26 @@ internal sealed class AgentStreamGrpcService(DurableAgentStreamRegistry registry
                     ResponseId = update.ResponseId ?? string.Empty,
                 };
                 await responseStream.WriteAsync(message, context.CancellationToken).ConfigureAwait(false);
+                messageCount++;
+                StreamingTelemetry.MessagesConsumed.Add(1, transportTag, sessionTag);
             }
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Completed);
+        }
+        catch (OperationCanceledException)
+        {
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Cancelled);
+            activity?.SetStatus(ActivityStatusCode.Error);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Errored);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            throw;
         }
         finally
         {
+            activity?.SetTag(StreamingTelemetry.Tags.MessageCount, messageCount);
             this._registry.TryRemove(request.SessionKey);
         }
     }

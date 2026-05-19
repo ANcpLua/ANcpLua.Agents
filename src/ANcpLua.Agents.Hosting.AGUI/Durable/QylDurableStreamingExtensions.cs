@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading.Channels;
@@ -79,6 +80,20 @@ public static class QylDurableStreamingExtensions
 
             Channel<AgentResponseUpdate> channel = registry.GetOrCreate(sessionKey);
 
+            using var activity = StreamingTelemetry.ActivitySource.StartActivity(
+                StreamingTelemetry.Spans.Subscribe,
+                ActivityKind.Server);
+            activity?.SetTag(StreamingTelemetry.Tags.SessionKey, sessionKey);
+            activity?.SetTag(StreamingTelemetry.Tags.Transport, StreamingTelemetry.Transports.Sse);
+
+            var transportTag = new KeyValuePair<string, object?>(
+                StreamingTelemetry.Tags.Transport,
+                StreamingTelemetry.Transports.Sse);
+            var sessionTag = new KeyValuePair<string, object?>(
+                StreamingTelemetry.Tags.SessionKey,
+                sessionKey);
+
+            long messageCount = 0;
             try
             {
                 await foreach (var update in channel.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
@@ -86,10 +101,26 @@ public static class QylDurableStreamingExtensions
                     string json = JsonSerializer.Serialize(update);
                     await context.Response.WriteAsync($"data: {json}\n\n", cancellationToken).ConfigureAwait(false);
                     await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
+                    messageCount++;
+                    StreamingTelemetry.MessagesConsumed.Add(1, transportTag, sessionTag);
                 }
+                activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Completed);
+            }
+            catch (OperationCanceledException)
+            {
+                activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Cancelled);
+                activity?.SetStatus(ActivityStatusCode.Error);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Errored);
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                throw;
             }
             finally
             {
+                activity?.SetTag(StreamingTelemetry.Tags.MessageCount, messageCount);
                 registry.TryRemove(sessionKey);
             }
         });

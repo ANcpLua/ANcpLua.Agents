@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ANcpLua.Roslyn.Utilities;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.DurableTask;
@@ -42,26 +43,48 @@ internal sealed class ChannelAgentResponseHandler(DurableAgentStreamRegistry reg
 
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, consumerDisconnect);
 
+        using var activity = StreamingTelemetry.ActivitySource.StartActivity(
+            StreamingTelemetry.Spans.Produce,
+            ActivityKind.Producer);
+        activity?.SetTag(StreamingTelemetry.Tags.SessionKey, sessionKey);
+
+        long messageCount = 0;
         Exception? error = null;
         try
         {
             await foreach (var update in messageStream.WithCancellation(linked.Token).ConfigureAwait(false))
             {
                 await channel.Writer.WriteAsync(update, linked.Token).ConfigureAwait(false);
+                messageCount++;
+                StreamingTelemetry.MessagesProduced.Add(
+                    1,
+                    new KeyValuePair<string, object?>(StreamingTelemetry.Tags.SessionKey, sessionKey));
             }
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Completed);
         }
         catch (OperationCanceledException) when (consumerDisconnect.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
         {
             // Consumer (SSE / gRPC client) disconnected. Stop producing — no one is reading.
             // The orchestration itself is healthy; treat this as a natural drain, not an error.
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.ConsumerDisconnect);
+        }
+        catch (OperationCanceledException oce)
+        {
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Cancelled);
+            activity?.SetStatus(ActivityStatusCode.Error);
+            error = oce;
+            throw;
         }
         catch (Exception ex)
         {
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Errored);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             error = ex;
             throw;
         }
         finally
         {
+            activity?.SetTag(StreamingTelemetry.Tags.MessageCount, messageCount);
             _ = channel.Writer.TryComplete(error);
         }
     }
