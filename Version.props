@@ -69,6 +69,11 @@
     <A2AAspNetCoreVersion>1.0.0-preview2</A2AAspNetCoreVersion>
   </PropertyGroup>
 
+  <PropertyGroup Label="ModelContextProtocol (MCP SDK — modelcontextprotocol/csharp-sdk)">
+    <ModelContextProtocolVersion>1.3.0</ModelContextProtocolVersion>
+    <ModelContextProtocolAspNetCoreVersion>1.3.0</ModelContextProtocolAspNetCoreVersion>
+  </PropertyGroup>
+
   <PropertyGroup Label="LLM Provider SDKs (AgentTesting Conformance/Examples fixtures)">
     <OpenAIVersion>2.10.0</OpenAIVersion>
     <AzureAIOpenAIVersion>2.1.0</AzureAIOpenAIVersion>
