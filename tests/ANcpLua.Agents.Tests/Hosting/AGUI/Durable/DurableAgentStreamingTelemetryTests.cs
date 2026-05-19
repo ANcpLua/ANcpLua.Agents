@@ -103,7 +103,7 @@ public sealed class DurableAgentStreamingTelemetryTests
     {
         var sessionKey = $"agent@telemetry-grpc-cancel-{Guid.NewGuid():N}";
         var registry = new DurableAgentStreamRegistry();
-        _ = registry.GetOrCreate(sessionKey); // create the channel; intentionally never write
+        var writer = registry.GetOrCreate(sessionKey).Writer;
 
         var captured = new List<Activity>();
         using var listener = new ActivityListener
@@ -115,15 +115,23 @@ public sealed class DurableAgentStreamingTelemetryTests
         ActivitySource.AddActivityListener(listener);
 
         using var cts = new CancellationTokenSource();
-        cts.CancelAfter(TimeSpan.FromMilliseconds(50));
+        var streamStarted = new TaskCompletionSource();
+        var recorder = new RecordingServerStreamWriter<AgentUpdateMessage>(streamStarted);
 
         var service = new AgentStreamGrpcService(registry);
-        var act = () => service.Subscribe(
+        var subscribeTask = Task.Run(async () => await service.Subscribe(
             new SubscribeRequest { SessionKey = sessionKey },
-            new RecordingServerStreamWriter<AgentUpdateMessage>(),
-            new FakeServerCallContext(cts.Token));
+            recorder,
+            new FakeServerCallContext(cts.Token)));
 
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        // Write one message to ensure the stream loop has started
+        await writer.WriteAsync(U("trigger"));
+        await streamStarted.Task;
+
+        // Now cancel mid-stream
+        cts.Cancel();
+
+        await subscribeTask.Awaiting(t => t).Should().ThrowAsync<OperationCanceledException>();
 
         var ours = captured.Where(a => (a.GetTagItem(StreamingTelemetry.Tags.SessionId) as string) == sessionKey).ToList();
         var span = ours.Should().ContainSingle().Subject;
@@ -133,9 +141,30 @@ public sealed class DurableAgentStreamingTelemetryTests
 
     private sealed class RecordingServerStreamWriter<T> : IServerStreamWriter<T>
     {
+        private readonly TaskCompletionSource? _firstWriteSignal;
+
+        public RecordingServerStreamWriter(TaskCompletionSource? firstWriteSignal = null)
+        {
+            this._firstWriteSignal = firstWriteSignal;
+        }
+
         public List<T> Messages { get; } = new();
         public WriteOptions? WriteOptions { get; set; }
-        public Task WriteAsync(T message) { this.Messages.Add(message); return Task.CompletedTask; }
+
+        public Task WriteAsync(T message)
+        {
+            this.Messages.Add(message);
+            this._firstWriteSignal?.TrySetResult();
+            return Task.CompletedTask;
+        }
+
+        public Task WriteAsync(T message, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            this.Messages.Add(message);
+            this._firstWriteSignal?.TrySetResult();
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class FakeServerCallContext(CancellationToken token) : ServerCallContext
