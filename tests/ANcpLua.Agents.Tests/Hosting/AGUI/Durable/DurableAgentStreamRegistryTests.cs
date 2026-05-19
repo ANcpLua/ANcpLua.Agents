@@ -177,4 +177,58 @@ public sealed class DurableAgentStreamRegistryTests
 
         act.Should().Throw<ArgumentException>();
     }
+
+    [Fact]
+    public void BoundedChannel_TryWriteReturnsFalse_WhenAtConfiguredCapacity()
+    {
+        // Pins the backpressure contract: a producer cannot blindly fill a channel that no
+        // consumer is draining. TryWrite is the deterministic synchronous probe — WriteAsync
+        // under FullMode=Wait would block, which is correct in production but flaky in tests.
+        var registry = new DurableAgentStreamRegistry(new DurableAgentStreamingOptions
+        {
+            ChannelCapacity = 2,
+        });
+        var writer = registry.GetOrCreate("agent@backpressure-capacity").Writer;
+
+        writer.TryWrite(U("first")).Should().BeTrue();
+        writer.TryWrite(U("second")).Should().BeTrue();
+        writer.TryWrite(U("third")).Should().BeFalse();
+    }
+
+    [Fact]
+    public void BoundedChannel_DropOldestPolicy_RetainsLatestWhenFull()
+    {
+        // Power-user policy: consumer is OK losing intermediate updates as long as the latest
+        // state lands. Verifies the FullMode plumbing actually reaches the underlying channel.
+        var registry = new DurableAgentStreamRegistry(new DurableAgentStreamingOptions
+        {
+            ChannelCapacity = 2,
+            FullMode = System.Threading.Channels.BoundedChannelFullMode.DropOldest,
+        });
+        var channel = registry.GetOrCreate("agent@backpressure-drop");
+
+        channel.Writer.TryWrite(U("oldest")).Should().BeTrue();
+        channel.Writer.TryWrite(U("middle")).Should().BeTrue();
+        channel.Writer.TryWrite(U("newest")).Should().BeTrue(); // succeeds by dropping "oldest"
+
+        channel.Writer.Complete();
+        var drained = new List<string?>();
+        while (channel.Reader.TryRead(out var item))
+        {
+            drained.Add(item.Text);
+        }
+
+        drained.Should().Equal("middle", "newest");
+    }
+
+    [Fact]
+    public void Constructor_ZeroCapacity_ThrowsArgumentOutOfRange()
+    {
+        var act = () => new DurableAgentStreamRegistry(new DurableAgentStreamingOptions
+        {
+            ChannelCapacity = 0,
+        });
+
+        act.Should().Throw<ArgumentOutOfRangeException>();
+    }
 }

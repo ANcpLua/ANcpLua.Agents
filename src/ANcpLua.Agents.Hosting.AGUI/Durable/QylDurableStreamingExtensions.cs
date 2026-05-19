@@ -35,15 +35,25 @@ public static class QylDurableStreamingExtensions
     ///     Registers the <see cref="DurableAgentStreamRegistry"/> and a side-channel
     ///     <see cref="IAgentResponseHandler"/> implementation. Call alongside <c>AddQylDurableAgents</c>.
     /// </summary>
+    /// <param name="services">Target DI container.</param>
+    /// <param name="configure">
+    ///     Optional callback to override <see cref="DurableAgentStreamingOptions"/>. Defaults apply
+    ///     when omitted (capacity 100, FullMode=Wait — backpressure, no message loss).
+    /// </param>
     /// <remarks>
     ///     Adds Grpc.AspNetCore services as well so callers can later opt in to the
     ///     <see cref="MapQylDurableAgentStreamGrpc"/> server-streaming endpoint without a second
     ///     wiring step. The gRPC server-side glue has no runtime cost when no gRPC endpoint is mapped.
     /// </remarks>
-    public static IServiceCollection AddQylDurableAgentStreaming(this IServiceCollection services)
+    public static IServiceCollection AddQylDurableAgentStreaming(
+        this IServiceCollection services,
+        Action<DurableAgentStreamingOptions>? configure = null)
     {
         Guard.NotNull(services);
 
+        var options = new DurableAgentStreamingOptions();
+        configure?.Invoke(options);
+        services.AddSingleton(options);
         services.AddSingleton<DurableAgentStreamRegistry>();
         services.AddSingleton<IAgentResponseHandler, ChannelAgentResponseHandler>();
         services.AddGrpc();

@@ -64,7 +64,24 @@ namespace ANcpLua.Agents.Hosting.AGUI.Durable;
 /// </remarks>
 public sealed class DurableAgentStreamRegistry
 {
+    private readonly DurableAgentStreamingOptions _options;
     private readonly ConcurrentDictionary<string, SessionState> _sessions = new(StringComparer.Ordinal);
+
+    /// <summary>
+    ///     Constructs a registry. When no <paramref name="options"/> is supplied the defaults
+    ///     from <see cref="DurableAgentStreamingOptions"/> apply (capacity 100, FullMode=Wait).
+    /// </summary>
+    public DurableAgentStreamRegistry(DurableAgentStreamingOptions? options = null)
+    {
+        this._options = options ?? new DurableAgentStreamingOptions();
+        if (this._options.ChannelCapacity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(options),
+                this._options.ChannelCapacity,
+                $"{nameof(DurableAgentStreamingOptions.ChannelCapacity)} must be positive.");
+        }
+    }
 
     /// <summary>
     ///     Consumer-side accessor. Returns the channel for <paramref name="sessionKey"/>, creating
@@ -136,13 +153,14 @@ public sealed class DurableAgentStreamRegistry
         return actual;
     }
 
-    private static SessionState CreateState() => new(
-        Channel.CreateUnbounded<AgentResponseUpdate>(
-            new UnboundedChannelOptions
+    private SessionState CreateState() => new(
+        Channel.CreateBounded<AgentResponseUpdate>(
+            new BoundedChannelOptions(this._options.ChannelCapacity)
             {
                 SingleReader = true,
                 SingleWriter = true,
                 AllowSynchronousContinuations = false,
+                FullMode = this._options.FullMode,
             }),
         new CancellationTokenSource());
 
