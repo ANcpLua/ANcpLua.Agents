@@ -10,7 +10,7 @@ namespace ANcpLua.Agents;
 ///     caller wants both the per-update observation surface (UI streaming, logging,
 ///     assertions) and the final aggregated response in a single pass.
 /// </summary>
-public static class AgentResponseExtensions
+public static class AgentResponseUpdateExtensions
 {
     /// <summary>
     ///     Drains <paramref name="updates"/>, invoking <paramref name="onUpdate"/> for each

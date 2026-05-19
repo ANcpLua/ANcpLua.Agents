@@ -4,7 +4,7 @@ using Microsoft.Extensions.AI;
 
 namespace ANcpLua.Agents.Tests.Instrumentation;
 
-public sealed class AgentResponseExtensionsAggregateAsyncTests
+public sealed class AgentResponseUpdateExtensionsAggregateAsyncTests
 {
     private static AgentResponseUpdate U(string text) => new(ChatRole.Assistant, text);
 
