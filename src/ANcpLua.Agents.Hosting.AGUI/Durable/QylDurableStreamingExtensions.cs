@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Grpc.AspNetCore.Server;
 
 namespace ANcpLua.Agents.Hosting.AGUI.Durable;
@@ -53,9 +54,9 @@ public static class QylDurableStreamingExtensions
 
         var options = new DurableAgentStreamingOptions();
         configure?.Invoke(options);
-        services.AddSingleton(options);
-        services.AddSingleton<DurableAgentStreamRegistry>();
-        services.AddSingleton<IAgentResponseHandler, ChannelAgentResponseHandler>();
+        services.TryAddSingleton(options);
+        services.TryAddSingleton<DurableAgentStreamRegistry>();
+        services.TryAddSingleton<IAgentResponseHandler, ChannelAgentResponseHandler>();
         services.AddGrpc();
         return services;
     }
