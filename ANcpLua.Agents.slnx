@@ -6,6 +6,7 @@
         <Project Path="src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj" />
         <Project Path="src/ANcpLua.Agents.Hosting.Azure/ANcpLua.Agents.Hosting.Azure.csproj" />
         <Project Path="src/ANcpLua.Agents.Hosting.Foundry/ANcpLua.Agents.Hosting.Foundry.csproj" />
+        <Project Path="src/ANcpLua.Agents.Hosting.GoogleGemini/ANcpLua.Agents.Hosting.GoogleGemini.csproj" />
         <Project Path="src/ANcpLua.Agents.Hosting.Anthropic/ANcpLua.Agents.Hosting.Anthropic.csproj" />
         <Project Path="src/ANcpLua.Agents.Hosting.DevUI/ANcpLua.Agents.Hosting.DevUI.csproj" />
         <Project Path="src/ANcpLua.Agents.Hosting.AGUI/ANcpLua.Agents.Hosting.AGUI.csproj" />

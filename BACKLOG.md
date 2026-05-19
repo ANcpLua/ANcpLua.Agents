@@ -89,20 +89,7 @@ src/ANcpLua.Agents.Imaging/
 
 **Required packages:** `OpenAI`, `Google.GenAI`, plus Grok via OpenAI-compatible image client.
 
-## 7. `ANcpLua.Agents.Hosting.GoogleGemini` (cheatsheet item 31)
-
-**Why deferred:** Gemini tool surface is provider-specific (`Tool.CodeExecution`, `Tool.GoogleMaps`, `Tool.GoogleSearch`) and requires the `RawRepresentationFactory` escape hatch. Wrap with `WithQylGeminiX` extensions.
-
-**Suggested layout:**
-```
-src/ANcpLua.Agents.Hosting.GoogleGemini/
-  Facades/QylGeminiToolExtensions.cs   // WithQylGeminiCodeExecution, WithQylGeminiMaps, WithQylGeminiSearch
-  Facades/QylGeminiAgentExtensions.cs  // AsQylGeminiAgent over the official Gemini SDK
-```
-
-**Required packages:** `Google.GenAI` (already pinned).
-
-## 8. `ANcpLua.Agents.Hosting.Onnx` (cheatsheet item 41a)
+## 7. `ANcpLua.Agents.Hosting.Onnx` (cheatsheet item 41a)
 
 **Why deferred:** local-inference path parallel to `Hosting.BitNet`; small but separate concern. Wraps `OnnxRuntimeGenAIChatClient`.
 
@@ -114,7 +101,7 @@ src/ANcpLua.Agents.Hosting.Onnx/
 
 **Required packages:** `Microsoft.ML.OnnxRuntimeGenAI`.
 
-## 9. `ANcpLua.Agents.Hosting.Hyperlight` (cheatsheet item 41b)
+## 8. `ANcpLua.Agents.Hosting.Hyperlight` (cheatsheet item 41b)
 
 **Why deferred:** sandboxed code-act provider; pairs with `QylConditionalToolProvider` and the existing `AIContextProvider` runtime primitive — but the Hyperlight SDK is itself preview-stage.
 
@@ -126,7 +113,7 @@ src/ANcpLua.Agents.Hosting.Hyperlight/
 
 **Required packages:** `Microsoft.Agents.AI.Hyperlight`.
 
-## 10. `ANcpLua.Agents.Hosting.{Bedrock, Mistral, Ollama, GitHubModels}` (cheatsheet item 34)
+## 9. `ANcpLua.Agents.Hosting.{Bedrock, Mistral, Ollama, GitHubModels}` (cheatsheet item 34)
 
 **Why deferred:** four thin facades (each ~100 LOC). The cheatsheet verified that Cerebras, Cohere, Groq, HuggingFace, OpenRouter, XAIGrok, and FoundryLocal are already covered by `AgentChatClientFactory`'s OpenAI-compatible base-URL swap — only these four need a per-provider facade because they have distinct SDK entry points.
 

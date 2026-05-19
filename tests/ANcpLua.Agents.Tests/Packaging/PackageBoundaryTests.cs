@@ -24,6 +24,7 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Hosting.ServiceDefaults",
         "ANcpLua.Agents.Hosting.A2A",
         "ANcpLua.Agents.Hosting.AGUI",
+        "ANcpLua.Agents.Hosting.GoogleGemini",
         "ANcpLua.Agents.Mcp",
         "ANcpLua.Agents.Mcp.Hosting",
     ];
@@ -34,8 +35,10 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Workflows",
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
-        // No prerelease MAF deps (ServiceDefaults is MAF-free; Mcp + Mcp.Hosting pin only stable MAF + ModelContextProtocol).
+        // No prerelease MAF deps (ServiceDefaults is MAF-free; Mcp + Mcp.Hosting pin only stable MAF + ModelContextProtocol;
+        // Hosting.GoogleGemini pins only stable MAF + the stable Google.GenAI SDK).
         "ANcpLua.Agents.Hosting.ServiceDefaults",
+        "ANcpLua.Agents.Hosting.GoogleGemini",
         "ANcpLua.Agents.Mcp",
         "ANcpLua.Agents.Mcp.Hosting",
     ];
@@ -78,6 +81,7 @@ public sealed partial class PackageBoundaryTests
             "Microsoft.Agents.AI.AGUI",
             "Microsoft.Agents.AI.Hosting.AGUI.AspNetCore",
         ],
+        ["ANcpLua.Agents.Hosting.GoogleGemini"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Mcp"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Mcp.Hosting"] = [],
     };
