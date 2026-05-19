@@ -13,8 +13,9 @@ namespace ANcpLua.Agents.Mcp;
 /// <remarks>
 /// <para>
 /// The injector is invoked from the call-tool request pipeline registered by
-/// <see cref="ANcpLua.Agents.Mcp.Hosting.Filters.QylMcpScopeInjectionFilter.WithQylScopeInjection{TScope}"/>.
-/// It runs before the inner handler dispatches to the actual tool method, so a
+/// the <c>WithQylScopeInjection&lt;TScope&gt;</c> extension on
+/// <c>IMcpServerBuilder</c> (shipped in <c>ANcpLua.Agents.Mcp.Hosting</c>). It
+/// runs before the inner handler dispatches to the actual tool method, so a
 /// returned dictionary becomes the argument bag the tool sees.
 /// </para>
 /// <para>
@@ -26,10 +27,10 @@ namespace ANcpLua.Agents.Mcp;
 /// <para>
 /// Returning the same instance that was supplied is allowed and encouraged
 /// when in-place mutation is cheaper than reallocation. Returning
-/// <see langword="null"/> is allowed when the resolved <paramref name="scope"/>
-/// has nothing to inject and the original argument bag was also
-/// <see langword="null"/>; callers MUST treat <see langword="null"/> and an
-/// empty dictionary equivalently.
+/// <see langword="null"/> is allowed when the resolved scope has nothing to
+/// inject and the original argument bag was also <see langword="null"/>;
+/// callers MUST treat <see langword="null"/> and an empty dictionary
+/// equivalently.
 /// </para>
 /// </remarks>
 public interface IQylConstraintInjector<in TScope>
