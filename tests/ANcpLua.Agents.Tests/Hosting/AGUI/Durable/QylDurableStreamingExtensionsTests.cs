@@ -67,10 +67,10 @@ public sealed class QylDurableStreamingExtensionsTests
 
         using var sp = services.BuildServiceProvider(validateScopes: true);
 
+        // TryAddSingleton ensures exactly one descriptor is registered even when called twice.
+        // Two descriptors would mean two independent registry instances — a split-brain bug.
         var registries = sp.GetServices<DurableAgentStreamRegistry>().ToArray();
-        // Multiple descriptors but a single resolved instance via singleton semantics — the
-        // last-registered descriptor wins for GetRequiredService, but all descriptors share
-        // the same instance because Singleton is keyed by the impl type identity here.
-        sp.GetRequiredService<DurableAgentStreamRegistry>().Should().BeSameAs(registries.Last());
+        registries.Should().HaveCount(1);
+        sp.GetRequiredService<DurableAgentStreamRegistry>().Should().BeSameAs(registries[0]);
     }
 }

@@ -115,15 +115,18 @@ public sealed class DurableAgentStreamingTelemetryTests
         ActivitySource.AddActivityListener(listener);
 
         using var cts = new CancellationTokenSource();
-        cts.CancelAfter(TimeSpan.FromMilliseconds(50));
 
         var service = new AgentStreamGrpcService(registry);
-        var act = () => service.Subscribe(
+        var subscribeTask = service.Subscribe(
             new SubscribeRequest { SessionKey = sessionKey },
             new RecordingServerStreamWriter<AgentUpdateMessage>(),
             new FakeServerCallContext(cts.Token));
 
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        // Cancel synchronously after Subscribe is already awaiting the empty channel —
+        // avoids a CancelAfter race that can flake on slow CI machines.
+        cts.Cancel();
+
+        await subscribeTask.Invoking(async t => await t).Should().ThrowAsync<OperationCanceledException>();
 
         var ours = captured.Where(a => (a.GetTagItem(StreamingTelemetry.Tags.SessionId) as string) == sessionKey).ToList();
         var span = ours.Should().ContainSingle().Subject;
@@ -136,6 +139,13 @@ public sealed class DurableAgentStreamingTelemetryTests
         public List<T> Messages { get; } = new();
         public WriteOptions? WriteOptions { get; set; }
         public Task WriteAsync(T message) { this.Messages.Add(message); return Task.CompletedTask; }
+
+        public Task WriteAsync(T message, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            this.Messages.Add(message);
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class FakeServerCallContext(CancellationToken token) : ServerCallContext

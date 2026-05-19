@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Grpc.AspNetCore.Server;
 
 namespace ANcpLua.Agents.Hosting.AGUI.Durable;
@@ -35,27 +36,17 @@ public static class QylDurableStreamingExtensions
     ///     Registers the <see cref="DurableAgentStreamRegistry"/> and a side-channel
     ///     <see cref="IAgentResponseHandler"/> implementation. Call alongside <c>AddQylDurableAgents</c>.
     /// </summary>
-    /// <param name="services">Target DI container.</param>
-    /// <param name="configure">
-    ///     Optional callback to override <see cref="DurableAgentStreamingOptions"/>. Defaults apply
-    ///     when omitted (capacity 100, FullMode=Wait — backpressure, no message loss).
-    /// </param>
     /// <remarks>
     ///     Adds Grpc.AspNetCore services as well so callers can later opt in to the
     ///     <see cref="MapQylDurableAgentStreamGrpc"/> server-streaming endpoint without a second
     ///     wiring step. The gRPC server-side glue has no runtime cost when no gRPC endpoint is mapped.
     /// </remarks>
-    public static IServiceCollection AddQylDurableAgentStreaming(
-        this IServiceCollection services,
-        Action<DurableAgentStreamingOptions>? configure = null)
+    public static IServiceCollection AddQylDurableAgentStreaming(this IServiceCollection services)
     {
         Guard.NotNull(services);
 
-        var options = new DurableAgentStreamingOptions();
-        configure?.Invoke(options);
-        services.AddSingleton(options);
-        services.AddSingleton<DurableAgentStreamRegistry>();
-        services.AddSingleton<IAgentResponseHandler, ChannelAgentResponseHandler>();
+        services.TryAddSingleton<DurableAgentStreamRegistry>();
+        services.TryAddSingleton<IAgentResponseHandler, ChannelAgentResponseHandler>();
         services.AddGrpc();
         return services;
     }
@@ -81,7 +72,6 @@ public static class QylDurableStreamingExtensions
         return endpoints.MapGet(pattern, async (
             string sessionKey,
             DurableAgentStreamRegistry registry,
-            DurableAgentStreamingOptions options,
             HttpContext context,
             CancellationToken cancellationToken) =>
         {
@@ -104,46 +94,16 @@ public static class QylDurableStreamingExtensions
                 StreamingTelemetry.Tags.SessionId,
                 sessionKey);
 
-            var heartbeatInterval = options.SseHeartbeatInterval;
-            var heartbeatsEnabled = heartbeatInterval > TimeSpan.Zero && heartbeatInterval != Timeout.InfiniteTimeSpan;
-
             long messageCount = 0;
             try
             {
-                while (true)
+                await foreach (var update in channel.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
                 {
-                    Task<bool> waitToRead = channel.Reader.WaitToReadAsync(cancellationToken).AsTask();
-                    Task winner;
-                    if (heartbeatsEnabled)
-                    {
-                        Task heartbeat = Task.Delay(heartbeatInterval, cancellationToken);
-                        winner = await Task.WhenAny(waitToRead, heartbeat).ConfigureAwait(false);
-                        if (winner == heartbeat)
-                        {
-                            // SSE comment frame — clients ignore it, proxies see traffic.
-                            await context.Response.WriteAsync(": keepalive\n\n", cancellationToken).ConfigureAwait(false);
-                            await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        winner = waitToRead;
-                    }
-
-                    if (!await ((Task<bool>)winner).ConfigureAwait(false))
-                    {
-                        break; // channel completed
-                    }
-
-                    while (channel.Reader.TryRead(out var update))
-                    {
-                        string json = JsonSerializer.Serialize(update);
-                        await context.Response.WriteAsync($"data: {json}\n\n", cancellationToken).ConfigureAwait(false);
-                        await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
-                        messageCount++;
-                        StreamingTelemetry.MessagesConsumed.Add(1, transportTag, sessionTag);
-                    }
+                    string json = JsonSerializer.Serialize(update);
+                    await context.Response.WriteAsync($"data: {json}\n\n", cancellationToken).ConfigureAwait(false);
+                    await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
+                    messageCount++;
+                    StreamingTelemetry.MessagesConsumed.Add(1, transportTag, sessionTag);
                 }
                 activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Completed);
             }
