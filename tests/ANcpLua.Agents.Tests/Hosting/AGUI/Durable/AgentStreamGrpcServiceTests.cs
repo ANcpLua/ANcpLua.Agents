@@ -96,15 +96,16 @@ public sealed class AgentStreamGrpcServiceTests
         // Intentionally do NOT complete the writer — exit must be driven by cancellation only.
 
         using var cts = new CancellationTokenSource();
-        cts.CancelAfter(TimeSpan.FromMilliseconds(50));
 
         var service = new AgentStreamGrpcService(registry);
-        var act = () => service.Subscribe(
+        var subscribeTask = service.Subscribe(
             new SubscribeRequest { SessionKey = "agent@caller-cancel" },
             new FakeServerStreamWriter<AgentUpdateMessage>(),
             CallContext(cts.Token));
 
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        cts.Cancel();
+
+        await subscribeTask.Invoking(async t => await t).Should().ThrowAsync<OperationCanceledException>();
         registry.GetOrCreate("agent@caller-cancel").Should().NotBeSameAs(firstChannel);
     }
 
@@ -112,7 +113,7 @@ public sealed class AgentStreamGrpcServiceTests
     public async Task Subscribe_NullRequest_ThrowsArgumentNull()
     {
         var service = new AgentStreamGrpcService(new DurableAgentStreamRegistry());
-        var act = () => service.Subscribe(null!, new FakeServerStreamWriter<AgentUpdateMessage>(), CallContext(CancellationToken.None));
+        var act = () => service.Subscribe(null!, new FakeServerStreamWriter<AgentUpdateMessage>(), CallContext(CancellationToken.None)); // intentionally passing null to exercise ArgumentNullException guard path
         await act.Should().ThrowAsync<ArgumentNullException>();
     }
 

@@ -50,7 +50,7 @@ public sealed class QylDurableStreamingExtensionsTests
     [Fact]
     public void AddQylDurableAgentStreaming_NullServices_ThrowsArgumentNull()
     {
-        var act = () => QylDurableStreamingExtensions.AddQylDurableAgentStreaming(null!);
+        var act = () => QylDurableStreamingExtensions.AddQylDurableAgentStreaming(null!); // intentional null to assert argument validation/exception handling
 
         act.Should().Throw<ArgumentNullException>();
     }
