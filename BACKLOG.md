@@ -144,4 +144,3 @@ src/ANcpLua.Agents.Hosting.GitHubModels/Facades/QylGitHubModelsAgentExtensions.c
 
 - **Testing/History/QylChatReducers.cs** (cheatsheet item 14) — `IChatReducer` test doubles (`MessageCountingChatReducer` faker, `SummarizingChatReducer` recordable). Skipped for minimal-code; the real reducers ship in MEAI already.
 - **Testing/Conformance/StructuredOutputExplicitSchemaTests.cs** — conformance row matching the new `RunQylWithSchemaAsync<T>` facade.
-- **Streaming aggregation** (cheatsheet item 38) — `AggregateQylAsync(this IAsyncEnumerable<AgentResponseUpdate>, ILogger)` was scoped out for minimal-code; MAF has no `ToAgentResponse` aggregator yet, so a clean implementation has to assemble manually.
