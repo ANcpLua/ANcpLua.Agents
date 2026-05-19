@@ -27,6 +27,7 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Hosting.GoogleGemini",
         "ANcpLua.Agents.Mcp",
         "ANcpLua.Agents.Mcp.Hosting",
+        "ANcpLua.Agents.DataIngestion",
     ];
 
     private static readonly HashSet<string> s_stablePackageIds =
@@ -36,11 +37,13 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
         // No prerelease MAF deps (ServiceDefaults is MAF-free; Mcp + Mcp.Hosting pin only stable MAF + ModelContextProtocol;
-        // Hosting.GoogleGemini pins only stable MAF + the stable Google.GenAI SDK).
+        // Hosting.GoogleGemini pins only stable MAF + the stable Google.GenAI SDK; DataIngestion pins stable MAF + preview
+        // Microsoft.Extensions.DataIngestion which is non-MAF and out of scope of the MAF stability check).
         "ANcpLua.Agents.Hosting.ServiceDefaults",
         "ANcpLua.Agents.Hosting.GoogleGemini",
         "ANcpLua.Agents.Mcp",
         "ANcpLua.Agents.Mcp.Hosting",
+        "ANcpLua.Agents.DataIngestion",
     ];
 
     private static readonly HashSet<string> s_nonStablePackageIds = s_expectedPackageIds.Except(s_stablePackageIds, StringComparer.Ordinal).ToHashSet(StringComparer.Ordinal);
@@ -79,11 +82,13 @@ public sealed partial class PackageBoundaryTests
         [
             "Microsoft.Agents.AI",
             "Microsoft.Agents.AI.AGUI",
+            "Microsoft.Agents.AI.DurableTask",
             "Microsoft.Agents.AI.Hosting.AGUI.AspNetCore",
         ],
         ["ANcpLua.Agents.Hosting.GoogleGemini"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Mcp"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Mcp.Hosting"] = [],
+        ["ANcpLua.Agents.DataIngestion"] = ["Microsoft.Agents.AI"],
     };
 
     [Fact]

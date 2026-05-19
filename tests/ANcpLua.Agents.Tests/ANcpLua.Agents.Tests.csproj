@@ -24,8 +24,13 @@
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.GoogleGemini\ANcpLua.Agents.Hosting.GoogleGemini.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.OpenAI\ANcpLua.Agents.Hosting.OpenAI.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Mcp\ANcpLua.Agents.Mcp.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.DataIngestion\ANcpLua.Agents.DataIngestion.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing.Workflows\ANcpLua.Agents.Testing.Workflows.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Workflows\ANcpLua.Agents.Workflows.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup Label="DataIngestion tests need an InMemory vector store fixture">
+        <PackageReference Include="Microsoft.SemanticKernel.Connectors.InMemory"/>
     </ItemGroup>
 </Project>
