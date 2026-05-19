@@ -1,0 +1,20 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>ANcpLua.Agents.Hosting.ServiceDefaults</RootNamespace>
+        <PackageId>ANcpLua.Agents.Hosting.ServiceDefaults</PackageId>
+        <Description>Aspire-style service defaults pre-tuned for Microsoft Agent Framework ActivitySources (Microsoft.Agents.AI, Experimental.Microsoft.Extensions.AI) plus standard health endpoints.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>maf;agents;microsoft-agents;aspire;servicedefaults;opentelemetry;health</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
+        <PackageReference Include="OpenTelemetry.Api"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+</Project>

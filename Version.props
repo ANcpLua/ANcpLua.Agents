@@ -24,7 +24,7 @@
     <MicrosoftAgentsAIVersion>1.6.1</MicrosoftAgentsAIVersion>
     <MicrosoftAgentsAIWorkflowsVersion>1.6.1</MicrosoftAgentsAIWorkflowsVersion>
     <MicrosoftAgentsAIOpenAIVersion>1.6.1</MicrosoftAgentsAIOpenAIVersion>
-    <!-- Preview (no stable exists): Foundry, Hosting, AzureFunctions, Foundry.Hosting, Anthropic, DevUI, Harness -->
+    <!-- Preview (no stable exists): Foundry, Hosting, AzureFunctions, Foundry.Hosting, Anthropic, DevUI, Harness, AGUI, A2A -->
     <MicrosoftAgentsAIFoundryVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIFoundryVersion>
     <MicrosoftAgentsAIHostingVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingVersion>
     <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
@@ -32,6 +32,11 @@
     <MicrosoftAgentsAIAnthropicVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIAnthropicVersion>
     <MicrosoftAgentsAIDevUIVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIDevUIVersion>
     <MicrosoftAgentsAIHarnessVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHarnessVersion>
+    <MicrosoftAgentsAIAGUIVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIAGUIVersion>
+    <MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>
+    <MicrosoftAgentsAIA2AVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIA2AVersion>
+    <MicrosoftAgentsAIHostingA2AVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingA2AVersion>
+    <MicrosoftAgentsAIHostingA2AAspNetCoreVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingA2AAspNetCoreVersion>
     <!-- rc1 train: Declarative workflows -->
     <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.6.1-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
     <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.6.1-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
@@ -57,6 +62,11 @@
     <MicrosoftExtensionsAIAbstractionsVersion>10.5.2</MicrosoftExtensionsAIAbstractionsVersion>
     <MicrosoftExtensionsAIOpenAIVersion>10.5.2</MicrosoftExtensionsAIOpenAIVersion>
     <MicrosoftBclAsyncInterfacesVersion>10.0.7</MicrosoftBclAsyncInterfacesVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="A2A (Agent2Agent protocol SDK — a2aproject/a2a-dotnet)">
+    <A2AVersion>1.0.0-preview2</A2AVersion>
+    <A2AAspNetCoreVersion>1.0.0-preview2</A2AAspNetCoreVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="LLM Provider SDKs (AgentTesting Conformance/Examples fixtures)">

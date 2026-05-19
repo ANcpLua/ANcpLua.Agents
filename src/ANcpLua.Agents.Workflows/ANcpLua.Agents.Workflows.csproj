@@ -5,6 +5,8 @@
         <Description>Workflow facades and execution helpers for Microsoft Agent Framework consumers.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>maf;agents;microsoft-agents;workflows;helpers</PackageTags>
+        <!-- Mirrors upstream MAF experimental API diagnostics; HandoffWorkflowBuilder is MAAIW001-tagged. -->
+        <NoWarn>$(NoWarn);MAAIW001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

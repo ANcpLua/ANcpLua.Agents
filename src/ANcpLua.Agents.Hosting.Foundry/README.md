@@ -4,8 +4,8 @@ Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing
 
 Preview-channel Qyl-prefixed facades over Microsoft Agent Framework Foundry hosted-agent support.
 
-Compatible with: Microsoft.Agents.AI 1.4.x
-Tested against: Microsoft.Agents.AI 1.4.0
+Compatible with: Microsoft.Agents.AI 1.6.x
+Tested against: Microsoft.Agents.AI 1.6.1
 Capability tested against: Microsoft.Agents.AI.Foundry.Hosting 1.4.0-preview.260505.1
 
 Includes the hosted-agent registration, toolbox registration, response mapping,

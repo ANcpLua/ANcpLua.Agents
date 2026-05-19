@@ -21,6 +21,11 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Foundry",
         "ANcpLua.Agents.Hosting.OpenAI",
         "ANcpLua.Agents.Hosting.BitNet",
+        "ANcpLua.Agents.Hosting.ServiceDefaults",
+        "ANcpLua.Agents.Hosting.A2A",
+        "ANcpLua.Agents.Hosting.AGUI",
+        "ANcpLua.Agents.Mcp",
+        "ANcpLua.Agents.Mcp.Hosting",
     ];
 
     private static readonly HashSet<string> s_stablePackageIds =
@@ -29,6 +34,10 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Workflows",
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
+        // No prerelease MAF deps (ServiceDefaults is MAF-free; Mcp + Mcp.Hosting pin only stable MAF + ModelContextProtocol).
+        "ANcpLua.Agents.Hosting.ServiceDefaults",
+        "ANcpLua.Agents.Mcp",
+        "ANcpLua.Agents.Mcp.Hosting",
     ];
 
     private static readonly HashSet<string> s_nonStablePackageIds = s_expectedPackageIds.Except(s_stablePackageIds, StringComparer.Ordinal).ToHashSet(StringComparer.Ordinal);
@@ -55,6 +64,22 @@ public sealed partial class PackageBoundaryTests
             "Microsoft.Agents.AI.Hosting.OpenAI",
         ],
         ["ANcpLua.Agents.Hosting.BitNet"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Hosting"],
+        ["ANcpLua.Agents.Hosting.ServiceDefaults"] = [],
+        ["ANcpLua.Agents.Hosting.A2A"] =
+        [
+            "Microsoft.Agents.AI",
+            "Microsoft.Agents.AI.A2A",
+            "Microsoft.Agents.AI.Hosting.A2A",
+            "Microsoft.Agents.AI.Hosting.A2A.AspNetCore",
+        ],
+        ["ANcpLua.Agents.Hosting.AGUI"] =
+        [
+            "Microsoft.Agents.AI",
+            "Microsoft.Agents.AI.AGUI",
+            "Microsoft.Agents.AI.Hosting.AGUI.AspNetCore",
+        ],
+        ["ANcpLua.Agents.Mcp"] = ["Microsoft.Agents.AI"],
+        ["ANcpLua.Agents.Mcp.Hosting"] = [],
     };
 
     [Fact]
@@ -176,8 +201,8 @@ public sealed partial class PackageBoundaryTests
 
             var readme = File.ReadAllText(readmePath);
             readme.Should().Contain("Consumer toolkit for Microsoft Agent Framework");
-            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.4.x");
-            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.4.0");
+            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.6.x");
+            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.6.1");
         }
     }
 

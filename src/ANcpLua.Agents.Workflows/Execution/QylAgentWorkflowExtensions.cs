@@ -62,6 +62,39 @@ public static class QylAgentWorkflowExtensions
     }
 
     /// <summary>
+    /// Builds a handoff workflow rooted at <paramref name="rootAgent"/>. The
+    /// <paramref name="configure"/> callback receives the underlying
+    /// <see cref="HandoffWorkflowBuilder"/> to register
+    /// <c>WithHandoffs(source, [targets])</c> / <c>WithHandoff(source, target, reason)</c> /
+    /// <c>WithHandoffInstructions</c> / <c>EnableReturnToPrevious</c>.
+    /// Completes the 3-of-3 first-class orchestration kinds (Sequential ✓, Concurrent ✓, Handoff ✓).
+    /// </summary>
+    public static Workflow BuildQylHandoff(
+        this AIAgent rootAgent,
+        Action<HandoffWorkflowBuilder> configure)
+    {
+        Guard.NotNull(rootAgent);
+        Guard.NotNull(configure);
+
+        var builder = AgentWorkflowBuilder.CreateHandoffBuilderWith(rootAgent);
+        configure(builder);
+        return builder.Build();
+    }
+
+    /// <summary>
+    /// Wraps a handoff workflow as an <see cref="AIAgent"/> with the supplied
+    /// <paramref name="name"/>, ready to compose into outer pipelines or expose as a tool.
+    /// </summary>
+    public static AIAgent AsQylHandoffAgent(
+        this AIAgent rootAgent,
+        string name,
+        Action<HandoffWorkflowBuilder> configure)
+    {
+        Guard.NotNullOrWhiteSpace(name);
+        return rootAgent.BuildQylHandoff(configure).AsAIAgent(name: name);
+    }
+
+    /// <summary>
     /// Wraps a sequential workflow as an agent.
     /// </summary>
     /// <param name="agents">The agents to run in order.</param>

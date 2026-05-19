@@ -1,0 +1,27 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>ANcpLua.Agents.Hosting.A2A</RootNamespace>
+        <PackageId>ANcpLua.Agents.Hosting.A2A</PackageId>
+        <Description>Preview-channel Agent2Agent protocol hosting facades for Microsoft Agent Framework consumers.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>maf;agents;microsoft-agents;a2a;agent2agent;hosting;preview</PackageTags>
+        <!-- Mirrors upstream MAF experimental API diagnostics for the A2A hosting surface. -->
+        <NoWarn>$(NoWarn);MEAI001;MAAI001</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
+        <PackageReference Include="Microsoft.Agents.AI"/>
+        <PackageReference Include="Microsoft.Agents.AI.A2A"/>
+        <PackageReference Include="Microsoft.Agents.AI.Hosting.A2A"/>
+        <PackageReference Include="Microsoft.Agents.AI.Hosting.A2A.AspNetCore"/>
+        <PackageReference Include="A2A"/>
+        <PackageReference Include="A2A.AspNetCore"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+</Project>

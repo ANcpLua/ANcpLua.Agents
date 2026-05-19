@@ -1,5 +1,6 @@
 ﻿using ANcpLua.Roslyn.Utilities;
 using Azure.AI.Projects;
+using Azure.AI.Projects.Agents;
 using Azure.Core;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Foundry;
@@ -53,6 +54,51 @@ public static class QylFoundryAgentExtensions
             options,
             clientFactory,
             loggerFactory,
+            services);
+    }
+
+    /// <summary>
+    ///     Wraps an already-created server-side <see cref="ProjectsAgentVersion"/> as a Qyl
+    ///     <see cref="ChatClientAgent"/>. The versioned-agent track (Nov 2025 NuGet) keeps
+    ///     definition state in Foundry; this overload pairs that with the in-process Qyl surface.
+    /// </summary>
+    public static FoundryAgent AsQylVersionedAIAgent(
+        this AIProjectClient projectClient,
+        ProjectsAgentVersion version,
+        IList<AITool>? tools = null,
+        Func<IChatClient, IChatClient>? clientFactory = null,
+        IServiceProvider? services = null)
+    {
+        Guard.NotNull(projectClient);
+        Guard.NotNull(version);
+
+        return AzureAIProjectChatClientExtensions.AsAIAgent(
+            projectClient,
+            version,
+            tools,
+            clientFactory,
+            services);
+    }
+
+    /// <summary>
+    ///     Sibling of <see cref="AsQylVersionedAIAgent(AIProjectClient, ProjectsAgentVersion, IList{AITool}?, Func{IChatClient, IChatClient}?, IServiceProvider?)"/>
+    ///     that takes a <see cref="ProjectsAgentRecord"/> (the lightweight discovery shape) instead.
+    /// </summary>
+    public static FoundryAgent AsQylVersionedAIAgent(
+        this AIProjectClient projectClient,
+        ProjectsAgentRecord record,
+        IList<AITool>? tools = null,
+        Func<IChatClient, IChatClient>? clientFactory = null,
+        IServiceProvider? services = null)
+    {
+        Guard.NotNull(projectClient);
+        Guard.NotNull(record);
+
+        return AzureAIProjectChatClientExtensions.AsAIAgent(
+            projectClient,
+            record,
+            tools,
+            clientFactory,
             services);
     }
 

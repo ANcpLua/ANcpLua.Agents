@@ -27,6 +27,11 @@
     <PackageVersion Include="Microsoft.Agents.AI.DevUI" Version="$(MicrosoftAgentsAIDevUIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.DurableTask" Version="$(MicrosoftAgentsAIDurableTaskVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Harness" Version="$(MicrosoftAgentsAIHarnessVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.AGUI" Version="$(MicrosoftAgentsAIAGUIVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore" Version="$(MicrosoftAgentsAIHostingAGUIAspNetCoreVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.A2A" Version="$(MicrosoftAgentsAIA2AVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Hosting.A2A" Version="$(MicrosoftAgentsAIHostingA2AVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Hosting.A2A.AspNetCore" Version="$(MicrosoftAgentsAIHostingA2AAspNetCoreVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="Microsoft.DurableTask (host-agnostic worker + client; gRPC sidecar backend)">
@@ -46,6 +51,11 @@
     <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="$(MicrosoftExtensionsAIAbstractionsVersion)"/>
     <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="$(MicrosoftExtensionsAIOpenAIVersion)"/>
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(MicrosoftBclAsyncInterfacesVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="A2A (Agent2Agent protocol SDK — a2aproject/a2a-dotnet)">
+    <PackageVersion Include="A2A" Version="$(A2AVersion)"/>
+    <PackageVersion Include="A2A.AspNetCore" Version="$(A2AAspNetCoreVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="LLM Providers (Conformance fixtures)">

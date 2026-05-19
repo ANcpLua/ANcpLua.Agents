@@ -17,6 +17,11 @@
         <PackageReference Include="Microsoft.Agents.AI.Hosting.OpenAI"/>
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI"/>
         <PackageReference Include="OpenAI"/>
+        <PackageReference Include="Azure.AI.OpenAI"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -69,7 +69,7 @@ public sealed class QylBitNetEndpointGenerator : IIncrementalGenerator
                     apiPath = named.Value.Value as string;
                     break;
                 case "EnableOpenTelemetry":
-                    enableOpenTelemetry = named.Value.Value is bool b ? b : true;
+                    enableOpenTelemetry = named.Value.Value is not bool b || b;
                     break;
                 case "OpenTelemetrySourceName":
                     openTelemetrySourceName = named.Value.Value as string;
