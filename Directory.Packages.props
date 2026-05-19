@@ -75,6 +75,10 @@
     <PackageVersion Include="ModelContextProtocol.AspNetCore" Version="$(ModelContextProtocolAspNetCoreVersion)"/>
   </ItemGroup>
 
+  <ItemGroup Label="ASP.NET Core (consumed by ANcpLua.Agents.Mcp.Hosting OAuth wiring — JwtBearer.dll is NOT in Microsoft.AspNetCore.App.Ref pack)">
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(AspNetCoreVersion)"/>
+  </ItemGroup>
+
   <ItemGroup Label="LLM Providers (Conformance fixtures)">
     <PackageVersion Include="OpenAI" Version="$(OpenAIVersion)"/>
     <PackageVersion Include="Azure.AI.OpenAI" Version="$(AzureAIOpenAIVersion)"/>

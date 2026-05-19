@@ -12,6 +12,13 @@
         <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
         <PackageReference Include="Microsoft.Extensions.AI"/>
         <PackageReference Include="ModelContextProtocol.AspNetCore"/>
+        <!--
+            JwtBearer.dll is NOT included in the Microsoft.AspNetCore.App.Ref shared
+            framework. Required by QylMcpOAuthExtensions.WithQylOAuthProtectedResource
+            which wires AddJwtBearer + AddMcp.AddProtectedResource for OAuth 2.1
+            protected-resource discovery. Verified empirically in the 10.0.7 ref pack.
+        -->
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer"/>
     </ItemGroup>
 
     <ItemGroup>
