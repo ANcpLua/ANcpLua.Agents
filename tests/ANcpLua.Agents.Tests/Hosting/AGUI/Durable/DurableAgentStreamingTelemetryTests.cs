@@ -10,7 +10,7 @@ namespace ANcpLua.Agents.Tests.Hosting.AGUI.Durable;
 
 /// <summary>
 ///     Pins the OpenTelemetry-shaped instrumentation contract on the durable-streaming surface:
-///     spans named <c>ANcpLua.Agents.Durable.Subscribe</c> with <c>session.key</c> / <c>transport</c>
+///     spans named <c>ANcpLua.Agents.Durable.Subscribe</c> with <c>session.id</c> / <c>transport</c>
 ///     tags, and a <c>messages_consumed</c> counter incremented per drained update.
 /// </summary>
 /// <remarks>
@@ -23,7 +23,7 @@ public sealed class DurableAgentStreamingTelemetryTests
     private static AgentResponseUpdate U(string text) => new(ChatRole.Assistant, text);
 
     [Fact]
-    public async Task GrpcSubscribe_EmitsSpan_WithSessionKeyAndTransportTags()
+    public async Task GrpcSubscribe_EmitsSpan_WithSessionIdAndTransportTags()
     {
         var sessionKey = $"agent@telemetry-grpc-span-{Guid.NewGuid():N}";
         var registry = new DurableAgentStreamRegistry();
@@ -46,7 +46,7 @@ public sealed class DurableAgentStreamingTelemetryTests
             new RecordingServerStreamWriter<AgentUpdateMessage>(),
             new FakeServerCallContext(CancellationToken.None));
 
-        var ours = captured.Where(a => (a.GetTagItem(StreamingTelemetry.Tags.SessionKey) as string) == sessionKey).ToList();
+        var ours = captured.Where(a => (a.GetTagItem(StreamingTelemetry.Tags.SessionId) as string) == sessionKey).ToList();
         var span = ours.Should().ContainSingle().Subject;
         span.OperationName.Should().Be(StreamingTelemetry.Spans.Subscribe);
         span.Kind.Should().Be(ActivityKind.Server);
@@ -80,7 +80,7 @@ public sealed class DurableAgentStreamingTelemetryTests
             // Filter by our unique session key so a parallel test class can't pollute the count.
             foreach (var t in tags)
             {
-                if (t.Key == StreamingTelemetry.Tags.SessionKey && t.Value?.ToString() == sessionKey)
+                if (t.Key == StreamingTelemetry.Tags.SessionId && t.Value?.ToString() == sessionKey)
                 {
                     measurements.Add(value);
                     return;
@@ -125,7 +125,7 @@ public sealed class DurableAgentStreamingTelemetryTests
 
         await act.Should().ThrowAsync<OperationCanceledException>();
 
-        var ours = captured.Where(a => (a.GetTagItem(StreamingTelemetry.Tags.SessionKey) as string) == sessionKey).ToList();
+        var ours = captured.Where(a => (a.GetTagItem(StreamingTelemetry.Tags.SessionId) as string) == sessionKey).ToList();
         var span = ours.Should().ContainSingle().Subject;
         span.GetTagItem(StreamingTelemetry.Tags.Outcome).Should().Be(StreamingTelemetry.Outcomes.Cancelled);
         span.Status.Should().Be(ActivityStatusCode.Error);

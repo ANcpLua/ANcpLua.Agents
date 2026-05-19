@@ -83,14 +83,14 @@ public static class QylDurableStreamingExtensions
             using var activity = StreamingTelemetry.ActivitySource.StartActivity(
                 StreamingTelemetry.Spans.Subscribe,
                 ActivityKind.Server);
-            activity?.SetTag(StreamingTelemetry.Tags.SessionKey, sessionKey);
+            activity?.SetTag(StreamingTelemetry.Tags.SessionId, sessionKey);
             activity?.SetTag(StreamingTelemetry.Tags.Transport, StreamingTelemetry.Transports.Sse);
 
             var transportTag = new KeyValuePair<string, object?>(
                 StreamingTelemetry.Tags.Transport,
                 StreamingTelemetry.Transports.Sse);
             var sessionTag = new KeyValuePair<string, object?>(
-                StreamingTelemetry.Tags.SessionKey,
+                StreamingTelemetry.Tags.SessionId,
                 sessionKey);
 
             long messageCount = 0;

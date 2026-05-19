@@ -40,14 +40,14 @@ internal sealed class AgentStreamGrpcService(DurableAgentStreamRegistry registry
         using var activity = StreamingTelemetry.ActivitySource.StartActivity(
             StreamingTelemetry.Spans.Subscribe,
             ActivityKind.Server);
-        activity?.SetTag(StreamingTelemetry.Tags.SessionKey, request.SessionKey);
+        activity?.SetTag(StreamingTelemetry.Tags.SessionId, request.SessionKey);
         activity?.SetTag(StreamingTelemetry.Tags.Transport, StreamingTelemetry.Transports.Grpc);
 
         var transportTag = new KeyValuePair<string, object?>(
             StreamingTelemetry.Tags.Transport,
             StreamingTelemetry.Transports.Grpc);
         var sessionTag = new KeyValuePair<string, object?>(
-            StreamingTelemetry.Tags.SessionKey,
+            StreamingTelemetry.Tags.SessionId,
             request.SessionKey);
 
         long messageCount = 0;

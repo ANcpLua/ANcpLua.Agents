@@ -46,7 +46,7 @@ internal sealed class ChannelAgentResponseHandler(DurableAgentStreamRegistry reg
         using var activity = StreamingTelemetry.ActivitySource.StartActivity(
             StreamingTelemetry.Spans.Produce,
             ActivityKind.Producer);
-        activity?.SetTag(StreamingTelemetry.Tags.SessionKey, sessionKey);
+        activity?.SetTag(StreamingTelemetry.Tags.SessionId, sessionKey);
 
         long messageCount = 0;
         Exception? error = null;
@@ -58,7 +58,7 @@ internal sealed class ChannelAgentResponseHandler(DurableAgentStreamRegistry reg
                 messageCount++;
                 StreamingTelemetry.MessagesProduced.Add(
                     1,
-                    new KeyValuePair<string, object?>(StreamingTelemetry.Tags.SessionKey, sessionKey));
+                    new KeyValuePair<string, object?>(StreamingTelemetry.Tags.SessionId, sessionKey));
             }
             activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Completed);
         }

@@ -75,7 +75,7 @@ internal static class StreamingTelemetry
     /// </summary>
     public static class Tags
     {
-        public const string SessionKey = "ancplua.agents.session.key";
+        public const string SessionId = "ancplua.agents.session.id";
         public const string Transport = "ancplua.agents.transport";
         public const string MessageCount = "ancplua.agents.message.count";
         public const string Outcome = "ancplua.agents.outcome";
