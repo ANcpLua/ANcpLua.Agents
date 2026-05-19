@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ANcpLua.Roslyn.Utilities;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.DurableTask;
@@ -17,7 +18,14 @@ namespace ANcpLua.Agents.Hosting.AGUI.Durable;
 ///     </para>
 ///     <para>
 ///         On producer exception the channel is completed with that exception so the reader's
-///         <c>ReadAllAsync</c> rethrows downstream, surfacing the failure to the SSE client.
+///         <c>ReadAllAsync</c> rethrows downstream, surfacing the failure to the SSE / gRPC client.
+///     </para>
+///     <para>
+///         The handler observes two cancellation sources: the orchestration's own token (a real
+///         orchestration shutdown is a failure that must propagate) and the per-session token
+///         returned by <see cref="DurableAgentStreamRegistry.GetOrCreateForProducer"/> (signalled
+///         when the consumer disconnects — a benign "no one is listening" that drains cleanly
+///         without surfacing as an error).
 ///     </para>
 /// </remarks>
 internal sealed class ChannelAgentResponseHandler(DurableAgentStreamRegistry registry) : IAgentResponseHandler
@@ -31,23 +39,52 @@ internal sealed class ChannelAgentResponseHandler(DurableAgentStreamRegistry reg
         Guard.NotNull(messageStream);
 
         string sessionKey = DurableAgentContext.Current.EntityContext.Id.ToString();
-        var channel = this._registry.GetOrCreate(sessionKey);
+        var channel = this._registry.GetOrCreateForProducer(sessionKey, out CancellationToken consumerDisconnect);
 
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, consumerDisconnect);
+
+        using var activity = StreamingTelemetry.ActivitySource.StartActivity(
+            StreamingTelemetry.Spans.Produce,
+            ActivityKind.Producer);
+        activity?.SetTag(StreamingTelemetry.Tags.SessionId, sessionKey);
+
+        long messageCount = 0;
         Exception? error = null;
         try
         {
-            await foreach (var update in messageStream.WithCancellation(cancellationToken).ConfigureAwait(false))
+            await foreach (var update in messageStream.WithCancellation(linked.Token).ConfigureAwait(false))
             {
-                await channel.Writer.WriteAsync(update, cancellationToken).ConfigureAwait(false);
+                await channel.Writer.WriteAsync(update, linked.Token).ConfigureAwait(false);
+                messageCount++;
+                StreamingTelemetry.MessagesProduced.Add(
+                    1,
+                    new KeyValuePair<string, object?>(StreamingTelemetry.Tags.SessionId, sessionKey));
             }
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Completed);
+        }
+        catch (OperationCanceledException) when (consumerDisconnect.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            // Consumer (SSE / gRPC client) disconnected. Stop producing — no one is reading.
+            // The orchestration itself is healthy; treat this as a natural drain, not an error.
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.ConsumerDisconnect);
+        }
+        catch (OperationCanceledException oce)
+        {
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Cancelled);
+            activity?.SetStatus(ActivityStatusCode.Error);
+            error = oce;
+            throw;
         }
         catch (Exception ex)
         {
+            activity?.SetTag(StreamingTelemetry.Tags.Outcome, StreamingTelemetry.Outcomes.Errored);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             error = ex;
             throw;
         }
         finally
         {
+            activity?.SetTag(StreamingTelemetry.Tags.MessageCount, messageCount);
             _ = channel.Writer.TryComplete(error);
         }
     }
