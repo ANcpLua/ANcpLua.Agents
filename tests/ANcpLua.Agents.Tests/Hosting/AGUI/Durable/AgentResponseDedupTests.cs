@@ -116,7 +116,7 @@ public sealed class AgentResponseDedupTests
     {
         // Eager throw on the call (not lazy on first MoveNextAsync) is the .NET idiom for
         // parameter validation on iterator methods. Implemented via wrapper + private core split.
-        ChannelReader<AgentResponseUpdate> reader = null!;
+        ChannelReader<AgentResponseUpdate> reader = null!; // OK: null assigned intentionally to verify ArgumentNullException is thrown on next line
 
         var act = () => reader.DedupByMessageIdAsync();
 

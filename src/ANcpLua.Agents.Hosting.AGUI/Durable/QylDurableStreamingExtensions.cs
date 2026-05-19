@@ -109,15 +109,16 @@ public static class QylDurableStreamingExtensions
             var heartbeatsEnabled = heartbeatInterval > TimeSpan.Zero && heartbeatInterval != Timeout.InfiniteTimeSpan;
 
             long messageCount = 0;
+            PeriodicTimer? heartbeatTimer = heartbeatsEnabled ? new PeriodicTimer(heartbeatInterval) : null;
             try
             {
                 while (true)
                 {
                     Task<bool> waitToRead = channel.Reader.WaitToReadAsync(cancellationToken).AsTask();
                     Task winner;
-                    if (heartbeatsEnabled)
+                    if (heartbeatTimer is not null)
                     {
-                        Task heartbeat = Task.Delay(heartbeatInterval, cancellationToken);
+                        Task heartbeat = heartbeatTimer.WaitForNextTickAsync(cancellationToken).AsTask();
                         winner = await Task.WhenAny(waitToRead, heartbeat).ConfigureAwait(false);
                         if (winner == heartbeat)
                         {
@@ -162,6 +163,7 @@ public static class QylDurableStreamingExtensions
             }
             finally
             {
+                heartbeatTimer?.Dispose();
                 activity?.SetTag(StreamingTelemetry.Tags.MessageCount, messageCount);
                 registry.TryRemove(sessionKey);
             }

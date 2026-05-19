@@ -55,7 +55,7 @@ public sealed class DurableAgentStreamRegistryTests
     {
         var registry = new DurableAgentStreamRegistry();
 
-        var act = () => registry.GetOrCreate(null!);
+        var act = () => registry.GetOrCreate(null!); // OK: passing null deliberately to assert ArgumentNullException
 
         act.Should().Throw<ArgumentNullException>();
     }
@@ -163,7 +163,7 @@ public sealed class DurableAgentStreamRegistryTests
     {
         var registry = new DurableAgentStreamRegistry();
 
-        var act = () => registry.GetOrCreateForProducer(null!, out _);
+        var act = () => registry.GetOrCreateForProducer(null!, out _); // OK: passing null deliberately to assert ArgumentNullException
 
         act.Should().Throw<ArgumentNullException>();
     }
