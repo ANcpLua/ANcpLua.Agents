@@ -50,13 +50,19 @@ public static class AgentChatClientFactory
     }
 
     /// <summary>
-    ///     Builds an <see cref="IChatClient"/> from the standard <c>ANCPLUA_AGENT_*</c> environment
-    ///     variables: <c>ANCPLUA_AGENT_API_KEY</c>, <c>ANCPLUA_AGENT_MODEL</c>,
-    ///     <c>ANCPLUA_AGENT_ENDPOINT</c>. Returns <c>null</c> when no API key is set.
+    ///     Builds an <see cref="IChatClient"/> from environment variables under
+    ///     <paramref name="prefix"/>: <c>{prefix}_API_KEY</c>, <c>{prefix}_MODEL</c>,
+    ///     <c>{prefix}_ENDPOINT</c>. Returns <c>null</c> when no API key is set.
+    ///     The default prefix is <c>ANCPLUA_AGENT</c>.
     /// </summary>
-    public static IChatClient? TryCreateFromEnvironment() =>
+    /// <param name="prefix">
+    ///     Environment-variable prefix without trailing underscore. Consumers that
+    ///     ship their own envvar conventions (e.g. <c>QYL_AGENT</c>) pass the prefix
+    ///     here instead of duplicating this factory body.
+    /// </param>
+    public static IChatClient? TryCreateFromEnvironment(string prefix = "ANCPLUA_AGENT") =>
         TryCreate(new AgentChatClientOptions(
-            ApiKey: Environment.GetEnvironmentVariable("ANCPLUA_AGENT_API_KEY"),
-            Model: Environment.GetEnvironmentVariable("ANCPLUA_AGENT_MODEL"),
-            Endpoint: Environment.GetEnvironmentVariable("ANCPLUA_AGENT_ENDPOINT")));
+            ApiKey: Environment.GetEnvironmentVariable($"{prefix}_API_KEY"),
+            Model: Environment.GetEnvironmentVariable($"{prefix}_MODEL"),
+            Endpoint: Environment.GetEnvironmentVariable($"{prefix}_ENDPOINT")));
 }
