@@ -184,7 +184,7 @@ internal sealed class AdminFilterFixture : IAsyncDisposable
         var transport = new HttpClientTransport(
             new HttpClientTransportOptions { Endpoint = new Uri("http://localhost/mcp") },
             httpClient,
-            loggerFactory: null!,
+            loggerFactory: null,
             ownsHttpClient: false);
         var client = await McpClient.CreateAsync(transport);
 
