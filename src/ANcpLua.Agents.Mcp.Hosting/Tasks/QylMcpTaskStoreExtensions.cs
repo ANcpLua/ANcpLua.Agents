@@ -8,6 +8,7 @@ namespace ANcpLua.Agents.Mcp.Hosting.Tasks;
 /// <summary>
 /// Task-store wiring for MCP servers that expose long-running tools.
 /// </summary>
+[Experimental("MCPEXP001")]
 public static class QylMcpTaskStoreExtensions
 {
     /// <summary>

@@ -13,6 +13,7 @@ namespace ANcpLua.Agents.Mcp;
 /// → <c>GetTaskResultAsync</c>) under a single span so progress notifications become
 /// mid-flight <see cref="ActivityEvent"/>s instead of one fat span at the end.
 /// </summary>
+[Experimental("MCPEXP001")]
 public static class QylMcpTaskExtensions
 {
     /// <summary>

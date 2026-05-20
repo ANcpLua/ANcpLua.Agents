@@ -5,18 +5,6 @@
         <Description>Qyl-prefixed Model Context Protocol server hosting facades for Microsoft Agent Framework consumers.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>maf;agents;microsoft-agents;mcp;model-context-protocol;hosting;aspnetcore</PackageTags>
-        <!--
-            MCPEXP001 is the MCP SDK's experimental-API marker covering the
-            long-running task lifecycle (IMcpTaskStore, InMemoryMcpTaskStore,
-            McpServerOptions.TaskStore). QylMcpTaskStoreExtensions.WithInMemoryTaskStore
-            wires the in-memory store onto the server-builder chain as the
-            user-facing payoff for adopting the experimental surface — the
-            extension IS the abstraction layer that isolates consumers from
-            churn. Revisit when the MCP SDK promotes the task API to stable.
-            Same precedent as the existing entry in ANcpLua.Agents.Mcp.csproj
-            that suppresses MCPEXP001 for QylMcpTaskExtensions.RunQylToolAsTaskAsync.
-        -->
-        <NoWarn>$(NoWarn);MCPEXP001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

@@ -105,7 +105,9 @@ server-reported state rather than a single fat span at the end. The
 `observer` callback receives the same values verbatim — independent of OTel
 emission — for any non-OTel UI or logging the caller needs.
 
-> The MCP task API is marked experimental in SDK 1.3.0 (`MCPEXP001`). This
-> package suppresses the diagnostic at the project level — `RunQylToolAsTaskAsync`
-> *is* the abstraction layer that isolates consumers from upstream churn. The
-> NoWarn will be revisited when the SDK promotes the task API to stable.
+> The MCP task API is marked experimental in SDK 1.3.0 (`MCPEXP001`).
+> `QylMcpTaskExtensions` carries `[Experimental("MCPEXP001")]` so the marker
+> propagates to callers at the call site — consumers acknowledge they're
+> using an experimental SDK boundary and choose whether to suppress at their
+> own callsite. The attribute will be removed when the SDK promotes the task
+> API to stable.

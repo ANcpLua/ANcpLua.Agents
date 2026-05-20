@@ -14,16 +14,8 @@
             QylHttpMcpClient implements, but CA2000 only recognizes IDisposable.Dispose
             in the finally block — so it flags the new HttpClientTransport(...) site
             regardless. Same precedent as ANcpLua.Agents.Testing (FakeHttpMessageHandler).
-
-            MCPEXP001 is the MCP SDK's experimental-API marker covering the entire
-            long-running task lifecycle (CallToolAsTaskAsync, PollTaskUntilCompleteAsync,
-            GetTaskResultAsync, McpTask, McpTaskMetadata). QylMcpTaskExtensions.RunQylToolAsTaskAsync
-            wraps the full lifecycle under one OTel span, which is the user-facing payoff for
-            adopting the experimental surface — the wrapper IS the abstraction layer that
-            isolates consumers from churn. Revisit when the MCP SDK promotes the task API
-            to stable. Same precedent as the existing CA2000 entry above.
         -->
-        <NoWarn>$(NoWarn);CA2000;MCPEXP001</NoWarn>
+        <NoWarn>$(NoWarn);CA2000</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
