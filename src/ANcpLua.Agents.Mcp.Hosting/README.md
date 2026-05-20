@@ -20,7 +20,10 @@ using System.ComponentModel;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddQylMcpServer();
+builder.Services
+    .AddMcpServer()
+    .WithHttpTransport()
+    .WithToolsFromAssembly();
 
 WebApplication app = builder.Build();
 app.MapQylMcp();

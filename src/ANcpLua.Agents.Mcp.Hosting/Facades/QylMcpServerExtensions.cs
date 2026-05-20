@@ -7,28 +7,19 @@ using Microsoft.Extensions.DependencyInjection;
 namespace ANcpLua.Agents.Mcp.Hosting;
 
 /// <summary>
-/// Qyl-prefixed facades over MAF / ModelContextProtocol.AspNetCore server-hosting APIs.
+/// Endpoint-mapping facade over MAF / ModelContextProtocol.AspNetCore.
 /// </summary>
+/// <remarks>
+/// The library does not ship an <c>AddQylMcpServer</c> sibling to the SDK's
+/// <c>services.AddMcpServer()</c>. The canonical SDK chain
+/// <c>services.AddMcpServer().WithHttpTransport().WithToolsFromAssembly()</c>
+/// is the entry point. All qyl-specific composition belongs on
+/// <c>IMcpServerBuilder</c> as <c>WithX(...)</c> chain calls (see the
+/// <c>Filters</c>, <c>Authentication</c>, <c>Logging</c>, and <c>Tasks</c>
+/// folders).
+/// </remarks>
 public static class QylMcpServerExtensions
 {
-    /// <summary>
-    /// Registers an MCP server with HTTP transport and discovers tools from the calling
-    /// assembly (types annotated with <c>[McpServerToolType]</c>).
-    /// </summary>
-    /// <param name="services">The DI service collection.</param>
-    /// <returns>The same service collection for chaining.</returns>
-    public static IServiceCollection AddQylMcpServer(this IServiceCollection services)
-    {
-        Guard.NotNull(services);
-
-        services
-            .AddMcpServer()
-            .WithHttpTransport()
-            .WithToolsFromAssembly();
-
-        return services;
-    }
-
     /// <summary>
     /// Maps the MCP Streamable-HTTP endpoint at the given path and, by default,
     /// the qyl-shaped <c>/alive</c> + <c>/health</c> health-check endpoints
