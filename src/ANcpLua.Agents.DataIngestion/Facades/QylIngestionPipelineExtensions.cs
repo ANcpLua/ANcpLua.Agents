@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using ANcpLua.Roslyn.Utilities;
+using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DataIngestion;
 using Microsoft.Extensions.DataIngestion.Chunkers;
@@ -14,7 +15,7 @@ namespace ANcpLua.Agents.DataIngestion;
 ///     <c>MarkdownReader → SemanticSimilarityChunker → SummaryEnricher → VectorStoreWriter</c>.
 ///     Returns a <see cref="QylIngestionPipelineHandle"/> that owns the pipeline + writer
 ///     lifecycle and exposes the resulting <see cref="VectorStoreCollection{TKey,TRecord}"/> for
-///     wire-in via <see cref="QylRagAgentOptionsExtensions.WithQylRagSearch"/>.
+///     wire-in via the extensions in <see cref="QylRagAgentOptionsExtensions"/>.
 /// </summary>
 public static class QylIngestionPipelineExtensions
 {
@@ -118,10 +119,9 @@ public sealed class QylIngestionPipelineHandle(
     public VectorStoreWriter<string> Writer => writer;
 
     /// <summary>
-    ///     The collection populated by the pipeline. Pass this to
-    ///     <see cref="QylRagAgentOptionsExtensions.WithQylRagSearch"/> or
-    ///     <see cref="QylVectorStoreSearchExtensions.AsQylRagContextProvider"/> to wire RAG into
-    ///     an agent.
+    ///     The collection populated by the pipeline. Pass it to
+    ///     <see cref="QylRagAgentOptionsExtensions"/> or
+    ///     <see cref="QylVectorStoreSearchExtensions"/> to wire RAG into an agent.
     /// </summary>
     public VectorStoreCollection<object, Dictionary<string, object?>> Collection => writer.VectorStoreCollection;
 

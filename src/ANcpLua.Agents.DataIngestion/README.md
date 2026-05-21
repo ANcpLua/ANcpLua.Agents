@@ -22,9 +22,9 @@ The two sides of RAG ship as orthogonal building blocks today:
 
 Joining them requires an adapter that reads `Dictionary<string, object?>`
 records, surfaces the `"content"` and `"summary"` fields, and projects scores.
-That adapter is `QylVectorStoreSearchExtensions.AsQylRagContextProvider`. The
-rest of this package is small sugar around the same pipeline you would write
-by hand.
+That adapter is `VectorStoreSearchAdapter`; `QylVectorStoreSearchExtensions`
+and `QylRagAgentOptionsExtensions` are the one-call facades. The rest of this
+package is small sugar around the same pipeline you would write by hand.
 
 ## Surface
 
@@ -57,6 +57,34 @@ var agent = chatClient.AsAIAgent(
     }
     .WithQylRagSearch(ingestion.Collection));
 ```
+
+## Configurable form
+
+For score thresholds, custom field names, custom projections, or OTel spans
+on each retrieval, drive the adapter directly:
+
+```csharp
+using System.Diagnostics;
+using ANcpLua.Agents.DataIngestion;
+
+var adapterOptions = new VectorStoreSearchAdapterOptions
+{
+    TopResults = 6,
+    MinScore = 0.65,
+    ContentField = "body",
+    SourceNameField = "origin",
+    DefaultSourceName = "kb",
+};
+
+var traceSource = new ActivitySource("MyApp.Rag");
+
+var agent = chatClient.AsAIAgent(
+    new ChatClientAgentOptions { Name = "ManualBot" }
+        .WithQylRagSearch(ingestion.Collection, adapterOptions, traceSource));
+```
+
+The adapter emits an `rag.search` span per retrieval, tagged with
+`gen_ai.operation.name`, query length, scanned-hit count, and kept-hit count.
 
 ## What the package does *not* do
 

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ANcpLua.Roslyn.Utilities;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.VectorData;
@@ -5,14 +6,10 @@ using Microsoft.Extensions.VectorData;
 namespace ANcpLua.Agents.DataIngestion;
 
 /// <summary>
-///     Bridge between <see cref="Microsoft.Extensions.DataIngestion.VectorStoreWriter{T}"/>'s
-///     produced <see cref="VectorStoreCollection{TKey,TRecord}"/> and
-///     <see cref="TextSearchProvider"/>'s search-callback delegate. The writer emits records as
-///     <see cref="Dictionary{TKey,TValue}"/> with at minimum a <c>"content"</c> field and,
-///     when <see cref="Microsoft.Extensions.DataIngestion.SummaryEnricher"/> is attached, a
-///     <c>"summary"</c> field. This extension wires those into a
-///     <see cref="TextSearchProvider.TextSearchResult"/> sequence so an agent can consume the
-///     retrieval output without a hand-written adapter.
+///     One-call facades over <see cref="VectorStoreSearchAdapter"/> that wrap a writer-produced
+///     <see cref="VectorStoreCollection{TKey,TRecord}"/> as an <see cref="AIContextProvider"/>.
+///     Reach for the adapter directly when you need to vary field names, set a score threshold,
+///     plug a custom projection, or emit tracing spans.
 /// </summary>
 public static class QylVectorStoreSearchExtensions
 {
@@ -31,8 +28,8 @@ public static class QylVectorStoreSearchExtensions
     ///     Fallback <see cref="TextSearchProvider.TextSearchResult.SourceName"/> when a record
     ///     does not carry a <c>"sourcename"</c> field.
     /// </param>
-    /// <param name="options">
-    ///     Optional behavior overrides. Defaults to
+    /// <param name="providerOptions">
+    ///     Optional <see cref="TextSearchProviderOptions"/>. Defaults to
     ///     <see cref="TextSearchProviderOptions.TextSearchBehavior.BeforeAIInvoke"/> — i.e. naive
     ///     RAG, not agentic. For agentic RAG, register a vector-search <c>AIFunction</c> tool
     ///     instead of using this provider.
@@ -40,79 +37,54 @@ public static class QylVectorStoreSearchExtensions
     public static AIContextProvider AsQylRagContextProvider(
         this VectorStoreCollection<object, Dictionary<string, object?>> collection,
         int topResults = 4,
-        string defaultSourceName = "manual",
-        TextSearchProviderOptions? options = null)
+        string defaultSourceName = "vector-store",
+        TextSearchProviderOptions? providerOptions = null)
     {
         Guard.NotNull(collection);
         Guard.NotNullOrWhiteSpace(defaultSourceName);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(topResults);
 
-        var searchOptions = options ?? new TextSearchProviderOptions
+        var adapterOptions = new VectorStoreSearchAdapterOptions
+        {
+            TopResults = topResults,
+            DefaultSourceName = defaultSourceName,
+        };
+
+        return collection.AsQylRagContextProvider(adapterOptions, providerOptions);
+    }
+
+    /// <summary>
+    ///     Configurable overload: wraps <paramref name="collection"/> as an
+    ///     <see cref="AIContextProvider"/> using the supplied
+    ///     <see cref="VectorStoreSearchAdapterOptions"/>. Use when you need field-name overrides,
+    ///     a score threshold, a custom projection, or tracing.
+    /// </summary>
+    /// <param name="collection">The writer-produced collection.</param>
+    /// <param name="adapterOptions">Adapter behavior overrides.</param>
+    /// <param name="providerOptions">
+    ///     Optional <see cref="TextSearchProviderOptions"/>. Defaults to
+    ///     <see cref="TextSearchProviderOptions.TextSearchBehavior.BeforeAIInvoke"/>.
+    /// </param>
+    /// <param name="activitySource">
+    ///     Optional <see cref="ActivitySource"/> for per-search OTel spans. See
+    ///     <see cref="VectorStoreSearchAdapter.ActivityName"/>.
+    /// </param>
+    public static AIContextProvider AsQylRagContextProvider(
+        this VectorStoreCollection<object, Dictionary<string, object?>> collection,
+        VectorStoreSearchAdapterOptions adapterOptions,
+        TextSearchProviderOptions? providerOptions = null,
+        ActivitySource? activitySource = null)
+    {
+        Guard.NotNull(collection);
+        Guard.NotNull(adapterOptions);
+
+        var adapter = new VectorStoreSearchAdapter(collection, adapterOptions, activitySource);
+
+        var searchOptions = providerOptions ?? new TextSearchProviderOptions
         {
             SearchTime = TextSearchProviderOptions.TextSearchBehavior.BeforeAIInvoke,
         };
 
-        return new TextSearchProvider(
-            BuildSearchCallback(collection, topResults, defaultSourceName),
-            searchOptions);
+        return new TextSearchProvider(adapter.SearchAsync, searchOptions);
     }
-
-    /// <summary>
-    ///     Returns the raw search-callback delegate without wrapping it in a
-    ///     <see cref="TextSearchProvider"/>. Useful when composing the callback with custom
-    ///     <see cref="TextSearchProviderOptions"/> or stacking it behind a caller-owned provider.
-    /// </summary>
-    public static Func<string, CancellationToken, Task<IEnumerable<TextSearchProvider.TextSearchResult>>>
-        AsQylSearchCallback(
-            this VectorStoreCollection<object, Dictionary<string, object?>> collection,
-            int topResults = 4,
-            string defaultSourceName = "manual")
-    {
-        Guard.NotNull(collection);
-        Guard.NotNullOrWhiteSpace(defaultSourceName);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(topResults);
-
-        return BuildSearchCallback(collection, topResults, defaultSourceName);
-    }
-
-    private static Func<string, CancellationToken, Task<IEnumerable<TextSearchProvider.TextSearchResult>>>
-        BuildSearchCallback(
-            VectorStoreCollection<object, Dictionary<string, object?>> collection,
-            int topResults,
-            string defaultSourceName) =>
-        async (query, cancellationToken) =>
-        {
-            var results = new List<TextSearchProvider.TextSearchResult>(topResults);
-
-            await foreach (var hit in collection.SearchAsync(query, top: topResults, cancellationToken: cancellationToken).ConfigureAwait(false))
-            {
-                if (!hit.Record.TryGetValue("content", out var contentValue)
-                    || contentValue is not string content
-                    || string.IsNullOrWhiteSpace(content))
-                {
-                    continue;
-                }
-
-                var summary = hit.Record.TryGetValue("summary", out var summaryValue)
-                    ? summaryValue as string
-                    : null;
-
-                var sourceName = hit.Record.TryGetValue("sourcename", out var sourceValue)
-                    ? sourceValue as string
-                    : null;
-
-                var text = string.IsNullOrWhiteSpace(summary)
-                    ? content
-                    : $"[Summary] {summary}\n\n[Excerpt] {content}";
-
-                results.Add(new TextSearchProvider.TextSearchResult
-                {
-                    Text = text,
-                    SourceName = sourceName ?? defaultSourceName,
-                    SourceLink = hit.Score is { } score ? $"score={score:F3}" : "",
-                });
-            }
-
-            return results;
-        };
 }
