@@ -103,14 +103,14 @@ public sealed partial class PackageBoundaryTests
 
         foreach (var project in LoadSourceProjects())
         {
-            var nonStableMafReferences = project.PackageReferences
+            var unrecognizedMafReferences = project.PackageReferences
                 .Where(static package => StringComparisonExtensions.StartsWithOrdinal(package, "Microsoft.Agents."))
                 .Select(package => (Package: package, Version: centralVersions.GetValueOrDefault(package, "")))
                 .Select(reference => (reference.Package, reference.Version, Channel: ParseMafDependencyChannel(reference.Version)))
                 .Where(reference => reference.Channel is MafDependencyChannel.Missing or MafDependencyChannel.UnknownPrerelease)
                 .Select(reference => (project.PackageId, reference.Package, reference.Version, reference.Channel.ToString()));
 
-            violations.AddRange(nonStableMafReferences);
+            violations.AddRange(unrecognizedMafReferences);
         }
 
         violations.Should().BeEmpty(
@@ -247,8 +247,7 @@ public sealed partial class PackageBoundaryTests
             return MafDependencyChannel.Preview;
         }
 
-        if (string.Equals(firstIdentifier, "rc", StringComparison.OrdinalIgnoreCase) ||
-            StringComparisonExtensions.StartsWithIgnoreCase(firstIdentifier, "rc."))
+        if (StringComparisonExtensions.StartsWithIgnoreCase(firstIdentifier, "rc"))
         {
             return MafDependencyChannel.ReleaseCandidate;
         }

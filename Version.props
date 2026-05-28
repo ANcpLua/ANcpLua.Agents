@@ -19,12 +19,11 @@
     <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.24</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF 1.8.0 — mirrors SDK truth, highest experimental track per package)">
-    <!-- Stable: core, Workflows, OpenAI (Foundry remains preview-only in 1.8.0) -->
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.8.0 — mirrors SDK truth, per-package channel)">
+    <!-- Core/Workflows/OpenAI align on the 1.8.0 release line; platform-specific packages follow published channels. -->
     <MicrosoftAgentsAIVersion>1.8.0</MicrosoftAgentsAIVersion>
     <MicrosoftAgentsAIWorkflowsVersion>1.8.0</MicrosoftAgentsAIWorkflowsVersion>
     <MicrosoftAgentsAIOpenAIVersion>1.8.0</MicrosoftAgentsAIOpenAIVersion>
-    <!-- Preview (no stable exists): Foundry, Hosting, AzureFunctions, Foundry.Hosting, Anthropic, DevUI, Harness, AGUI, A2A -->
     <MicrosoftAgentsAIFoundryVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIFoundryVersion>
     <MicrosoftAgentsAIHostingVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingVersion>
     <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
@@ -37,12 +36,12 @@
     <MicrosoftAgentsAIA2AVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIA2AVersion>
     <MicrosoftAgentsAIHostingA2AVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingA2AVersion>
     <MicrosoftAgentsAIHostingA2AAspNetCoreVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingA2AAspNetCoreVersion>
-    <!-- rc1 train: Declarative workflows -->
+    <!-- Declarative workflows channel -->
     <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.8.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
     <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.8.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
-    <!-- Alpha train: OpenAI hosting -->
+    <!-- OpenAI hosting channel -->
     <MicrosoftAgentsAIHostingOpenAIVersion>1.8.0-alpha.260528.1</MicrosoftAgentsAIHostingOpenAIVersion>
-    <!-- Preview train: DurableTask integration (Qyl.DurableAgents host) -->
+    <!-- DurableTask integration channel -->
     <MicrosoftAgentsAIDurableTaskVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIDurableTaskVersion>
   </PropertyGroup>
 
