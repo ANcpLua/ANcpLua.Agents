@@ -210,8 +210,8 @@ public sealed partial class PackageBoundaryTests
 
             var readme = File.ReadAllText(readmePath);
             readme.Should().Contain("Consumer toolkit for Microsoft Agent Framework");
-            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.6.x");
-            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.6.1");
+            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.7.x");
+            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.7.0");
         }
     }
 

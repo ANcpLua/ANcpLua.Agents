@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ANcpLua.Agents.Context;
 using ANcpLua.Roslyn.Utilities;
 using Microsoft.Agents.AI;
@@ -90,6 +91,8 @@ public sealed class QylAgentOptionsBuilder
 /// </summary>
 public sealed class QylAgentAdvancedOptionsBuilder(ChatClientAgentOptions options)
 {
+    private const string EnableMessageInjectionPropertyName = "EnableMessageInjection";
+
     /// <summary>Adds one or more <see cref="AIContextProvider"/> instances; preserves any already attached.</summary>
     public QylAgentAdvancedOptionsBuilder WithAIContextProviders(params AIContextProvider[] providers)
     {
@@ -113,6 +116,21 @@ public sealed class QylAgentAdvancedOptionsBuilder(ChatClientAgentOptions option
     public QylAgentAdvancedOptionsBuilder UseProvidedChatClientAsIs(bool value = true)
     {
         options.UseProvidedChatClientAsIs = value;
+        return this;
+    }
+
+    /// <summary>
+    ///     Enables MAF's experimental message-injection pipeline for callers that explicitly
+    ///     opt into the upstream <c>MAAI001</c> surface.
+    /// </summary>
+    [Experimental("MAAI001")]
+    public QylAgentAdvancedOptionsBuilder UseMessageInjection(bool value = true)
+    {
+        var property = typeof(ChatClientAgentOptions).GetProperty(EnableMessageInjectionPropertyName);
+        if (property is not { CanWrite: true } || property.PropertyType != typeof(bool))
+            throw new NotSupportedException("The referenced Microsoft.Agents.AI version does not expose ChatClientAgentOptions.EnableMessageInjection.");
+
+        property.SetValue(options, value);
         return this;
     }
 

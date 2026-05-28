@@ -27,5 +27,5 @@ opinionated choices best left to the consumer's own ServiceDefaults extension on
 ---
 Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing.
 
-Compatible with: Microsoft.Agents.AI 1.6.x
-Tested against: Microsoft.Agents.AI 1.6.1
+Compatible with: Microsoft.Agents.AI 1.7.x
+Tested against: Microsoft.Agents.AI 1.7.0

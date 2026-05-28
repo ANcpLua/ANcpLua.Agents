@@ -4,9 +4,9 @@ Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing
 
 Preview-channel Qyl-prefixed facades over Microsoft Agent Framework Azure Functions hosting.
 
-Compatible with: Microsoft.Agents.AI 1.6.x
-Tested against: Microsoft.Agents.AI 1.6.1
-Capability tested against: Microsoft.Agents.AI.Hosting.AzureFunctions 1.4.0-preview.260505.1
+Compatible with: Microsoft.Agents.AI 1.7.x
+Tested against: Microsoft.Agents.AI 1.7.0
+Capability tested against: Microsoft.Agents.AI.Hosting.AzureFunctions 1.7.0-preview.260526.1
 
 Channel: preview. Keep this package isolated from stable consumers.
 

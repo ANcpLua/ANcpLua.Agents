@@ -4,9 +4,9 @@ Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing
 
 Stable workflow helpers and Qyl-prefixed facades over Microsoft Agent Framework workflows.
 
-Compatible with: Microsoft.Agents.AI 1.6.x
-Tested against: Microsoft.Agents.AI 1.6.1
-Capability tested against: Microsoft.Agents.AI.Workflows 1.4.0
+Compatible with: Microsoft.Agents.AI 1.7.x
+Tested against: Microsoft.Agents.AI 1.7.0
+Capability tested against: Microsoft.Agents.AI.Workflows 1.7.0
 
 Channel: stable. This package must not reference Microsoft Agent Framework preview, RC, or alpha packages.
 

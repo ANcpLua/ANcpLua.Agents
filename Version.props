@@ -8,7 +8,7 @@
     file must define every $(...Version) variable that Directory.Packages.props
     references — pruning to "ahead-only" breaks restore.
 
-    Values mirror SDK truth (numeric base 1.6.1; experimental tracks where
+    Values mirror SDK truth (numeric base 1.7.0; experimental tracks where
     upstream ships them). Deviations from truth:
       - Google.GenAI (not in truth)
   -->
@@ -19,31 +19,31 @@
     <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.23</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF 1.6.1 — mirrors SDK truth, highest experimental track per package)">
-    <!-- Stable: core, Workflows, OpenAI (Foundry moved to preview-only in 1.6.1) -->
-    <MicrosoftAgentsAIVersion>1.6.1</MicrosoftAgentsAIVersion>
-    <MicrosoftAgentsAIWorkflowsVersion>1.6.1</MicrosoftAgentsAIWorkflowsVersion>
-    <MicrosoftAgentsAIOpenAIVersion>1.6.1</MicrosoftAgentsAIOpenAIVersion>
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.7.0 — mirrors SDK truth, highest experimental track per package)">
+    <!-- Stable: core, Workflows, OpenAI (Foundry remains preview-only in 1.7.0) -->
+    <MicrosoftAgentsAIVersion>1.7.0</MicrosoftAgentsAIVersion>
+    <MicrosoftAgentsAIWorkflowsVersion>1.7.0</MicrosoftAgentsAIWorkflowsVersion>
+    <MicrosoftAgentsAIOpenAIVersion>1.7.0</MicrosoftAgentsAIOpenAIVersion>
     <!-- Preview (no stable exists): Foundry, Hosting, AzureFunctions, Foundry.Hosting, Anthropic, DevUI, Harness, AGUI, A2A -->
-    <MicrosoftAgentsAIFoundryVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIFoundryVersion>
-    <MicrosoftAgentsAIHostingVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingVersion>
-    <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
-    <MicrosoftAgentsAIFoundryHostingVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIFoundryHostingVersion>
-    <MicrosoftAgentsAIAnthropicVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIAnthropicVersion>
-    <MicrosoftAgentsAIDevUIVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIDevUIVersion>
-    <MicrosoftAgentsAIHarnessVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHarnessVersion>
-    <MicrosoftAgentsAIAGUIVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIAGUIVersion>
-    <MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>
-    <MicrosoftAgentsAIA2AVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIA2AVersion>
-    <MicrosoftAgentsAIHostingA2AVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingA2AVersion>
-    <MicrosoftAgentsAIHostingA2AAspNetCoreVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIHostingA2AAspNetCoreVersion>
+    <MicrosoftAgentsAIFoundryVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIFoundryVersion>
+    <MicrosoftAgentsAIHostingVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIHostingVersion>
+    <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
+    <MicrosoftAgentsAIFoundryHostingVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIFoundryHostingVersion>
+    <MicrosoftAgentsAIAnthropicVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIAnthropicVersion>
+    <MicrosoftAgentsAIDevUIVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIDevUIVersion>
+    <MicrosoftAgentsAIHarnessVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIHarnessVersion>
+    <MicrosoftAgentsAIAGUIVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIAGUIVersion>
+    <MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>
+    <MicrosoftAgentsAIA2AVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIA2AVersion>
+    <MicrosoftAgentsAIHostingA2AVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIHostingA2AVersion>
+    <MicrosoftAgentsAIHostingA2AAspNetCoreVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIHostingA2AAspNetCoreVersion>
     <!-- rc1 train: Declarative workflows -->
-    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.6.1-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
-    <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.6.1-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.7.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.7.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
     <!-- Alpha train: OpenAI hosting -->
-    <MicrosoftAgentsAIHostingOpenAIVersion>1.6.1-alpha.260514.1</MicrosoftAgentsAIHostingOpenAIVersion>
+    <MicrosoftAgentsAIHostingOpenAIVersion>1.7.0-alpha.260526.1</MicrosoftAgentsAIHostingOpenAIVersion>
     <!-- Preview train: DurableTask integration (Qyl.DurableAgents host) -->
-    <MicrosoftAgentsAIDurableTaskVersion>1.6.1-preview.260514.1</MicrosoftAgentsAIDurableTaskVersion>
+    <MicrosoftAgentsAIDurableTaskVersion>1.7.0-preview.260526.1</MicrosoftAgentsAIDurableTaskVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.DurableTask (host-agnostic worker + client; gRPC sidecar backend)">
@@ -56,7 +56,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="ManagedAgentTelemetry.Host sample (Foundry persistent agents + Teams + RAG + AzMon)">
-    <AzureAIProjectsVersion>2.1.0-beta.1</AzureAIProjectsVersion>
+    <AzureAIProjectsVersion>2.1.0-beta.2</AzureAIProjectsVersion>
     <MicrosoftGraphVersion>5.104.0</MicrosoftGraphVersion>
     <AzureSearchDocumentsVersion>11.7.0</AzureSearchDocumentsVersion>
     <AzureMonitorOpenTelemetryAspNetCoreVersion>1.4.0</AzureMonitorOpenTelemetryAspNetCoreVersion>

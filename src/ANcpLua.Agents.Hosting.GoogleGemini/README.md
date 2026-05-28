@@ -5,8 +5,8 @@ official `Google.GenAI` SDK. Wraps Gemini's `RawRepresentationFactory` +
 `GenerateContentConfig` boilerplate as named extension methods on
 `ChatClientAgentOptions`, plus a single-call agent factory.
 
-Compatible with: Microsoft.Agents.AI 1.6.x
-Tested against: Microsoft.Agents.AI 1.6.1
+Compatible with: Microsoft.Agents.AI 1.7.x
+Tested against: Microsoft.Agents.AI 1.7.0
 Capability tested against: Google.GenAI 1.6.1
 
 > **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).

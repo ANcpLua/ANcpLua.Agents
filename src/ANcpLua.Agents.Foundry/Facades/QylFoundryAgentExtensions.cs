@@ -27,7 +27,7 @@ public static class QylFoundryAgentExtensions
         Guard.NotNullOrWhiteSpace(model);
         Guard.NotNullOrWhiteSpace(instructions);
 
-        return AzureAIProjectChatClientExtensions.AsAIAgent(
+        return AIProjectClientExtensions.AsAIAgent(
             projectClient,
             model,
             instructions,
@@ -49,7 +49,7 @@ public static class QylFoundryAgentExtensions
         Guard.NotNull(projectClient);
         Guard.NotNull(options);
 
-        return AzureAIProjectChatClientExtensions.AsAIAgent(
+        return AIProjectClientExtensions.AsAIAgent(
             projectClient,
             options,
             clientFactory,
@@ -72,7 +72,7 @@ public static class QylFoundryAgentExtensions
         Guard.NotNull(projectClient);
         Guard.NotNull(version);
 
-        return AzureAIProjectChatClientExtensions.AsAIAgent(
+        return AIProjectClientExtensions.AsAIAgent(
             projectClient,
             version,
             tools,
@@ -94,7 +94,7 @@ public static class QylFoundryAgentExtensions
         Guard.NotNull(projectClient);
         Guard.NotNull(record);
 
-        return AzureAIProjectChatClientExtensions.AsAIAgent(
+        return AIProjectClientExtensions.AsAIAgent(
             projectClient,
             record,
             tools,

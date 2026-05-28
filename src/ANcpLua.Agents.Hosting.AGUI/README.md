@@ -2,7 +2,7 @@
 
 Preview-channel Qyl-prefixed facades over Microsoft Agent Framework AG-UI (CopilotKit) streaming protocol support — server hosting plus client adapter in a single package.
 
-Tested against `Microsoft.Agents.AI.AGUI` and `Microsoft.Agents.AI.Hosting.AGUI.AspNetCore` at `1.6.1-preview.260514.1`.
+Tested against `Microsoft.Agents.AI.AGUI` and `Microsoft.Agents.AI.Hosting.AGUI.AspNetCore` at `1.7.0-preview.260526.1`.
 
 Channel: preview. Keep this package isolated from stable consumers.
 
@@ -56,5 +56,5 @@ IChatClient client = http.AsQylAGUIChatClient(new Uri("http://localhost:5000"));
 ---
 Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing.
 
-Compatible with: Microsoft.Agents.AI 1.6.x
-Tested against: Microsoft.Agents.AI 1.6.1
+Compatible with: Microsoft.Agents.AI 1.7.x
+Tested against: Microsoft.Agents.AI 1.7.0
