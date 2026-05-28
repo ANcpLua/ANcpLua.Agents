@@ -14,9 +14,9 @@
   -->
 
   <PropertyGroup Label="Roslyn.Utilities (consumed from sibling repo)">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.5</ANcpLuaRoslynUtilitiesVersion>
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.5</ANcpLuaRoslynUtilitiesTestingVersion>
-    <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.5</ANcpLuaRoslynUtilitiesSourcesVersion>
+    <ANcpLuaRoslynUtilitiesVersion>2.2.23</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.23</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.23</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Agents (MAF 1.6.1 — mirrors SDK truth, highest experimental track per package)">
