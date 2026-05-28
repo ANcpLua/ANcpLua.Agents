@@ -7,7 +7,7 @@ official `Google.GenAI` SDK. Wraps Gemini's `RawRepresentationFactory` +
 
 Compatible with: Microsoft.Agents.AI 1.7.x
 Tested against: Microsoft.Agents.AI 1.7.0
-Capability tested against: Google.GenAI 1.6.1
+Capability tested against: Google.GenAI 1.6.2
 
 > **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).
 

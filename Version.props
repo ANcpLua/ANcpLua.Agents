@@ -92,7 +92,7 @@
     <AzureIdentityVersion>1.21.0</AzureIdentityVersion>
     <AnthropicSDKVersion>5.10.0</AnthropicSDKVersion>
     <OllamaSharpVersion>5.4.25</OllamaSharpVersion>
-    <GoogleGenAIVersion>1.6.1</GoogleGenAIVersion>
+    <GoogleGenAIVersion>1.6.2</GoogleGenAIVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Testing">
