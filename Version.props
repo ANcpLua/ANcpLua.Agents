@@ -63,15 +63,15 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions.AI">
-    <MicrosoftExtensionsAIVersion>10.5.2</MicrosoftExtensionsAIVersion>
-    <MicrosoftExtensionsAIAbstractionsVersion>10.5.2</MicrosoftExtensionsAIAbstractionsVersion>
-    <MicrosoftExtensionsAIOpenAIVersion>10.5.2</MicrosoftExtensionsAIOpenAIVersion>
-    <MicrosoftBclAsyncInterfacesVersion>10.0.7</MicrosoftBclAsyncInterfacesVersion>
+    <MicrosoftExtensionsAIVersion>10.6.0</MicrosoftExtensionsAIVersion>
+    <MicrosoftExtensionsAIAbstractionsVersion>10.6.0</MicrosoftExtensionsAIAbstractionsVersion>
+    <MicrosoftExtensionsAIOpenAIVersion>10.6.0</MicrosoftExtensionsAIOpenAIVersion>
+    <MicrosoftBclAsyncInterfacesVersion>10.0.8</MicrosoftBclAsyncInterfacesVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions.DataIngestion (RAG ingestion building blocks — ANcpLua.Agents.DataIngestion facades)">
-    <MicrosoftExtensionsDataIngestionVersion>10.5.0-preview.1.26213.4</MicrosoftExtensionsDataIngestionVersion>
-    <MicrosoftExtensionsDataIngestionMarkdigVersion>10.5.0-preview.1.26213.4</MicrosoftExtensionsDataIngestionMarkdigVersion>
+    <MicrosoftExtensionsDataIngestionVersion>10.6.0-preview.1.26261.4</MicrosoftExtensionsDataIngestionVersion>
+    <MicrosoftExtensionsDataIngestionMarkdigVersion>10.6.0-preview.1.26261.4</MicrosoftExtensionsDataIngestionMarkdigVersion>
     <MicrosoftMLTokenizersVersion>2.0.0</MicrosoftMLTokenizersVersion>
     <MicrosoftSemanticKernelConnectorsInMemoryVersion>1.74.0-preview</MicrosoftSemanticKernelConnectorsInMemoryVersion>
   </PropertyGroup>
