@@ -9,23 +9,23 @@ using Microsoft.Graph;
 using Qyl.DurableAgents;
 using Qyl.DurableAgents.Generated;
 
-string foundryEndpoint = Environment.GetEnvironmentVariable("AZURE_AI_FOUNDRY_ENDPOINT")
-    ?? throw new InvalidOperationException("AZURE_AI_FOUNDRY_ENDPOINT is required.");
+var foundryEndpoint = Environment.GetEnvironmentVariable("AZURE_AI_FOUNDRY_ENDPOINT")
+                      ?? throw new InvalidOperationException("AZURE_AI_FOUNDRY_ENDPOINT is required.");
 
-string deploymentName = Environment.GetEnvironmentVariable("AZURE_AI_FOUNDRY_DEPLOYMENT")
-    ?? "gpt-4o-mini";
+var deploymentName = Environment.GetEnvironmentVariable("AZURE_AI_FOUNDRY_DEPLOYMENT")
+                     ?? "gpt-4o-mini";
 
-string searchEndpoint = Environment.GetEnvironmentVariable("AZURE_SEARCH_ENDPOINT")
-    ?? throw new InvalidOperationException("AZURE_SEARCH_ENDPOINT is required.");
+var searchEndpoint = Environment.GetEnvironmentVariable("AZURE_SEARCH_ENDPOINT")
+                     ?? throw new InvalidOperationException("AZURE_SEARCH_ENDPOINT is required.");
 
-string searchIndex = Environment.GetEnvironmentVariable("AZURE_SEARCH_INDEX")
-    ?? "runbooks";
+var searchIndex = Environment.GetEnvironmentVariable("AZURE_SEARCH_INDEX")
+                  ?? "runbooks";
 
 Azure.Identity.AzureCliCredential credential = new();
 
 SearchClient searchClient = new(new Uri(searchEndpoint), searchIndex, credential);
 RunbookSearch runbookSearch = new(searchClient);
-AIFunction runbookTool = AIFunctionFactory.Create(runbookSearch.SearchAsync);
+var runbookTool = AIFunctionFactory.Create(runbookSearch.SearchAsync);
 
 AIAgent telemetryAssistant = new AIProjectClient(new Uri(foundryEndpoint), credential)
     .AsAIAgent(
@@ -38,7 +38,7 @@ AIAgent telemetryAssistant = new AIProjectClient(new Uri(foundryEndpoint), crede
         name: "TelemetryAssistant",
         tools: [runbookTool]);
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton(_ => new GraphServiceClient(
     credential,
@@ -53,7 +53,7 @@ builder.Services
 builder.Services.AddQylDurableAgents(options => options.AddAIAgent(telemetryAssistant));
 builder.Services.AddQylDurableAgentStreaming();
 
-WebApplication app = builder.Build();
+var app = builder.Build();
 
 QylActivityServices.Provider = app.Services;
 

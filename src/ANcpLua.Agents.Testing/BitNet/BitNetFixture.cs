@@ -168,12 +168,12 @@ public sealed class BitNetFixture : IAsyncLifetime
             ["image", "inspect", DockerImage],
             TimeSpan.FromSeconds(5)).ConfigureAwait(false);
 
-        if (inspect.ExitCode != 0)
+        if (inspect.ExitCode is not 0)
         {
             var pull = await RunDockerAsync(
                 ["pull", DockerImage],
                 TimeSpan.FromMinutes(10)).ConfigureAwait(false);
-            if (pull.ExitCode != 0)
+            if (pull.ExitCode is not 0)
             {
                 return null;
             }
@@ -185,7 +185,7 @@ public sealed class BitNetFixture : IAsyncLifetime
             ["run", "-d", "--rm", "--name", containerName, "-p", $"{DockerPort}:11434", DockerImage],
             TimeSpan.FromMinutes(5)).ConfigureAwait(false);
 
-        if (run.ExitCode != 0)
+        if (run.ExitCode is not 0)
         {
             // Most likely: port conflict, or rate-limit on a cache miss the pull above didn't
             // cover (e.g. concurrent test runs). Caller falls through to the legacy fallback
@@ -216,7 +216,7 @@ public sealed class BitNetFixture : IAsyncLifetime
             ["version", "--format", "{{.Server.Version}}"],
             TimeSpan.FromSeconds(5)).ConfigureAwait(false);
 
-        return result.ExitCode == 0;
+        return result.ExitCode is 0;
     }
 
     private static async ValueTask<(int ExitCode, string Stdout, string Stderr)> RunDockerAsync(

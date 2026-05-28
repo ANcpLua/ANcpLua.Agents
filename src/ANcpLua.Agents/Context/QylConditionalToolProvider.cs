@@ -44,7 +44,7 @@ public sealed class QylConditionalToolProvider : AIContextProvider
         Guard.NotNull(matcher);
         Guard.NotNull(toolFactory);
 
-        _rules.Add(new Rule(name, matcher, toolFactory, instructions));
+        _rules.Add(new Rule(matcher, toolFactory, instructions));
         return this;
     }
 
@@ -58,10 +58,8 @@ public sealed class QylConditionalToolProvider : AIContextProvider
         List<AITool> tools = [];
         var instructions = new StringBuilder();
 
-        foreach (var rule in _rules)
+        foreach (var rule in _rules.Where(rule => rule.Matcher(messages)))
         {
-            if (!rule.Matcher(messages)) continue;
-
             tools.AddRange(rule.ToolFactory());
             if (!string.IsNullOrWhiteSpace(rule.Instructions))
             {
@@ -70,7 +68,7 @@ public sealed class QylConditionalToolProvider : AIContextProvider
             }
         }
 
-        if (tools.Count == 0 && instructions.Length == 0)
+        if (tools.Count is 0 && instructions.Length is 0)
             return ValueTask.FromResult(new AIContext());
 
         return ValueTask.FromResult(new AIContext
@@ -81,7 +79,6 @@ public sealed class QylConditionalToolProvider : AIContextProvider
     }
 
     private sealed record Rule(
-        string Name,
         Func<IEnumerable<ChatMessage>, bool> Matcher,
         Func<IList<AITool>> ToolFactory,
         string? Instructions);

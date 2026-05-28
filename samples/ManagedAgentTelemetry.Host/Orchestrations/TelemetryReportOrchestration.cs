@@ -29,19 +29,19 @@ public static class TelemetryReportOrchestration
         TaskOrchestrationContext context,
         TelemetryReportRequest input)
     {
-        DurableAIAgent assistant = context.GetAgent("TelemetryAssistant");
-        AgentSession session = await assistant.CreateSessionAsync().ConfigureAwait(false);
+        var assistant = context.GetAgent("TelemetryAssistant");
+        var session = await assistant.CreateSessionAsync().ConfigureAwait(false);
 
-        AgentResponse<TelemetryReport> response = await assistant.RunAsync<TelemetryReport>(
+        var response = await assistant.RunAsync<TelemetryReport>(
             message:
                 $"Summarize run {input.RunId} for client {input.ClientId}. " +
                 $"Focus on: {string.Join(", ", input.Topics)}. " +
                 $"Use the runbook search tool if any topic relates to a known incident type.",
             session: session).ConfigureAwait(false);
 
-        TelemetryReport report = response.Result
-            ?? throw new InvalidOperationException(
-                $"TelemetryAssistant returned no structured TelemetryReport for run {input.RunId} (client {input.ClientId}).");
+        var report = response.Result
+                     ?? throw new InvalidOperationException(
+                         $"TelemetryAssistant returned no structured TelemetryReport for run {input.RunId} (client {input.ClientId}).");
 
         await context.CallActivityAsync(
             nameof(PostTeamsNotification),
@@ -57,7 +57,7 @@ public static class TelemetryReportOrchestration
     [QylActivity(nameof(PostTeamsNotification))]
     public static async Task PostTeamsNotification(TeamsNotificationInput input)
     {
-        TeamsNotifier notifier = QylActivityServices.Required.GetRequiredService<TeamsNotifier>();
+        var notifier = QylActivityServices.Required.GetRequiredService<TeamsNotifier>();
         await notifier.PostReportAsync(input.TeamId, input.ChannelId, input.Report).ConfigureAwait(false);
     }
 }

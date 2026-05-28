@@ -83,7 +83,7 @@ public sealed class AgentRunHarnessBuilder
     {
         var session = _session ?? await _agent.CreateSessionAsync(cancellationToken).ConfigureAwait(false);
 
-        var response = _messages.Count == 0
+        var response = _messages.Count is 0
             ? await _agent.RunAsync(session, _options, cancellationToken).ConfigureAwait(false)
             : await _agent.RunAsync(_messages, session, _options, cancellationToken).ConfigureAwait(false);
 
@@ -96,7 +96,7 @@ public sealed class AgentRunHarnessBuilder
         var session = _session ?? await _agent.CreateSessionAsync(cancellationToken).ConfigureAwait(false);
 
         var updates = new List<AgentResponseUpdate>();
-        var stream = _messages.Count == 0
+        var stream = _messages.Count is 0
             ? _agent.RunStreamingAsync(session, _options, cancellationToken)
             : _agent.RunStreamingAsync(_messages, session, _options, cancellationToken);
 

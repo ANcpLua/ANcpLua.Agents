@@ -101,7 +101,7 @@ public static class QylDurableStreamingExtensions
             context.Response.Headers.CacheControl = "no-cache";
             context.Response.Headers["X-Accel-Buffering"] = "no";
 
-            Channel<AgentResponseUpdate> channel = registry.GetOrCreate(sessionKey);
+            var channel = registry.GetOrCreate(sessionKey);
 
             using var activity = StreamingTelemetry.ActivitySource.StartActivity(
                 StreamingTelemetry.Spans.Subscribe,
@@ -120,7 +120,7 @@ public static class QylDurableStreamingExtensions
             var heartbeatsEnabled = heartbeatInterval > TimeSpan.Zero && heartbeatInterval != Timeout.InfiniteTimeSpan;
 
             long messageCount = 0;
-            PeriodicTimer? heartbeatTimer = heartbeatsEnabled ? new PeriodicTimer(heartbeatInterval) : null;
+            var heartbeatTimer = heartbeatsEnabled ? new PeriodicTimer(heartbeatInterval) : null;
             try
             {
                 // Both awaitables persist across iterations so neither is started twice in parallel:
@@ -160,7 +160,7 @@ public static class QylDurableStreamingExtensions
 
                     while (channel.Reader.TryRead(out var update))
                     {
-                        string json = JsonSerializer.Serialize(update);
+                        var json = JsonSerializer.Serialize(update);
                         await context.Response.WriteAsync($"data: {json}\n\n", cancellationToken).ConfigureAwait(false);
                         await context.Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
                         messageCount++;

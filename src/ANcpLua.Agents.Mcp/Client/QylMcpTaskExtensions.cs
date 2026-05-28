@@ -77,19 +77,19 @@ public static class QylMcpTaskExtensions
 
         try
         {
-            McpTask task = await client.CallToolAsTaskAsync(
+            var task = await client.CallToolAsTaskAsync(
                 toolName,
                 arguments,
                 progress: progressBridge,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             activity?.SetTag("mcp.task.id", task.TaskId);
 
-            McpTask completed = await client.PollTaskUntilCompleteAsync(
+            var completed = await client.PollTaskUntilCompleteAsync(
                 task.TaskId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             activity?.SetTag("mcp.task.status", completed.Status.ToString());
 
-            JsonElement result = await client.GetTaskResultAsync(
+            var result = await client.GetTaskResultAsync(
                 task.TaskId,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
             activity?.SetStatus(ActivityStatusCode.Ok);

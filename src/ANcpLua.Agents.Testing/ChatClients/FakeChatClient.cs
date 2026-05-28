@@ -152,7 +152,7 @@ public sealed class FakeChatClient : IChatClient
     /// </summary>
     public static FakeChatClient WithSequence(params string[] responses)
     {
-        if (responses.Length == 0)
+        if (responses.Length is 0)
             throw new ArgumentException("At least one response is required.", nameof(responses));
 
         var client = new FakeChatClient();
@@ -396,7 +396,7 @@ public sealed class FakeChatClient : IChatClient
     {
         var expanded = ExpandTextForStreaming(prepared.Contents);
 
-        if (expanded.Count == 0)
+        if (expanded.Count is 0)
         {
             if (prepared.Usage is not null)
                 yield return new ChatResponseUpdate

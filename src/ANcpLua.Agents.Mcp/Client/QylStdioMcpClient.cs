@@ -25,7 +25,7 @@ public sealed class QylStdioMcpClient : IAsyncDisposable
         Guard.NotNull(options);
 
         StdioClientTransport transport = new(options);
-        McpClient client = await McpClient.CreateAsync(transport, cancellationToken: cancellationToken).ConfigureAwait(false);
+        var client = await McpClient.CreateAsync(transport, cancellationToken: cancellationToken).ConfigureAwait(false);
         return new QylStdioMcpClient(client);
     }
 

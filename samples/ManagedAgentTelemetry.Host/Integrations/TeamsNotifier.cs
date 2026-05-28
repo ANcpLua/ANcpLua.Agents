@@ -16,7 +16,7 @@ public sealed class TeamsNotifier(GraphServiceClient graph)
         Orchestrations.TelemetryReport report,
         CancellationToken cancellationToken = default)
     {
-        string cardJson = JsonSerializer.Serialize(BuildAdaptiveCard(report));
+        var cardJson = JsonSerializer.Serialize(BuildAdaptiveCard(report));
 
         ChatMessage message = new()
         {

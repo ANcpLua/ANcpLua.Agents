@@ -35,7 +35,7 @@ public sealed class QylHttpMcpClient : IAsyncDisposable
         try
         {
             transport = new HttpClientTransport(options);
-            McpClient client = await McpClient.CreateAsync(transport, cancellationToken: cancellationToken).ConfigureAwait(false);
+            var client = await McpClient.CreateAsync(transport, cancellationToken: cancellationToken).ConfigureAwait(false);
             QylHttpMcpClient bundle = new(client, transport);
             transport = null;
             return bundle;

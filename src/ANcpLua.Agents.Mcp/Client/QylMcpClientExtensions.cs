@@ -91,7 +91,7 @@ public static class QylMcpClientExtensions
     {
         Guard.NotNull(client);
 
-        IList<McpClientTool> tools = await client.ListToolsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+        var tools = await client.ListToolsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
         return [.. tools.Cast<AITool>()];
     }
 

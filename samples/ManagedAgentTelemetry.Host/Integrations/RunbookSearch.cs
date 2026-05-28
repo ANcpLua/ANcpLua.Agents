@@ -28,7 +28,7 @@ public sealed class RunbookSearch(SearchClient search)
                 .ConfigureAwait(false);
 
         List<RunbookHit> hits = [];
-        await foreach (SearchResult<RunbookDocument> result in response.Value.GetResultsAsync().ConfigureAwait(false))
+        await foreach (var result in response.Value.GetResultsAsync().ConfigureAwait(false))
         {
             hits.Add(new RunbookHit(
                 Title: result.Document.Title,

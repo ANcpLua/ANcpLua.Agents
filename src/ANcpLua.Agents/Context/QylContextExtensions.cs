@@ -23,7 +23,7 @@ public static class QylContextExtensions
         Guard.NotNull(options);
         Guard.NotNull(providers);
 
-        if (providers.Length == 0) return options;
+        if (providers.Length is 0) return options;
 
         foreach (var provider in providers) Guard.NotNull(provider);
 

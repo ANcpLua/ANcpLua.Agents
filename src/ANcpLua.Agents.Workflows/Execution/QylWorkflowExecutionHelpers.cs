@@ -17,7 +17,7 @@ internal static class QylWorkflowExecutionHelpers
         Guard.NotNull(workflow);
         Guard.NotNull(input);
 
-        StreamingRun run = await InProcessExecution
+        var run = await InProcessExecution
             .RunStreamingAsync(workflow, input, sessionId, cancellationToken)
             .ConfigureAwait(false);
         await run.TrySendMessageAsync(new TurnToken(emitEvents)).ConfigureAwait(false);
@@ -33,7 +33,7 @@ internal static class QylWorkflowExecutionHelpers
     {
         Guard.NotNull(agents);
         Guard.NotNull(input);
-        Workflow workflow = AgentWorkflowBuilder.BuildSequential(agents);
+        var workflow = AgentWorkflowBuilder.BuildSequential(agents);
         return await StreamQylAgentsAsync(workflow, input, sessionId, emitEvents, cancellationToken).ConfigureAwait(false);
     }
 
@@ -46,7 +46,7 @@ internal static class QylWorkflowExecutionHelpers
     {
         Guard.NotNull(agents);
         Guard.NotNull(input);
-        Workflow workflow = AgentWorkflowBuilder.BuildConcurrent(agents);
+        var workflow = AgentWorkflowBuilder.BuildConcurrent(agents);
         return await StreamQylAgentsAsync(workflow, input, sessionId, emitEvents, cancellationToken).ConfigureAwait(false);
     }
 }
