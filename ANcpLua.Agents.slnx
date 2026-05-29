@@ -2,6 +2,7 @@
     <Folder Name="/src/">
         <Project Path="src/ANcpLua.Agents/ANcpLua.Agents.csproj" />
         <Project Path="src/ANcpLua.Agents.Workflows/ANcpLua.Agents.Workflows.csproj" />
+        <Project Path="src/ANcpLua.Agents.Workflows.Declarative/ANcpLua.Agents.Workflows.Declarative.csproj" />
         <Project Path="src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj" />
         <Project Path="src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj" />
         <Project Path="src/ANcpLua.Agents.Hosting.Azure/ANcpLua.Agents.Hosting.Azure.csproj" />

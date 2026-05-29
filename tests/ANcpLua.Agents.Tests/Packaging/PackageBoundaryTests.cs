@@ -12,6 +12,7 @@ public sealed partial class PackageBoundaryTests
     [
         "ANcpLua.Agents",
         "ANcpLua.Agents.Workflows",
+        "ANcpLua.Agents.Workflows.Declarative",
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
         "ANcpLua.Agents.Hosting.Azure",
@@ -50,6 +51,7 @@ public sealed partial class PackageBoundaryTests
     {
         ["ANcpLua.Agents"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Workflows"],
+        ["ANcpLua.Agents.Workflows.Declarative"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Workflows", "Microsoft.Agents.AI.Workflows.Declarative"],
         ["ANcpLua.Agents.Testing"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions"],
         ["ANcpLua.Agents.Testing.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions", "Microsoft.Agents.AI.Workflows"],
         ["ANcpLua.Agents.Hosting.Azure"] = ["Microsoft.Agents.AI.Hosting.AzureFunctions"],
