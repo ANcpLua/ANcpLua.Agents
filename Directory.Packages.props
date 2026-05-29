@@ -65,10 +65,6 @@
     <PackageVersion Include="Microsoft.SemanticKernel.Connectors.InMemory" Version="$(MicrosoftSemanticKernelConnectorsInMemoryVersion)"/>
   </ItemGroup>
 
-  <ItemGroup Label="A2A (Agent2Agent protocol SDK — a2aproject/a2a-dotnet)">
-    <PackageVersion Include="A2A" Version="$(A2AVersion)"/>
-    <PackageVersion Include="A2A.AspNetCore" Version="$(A2AAspNetCoreVersion)"/>
-  </ItemGroup>
 
   <ItemGroup Label="ModelContextProtocol (MCP SDK — modelcontextprotocol/csharp-sdk)">
     <PackageVersion Include="ModelContextProtocol" Version="$(ModelContextProtocolVersion)"/>
