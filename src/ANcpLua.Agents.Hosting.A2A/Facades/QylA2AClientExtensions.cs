@@ -57,6 +57,59 @@ public static class QylA2AClientExtensions
     }
 
     /// <summary>
+    /// Resolves the A2A agent card at the well-known URI under the supplied base address and returns an
+    /// <see cref="AIAgent"/>, taking agent identity from <paramref name="agentOptions"/> (non-null values
+    /// override the resolved card).
+    /// </summary>
+    /// <param name="uri">The base URI of the remote A2A endpoint.</param>
+    /// <param name="agentOptions">Identity options; non-null values override the corresponding card values.</param>
+    /// <param name="httpClient">Optional <see cref="HttpClient"/> reused for both card resolution and agent traffic.</param>
+    /// <param name="clientOptions">Optional client options controlling protocol-binding preference (HTTP+JSON vs JSON-RPC).</param>
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    /// <param name="cancellationToken">A token to observe while waiting for the agent-card resolution to complete.</param>
+    /// <returns>An <see cref="AIAgent"/> backed by the remote A2A endpoint.</returns>
+    public static Task<AIAgent> ConnectQylA2AAsync(
+        Uri uri,
+        A2AAgentOptions agentOptions,
+        HttpClient? httpClient = null,
+        A2AClientOptions? clientOptions = null,
+        ILoggerFactory? loggerFactory = null,
+        CancellationToken cancellationToken = default)
+    {
+        Guard.NotNull(uri);
+        Guard.NotNull(agentOptions);
+
+        A2ACardResolver resolver = new(uri);
+        return resolver.GetAIAgentAsync(agentOptions, httpClient, clientOptions, loggerFactory, cancellationToken);
+    }
+
+    /// <summary>
+    /// Returns an <see cref="AIAgent"/> backed by the remote A2A endpoint described by the supplied
+    /// <see cref="A2ACardResolver"/>, taking agent identity from <paramref name="agentOptions"/>
+    /// (non-null values override the resolved card).
+    /// </summary>
+    /// <param name="resolver">A pre-configured <see cref="A2ACardResolver"/>.</param>
+    /// <param name="agentOptions">Identity options; non-null values override the corresponding card values.</param>
+    /// <param name="httpClient">Optional <see cref="HttpClient"/> reused for both card resolution and agent traffic.</param>
+    /// <param name="clientOptions">Optional client options controlling protocol-binding preference (HTTP+JSON vs JSON-RPC).</param>
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    /// <param name="cancellationToken">A token to observe while waiting for the agent-card resolution to complete.</param>
+    /// <returns>An <see cref="AIAgent"/> backed by the remote A2A endpoint.</returns>
+    public static Task<AIAgent> ConnectQylA2AAsync(
+        this A2ACardResolver resolver,
+        A2AAgentOptions agentOptions,
+        HttpClient? httpClient = null,
+        A2AClientOptions? clientOptions = null,
+        ILoggerFactory? loggerFactory = null,
+        CancellationToken cancellationToken = default)
+    {
+        Guard.NotNull(resolver);
+        Guard.NotNull(agentOptions);
+
+        return resolver.GetAIAgentAsync(agentOptions, httpClient, clientOptions, loggerFactory, cancellationToken);
+    }
+
+    /// <summary>
     /// Returns an <see cref="AIAgent"/> backed by the supplied <see cref="AgentCard"/>.
     /// </summary>
     /// <param name="card">The agent card describing the remote A2A endpoint.</param>
