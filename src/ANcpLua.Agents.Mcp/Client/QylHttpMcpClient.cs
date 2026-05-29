@@ -5,9 +5,13 @@ namespace ANcpLua.Agents.Mcp;
 
 /// <summary>
 /// Wraps a connected <see cref="McpClient"/> over a <see cref="HttpClientTransport"/>.
-/// The SDK's <see cref="McpClient"/> takes ownership of the transport and releases the
-/// underlying <c>HttpClient</c> connection pool when disposed, so this bundle disposes
-/// only the client — structurally identical to <see cref="QylStdioMcpClient"/>.
+/// Once connected, <see cref="McpClient"/> takes ownership of the transport and releases
+/// the underlying <c>HttpClient</c> connection pool on dispose, so this bundle disposes
+/// only the client. If the connection fails, the transport is disposed explicitly —
+/// unlike <see cref="QylStdioMcpClient"/>, whose transport is not disposable,
+/// <see cref="HttpClientTransport"/> is <see cref="IAsyncDisposable"/> and owns an
+/// <c>HttpClient</c> from construction, so a failed <see cref="McpClient.CreateAsync"/>
+/// would otherwise leak it.
 /// </summary>
 public sealed class QylHttpMcpClient : IAsyncDisposable
 {
@@ -25,8 +29,16 @@ public sealed class QylHttpMcpClient : IAsyncDisposable
             Endpoint = endpoint,
             TransportMode = HttpTransportMode.StreamableHttp
         });
-        var client = await McpClient.CreateAsync(transport, cancellationToken: cancellationToken).ConfigureAwait(false);
-        return new QylHttpMcpClient(client);
+        try
+        {
+            return new QylHttpMcpClient(
+                await McpClient.CreateAsync(transport, cancellationToken: cancellationToken).ConfigureAwait(false));
+        }
+        catch
+        {
+            await transport.DisposeAsync().ConfigureAwait(false);
+            throw;
+        }
     }
 
     /// <inheritdoc />
