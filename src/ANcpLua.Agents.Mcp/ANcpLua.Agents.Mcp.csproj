@@ -6,14 +6,13 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>maf;agents;microsoft-agents;mcp;model-context-protocol;client</PackageTags>
         <!--
-            CA2000 cannot model IAsyncDisposable-only ownership transfer.
-            ModelContextProtocol.Client.HttpClientTransport is IAsyncDisposable (no
-            sync Dispose), and McpClient.CreateAsync(IClientTransport) takes ownership
-            of the transport. The recommended dispose pattern (`x?.Dispose()` in
-            finally with `transport = null` after transfer) is exactly what
-            QylHttpMcpClient implements, but CA2000 only recognizes IDisposable.Dispose
-            in the finally block — so it flags the new HttpClientTransport(...) site
-            regardless. Same precedent as ANcpLua.Agents.Testing (FakeHttpMessageHandler).
+            CA2000 false positive in QylHttpMcpClient: HttpClientTransport is
+            IAsyncDisposable and owns an HttpClient from construction. On success
+            McpClient.CreateAsync takes ownership (the client disposes the transport on
+            DisposeAsync); on failure ConnectAsync disposes it explicitly in a catch.
+            CA2000 cannot model the success-path ownership transfer into CreateAsync, so it
+            still flags the `new HttpClientTransport(...)` site. StdioClientTransport is not
+            disposable, so the stdio bundle is unaffected.
         -->
         <NoWarn>$(NoWarn);CA2000</NoWarn>
     </PropertyGroup>

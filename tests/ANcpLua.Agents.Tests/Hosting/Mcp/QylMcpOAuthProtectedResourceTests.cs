@@ -22,7 +22,7 @@ public sealed class QylMcpOAuthProtectedResourceTests
         builder.WebHost.UseTestServer();
         builder.Services
             .AddMcpServer()
-            .WithHttpTransport()
+            .WithHttpTransport(o => o.Stateless = true)
             .WithQylOAuthProtectedResource(o =>
             {
                 o.Authority = "https://idp.example.com/realms/qyl";
@@ -61,7 +61,7 @@ public sealed class QylMcpOAuthProtectedResourceTests
         builder.WebHost.UseTestServer();
         builder.Services
             .AddMcpServer()
-            .WithHttpTransport()
+            .WithHttpTransport(o => o.Stateless = true)
             .WithQylOAuthProtectedResource(o =>
             {
                 o.Authority = "https://idp.example.com/realms/qyl";
@@ -106,7 +106,7 @@ public sealed class QylMcpOAuthProtectedResourceTests
         builder.WebHost.UseTestServer();
         builder.Services
             .AddMcpServer()
-            .WithHttpTransport()
+            .WithHttpTransport(o => o.Stateless = true)
             .WithQylOAuthProtectedResource(o =>
             {
                 o.Authority = "https://idp.example.com/realms/qyl";

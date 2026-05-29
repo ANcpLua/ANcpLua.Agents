@@ -92,7 +92,7 @@ public static class QylMcpClientExtensions
         Guard.NotNull(client);
 
         var tools = await client.ListToolsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
-        return [.. tools.Cast<AITool>()];
+        return [.. tools];
     }
 
     /// <summary>

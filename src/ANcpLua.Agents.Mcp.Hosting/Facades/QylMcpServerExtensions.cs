@@ -17,6 +17,11 @@ namespace ANcpLua.Agents.Mcp.Hosting;
 /// <c>IMcpServerBuilder</c> as <c>WithX(...)</c> chain calls (see the
 /// <c>Filters</c>, <c>Authentication</c>, <c>Logging</c>, and <c>Tasks</c>
 /// folders).
+/// <para>
+/// Set <c>Stateless</c> explicitly on <c>WithHttpTransport(...)</c>: the SDK
+/// default is expected to change, and stateless mode disables server-to-client
+/// features (sampling, elicitation, roots, resource subscriptions).
+/// </para>
 /// </remarks>
 public static class QylMcpServerExtensions
 {
