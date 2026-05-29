@@ -1,6 +1,7 @@
 using A2A;
 using ANcpLua.Roslyn.Utilities;
 using Microsoft.Agents.AI;
+using Microsoft.Agents.AI.A2A;
 using Microsoft.Extensions.Logging;
 
 namespace ANcpLua.Agents.Hosting.A2A;
@@ -72,5 +73,47 @@ public static class QylA2AClientExtensions
         Guard.NotNull(card);
 
         return card.AsAIAgent(httpClient, options, loggerFactory);
+    }
+
+    /// <summary>
+    /// Returns an <see cref="AIAgent"/> backed by the supplied A2A client, using the
+    /// <see href="https://github.com/a2aproject/A2A/blob/main/docs/topics/agent-discovery.md#3-direct-configuration--private-discovery">direct configuration / private discovery</see>
+    /// mechanism for endpoints known ahead of time.
+    /// </summary>
+    /// <param name="client">The A2A client pointing at the known remote endpoint.</param>
+    /// <param name="id">Optional unique identifier for the agent.</param>
+    /// <param name="name">Optional agent name.</param>
+    /// <param name="description">Optional agent description.</param>
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    /// <returns>An <see cref="AIAgent"/> backed by the remote A2A endpoint.</returns>
+    public static AIAgent AsQylA2AAgent(
+        this IA2AClient client,
+        string? id = null,
+        string? name = null,
+        string? description = null,
+        ILoggerFactory? loggerFactory = null)
+    {
+        Guard.NotNull(client);
+
+        return client.AsAIAgent(id, name, description, loggerFactory);
+    }
+
+    /// <summary>
+    /// Returns an <see cref="AIAgent"/> backed by the supplied A2A client, taking agent identity
+    /// (id, name, description) from the supplied <see cref="A2AAgentOptions"/>.
+    /// </summary>
+    /// <param name="client">The A2A client pointing at the known remote endpoint.</param>
+    /// <param name="options">Options controlling the agent's identity.</param>
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    /// <returns>An <see cref="AIAgent"/> backed by the remote A2A endpoint.</returns>
+    public static AIAgent AsQylA2AAgent(
+        this IA2AClient client,
+        A2AAgentOptions options,
+        ILoggerFactory? loggerFactory = null)
+    {
+        Guard.NotNull(client);
+        Guard.NotNull(options);
+
+        return client.AsAIAgent(options, loggerFactory);
     }
 }
