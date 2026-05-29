@@ -76,6 +76,29 @@ public static class QylA2AClientExtensions
     }
 
     /// <summary>
+    /// Returns an <see cref="AIAgent"/> backed by the supplied <see cref="AgentCard"/>, taking agent
+    /// identity from <paramref name="agentOptions"/> (non-null values override the card's name/description).
+    /// </summary>
+    /// <param name="card">The agent card describing the remote A2A endpoint.</param>
+    /// <param name="agentOptions">Identity options; non-null values override the corresponding card values.</param>
+    /// <param name="httpClient">Optional <see cref="HttpClient"/> reused for agent traffic.</param>
+    /// <param name="clientOptions">Optional client options controlling protocol-binding preference (HTTP+JSON vs JSON-RPC).</param>
+    /// <param name="loggerFactory">Optional logger factory.</param>
+    /// <returns>An <see cref="AIAgent"/> backed by the remote A2A endpoint.</returns>
+    public static AIAgent AsQylA2AAgent(
+        this AgentCard card,
+        A2AAgentOptions agentOptions,
+        HttpClient? httpClient = null,
+        A2AClientOptions? clientOptions = null,
+        ILoggerFactory? loggerFactory = null)
+    {
+        Guard.NotNull(card);
+        Guard.NotNull(agentOptions);
+
+        return card.AsAIAgent(agentOptions, httpClient, clientOptions, loggerFactory);
+    }
+
+    /// <summary>
     /// Returns an <see cref="AIAgent"/> backed by the supplied A2A client, using the
     /// <see href="https://github.com/a2aproject/A2A/blob/main/docs/topics/agent-discovery.md#3-direct-configuration--private-discovery">direct configuration / private discovery</see>
     /// mechanism for endpoints known ahead of time.
