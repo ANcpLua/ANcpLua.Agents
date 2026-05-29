@@ -27,7 +27,6 @@
     <PackageVersion Include="Microsoft.Agents.AI.Anthropic" Version="$(MicrosoftAgentsAIAnthropicVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.DevUI" Version="$(MicrosoftAgentsAIDevUIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.DurableTask" Version="$(MicrosoftAgentsAIDurableTaskVersion)"/>
-    <PackageVersion Include="Microsoft.Agents.AI.Harness" Version="$(MicrosoftAgentsAIHarnessVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.AGUI" Version="$(MicrosoftAgentsAIAGUIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore" Version="$(MicrosoftAgentsAIHostingAGUIAspNetCoreVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.A2A" Version="$(MicrosoftAgentsAIA2AVersion)"/>
