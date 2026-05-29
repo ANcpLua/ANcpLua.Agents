@@ -18,7 +18,6 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
         <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
         <PackageReference Include="Microsoft.Agents.AI"/>
-        <PackageReference Include="Microsoft.Agents.AI.Abstractions"/>
         <PackageReference Include="Microsoft.Agents.AI.AGUI"/>
         <PackageReference Include="Microsoft.Agents.AI.DurableTask"/>
         <PackageReference Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore"/>
