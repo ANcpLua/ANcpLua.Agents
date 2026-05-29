@@ -6,7 +6,7 @@ RC-channel Qyl-prefixed facades over Microsoft Agent Framework Foundry and decla
 
 Compatible with: Microsoft.Agents.AI 1.8.x
 Tested against: Microsoft.Agents.AI 1.8.0
-Capability tested against: Microsoft.Agents.AI.Foundry 1.7.0-preview.260526.1 and Microsoft.Agents.AI.Workflows.Declarative.Foundry 1.7.0-rc1
+Capability tested against: Microsoft.Agents.AI.Foundry 1.8.0-preview.260528.1 and Microsoft.Agents.AI.Workflows.Declarative.Foundry 1.8.0-rc1
 
 Channel: rc1. Keep this package isolated from stable consumers.
 

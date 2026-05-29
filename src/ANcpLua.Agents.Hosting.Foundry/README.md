@@ -6,7 +6,7 @@ Preview-channel Qyl-prefixed facades over Microsoft Agent Framework Foundry host
 
 Compatible with: Microsoft.Agents.AI 1.8.x
 Tested against: Microsoft.Agents.AI 1.8.0
-Capability tested against: Microsoft.Agents.AI.Foundry.Hosting 1.7.0-preview.260526.1
+Capability tested against: Microsoft.Agents.AI.Foundry.Hosting 1.8.0-preview.260528.1
 
 Includes the hosted-agent registration, toolbox registration, response mapping,
 and toolbox tool materialization facade helpers.

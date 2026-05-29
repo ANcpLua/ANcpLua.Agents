@@ -2,7 +2,7 @@
 
 Preview-channel Qyl-prefixed facades over Microsoft Agent Framework AG-UI (CopilotKit) streaming protocol support — server hosting plus client adapter in a single package.
 
-Tested against `Microsoft.Agents.AI.AGUI` and `Microsoft.Agents.AI.Hosting.AGUI.AspNetCore` at `1.7.0-preview.260526.1`.
+Tested against `Microsoft.Agents.AI.AGUI` and `Microsoft.Agents.AI.Hosting.AGUI.AspNetCore` at `1.8.0-preview.260528.1`.
 
 Channel: preview. Keep this package isolated from stable consumers.
 

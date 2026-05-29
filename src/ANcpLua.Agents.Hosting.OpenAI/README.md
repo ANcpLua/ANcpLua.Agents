@@ -6,7 +6,7 @@ Alpha-channel OpenAI-compatible hosting facades and client factory for Microsoft
 
 Compatible with: Microsoft.Agents.AI 1.8.x
 Tested against: Microsoft.Agents.AI 1.8.0
-Capability tested against: Microsoft.Agents.AI.Hosting.OpenAI 1.7.0-alpha.260526.1 and Microsoft.Agents.AI.OpenAI 1.7.0
+Capability tested against: Microsoft.Agents.AI.Hosting.OpenAI 1.8.0-alpha.260528.1 and Microsoft.Agents.AI.OpenAI 1.8.0
 
 Channel: alpha. Keep this package isolated from stable and preview consumers unless explicitly intended.
 

@@ -6,7 +6,7 @@ Preview-channel Qyl-prefixed facades over Microsoft Agent Framework Anthropic su
 
 Compatible with: Microsoft.Agents.AI 1.8.x
 Tested against: Microsoft.Agents.AI 1.8.0
-Capability tested against: Microsoft.Agents.AI.Anthropic 1.7.0-preview.260526.1
+Capability tested against: Microsoft.Agents.AI.Anthropic 1.8.0-preview.260528.1
 
 Channel: preview. Keep this package isolated from stable consumers.
 

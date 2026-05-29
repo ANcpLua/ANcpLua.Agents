@@ -6,7 +6,7 @@ Stable workflow testing harness for Microsoft Agent Framework consumers, includi
 
 Compatible with: Microsoft.Agents.AI 1.8.x
 Tested against: Microsoft.Agents.AI 1.8.0
-Capability tested against: Microsoft.Agents.AI.Workflows 1.7.0
+Capability tested against: Microsoft.Agents.AI.Workflows 1.8.0
 
 Channel: stable. This package exposes a facade layer over Microsoft.Agents.AI.Workflows and may change internal implementations across versions, so consumers should track facade contract changes rather than diff internal internals for parity.
 

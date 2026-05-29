@@ -6,7 +6,7 @@ Stable workflow helpers and Qyl-prefixed facades over Microsoft Agent Framework 
 
 Compatible with: Microsoft.Agents.AI 1.8.x
 Tested against: Microsoft.Agents.AI 1.8.0
-Capability tested against: Microsoft.Agents.AI.Workflows 1.7.0
+Capability tested against: Microsoft.Agents.AI.Workflows 1.8.0
 
 Channel: stable. This package must not reference Microsoft Agent Framework preview, RC, or alpha packages.
 
