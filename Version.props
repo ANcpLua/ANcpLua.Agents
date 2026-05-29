@@ -30,7 +30,6 @@
     <MicrosoftAgentsAIFoundryHostingVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIFoundryHostingVersion>
     <MicrosoftAgentsAIAnthropicVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIAnthropicVersion>
     <MicrosoftAgentsAIDevUIVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIDevUIVersion>
-    <MicrosoftAgentsAIHarnessVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHarnessVersion>
     <MicrosoftAgentsAIAGUIVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIAGUIVersion>
     <MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>
     <MicrosoftAgentsAIA2AVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIA2AVersion>
