@@ -5,8 +5,8 @@ Consumer toolkit for Microsoft Agent Framework — Qyl-prefixed facades over
 an MCP server over Streamable HTTP, so other MAF (or any MCP-aware) clients can
 consume them.
 
-Compatible with: Microsoft.Agents.AI 1.7.x
-Tested against: Microsoft.Agents.AI 1.7.0
+Compatible with: Microsoft.Agents.AI 1.8.x
+Tested against: Microsoft.Agents.AI 1.8.0
 Capability tested against: ModelContextProtocol.AspNetCore 1.3.0
 
 > **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).

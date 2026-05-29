@@ -4,8 +4,8 @@ Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing
 
 Preview-channel Qyl-prefixed facades over Microsoft Agent Framework DevUI support.
 
-Compatible with: Microsoft.Agents.AI 1.7.x
-Tested against: Microsoft.Agents.AI 1.7.0
+Compatible with: Microsoft.Agents.AI 1.8.x
+Tested against: Microsoft.Agents.AI 1.8.0
 Capability tested against: Microsoft.Agents.AI.DevUI 1.7.0-preview.260526.1
 
 Channel: preview. Keep this package isolated from stable consumers.
