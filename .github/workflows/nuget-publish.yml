@@ -113,10 +113,13 @@ jobs:
           dotnet pack src/ANcpLua.Agents.Hosting.Anthropic/ANcpLua.Agents.Hosting.Anthropic.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
           dotnet pack src/ANcpLua.Agents.Hosting.DevUI/ANcpLua.Agents.Hosting.DevUI.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
 
-      # RC1 channel: Foundry package consumes MAF declarative Foundry rc1.
+      # RC1 channel: Foundry consumes MAF declarative Foundry rc1; Workflows.Declarative consumes
+      # MAF Workflows.Declarative rc1.
       - name: Pack (rc1 channel)
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet pack src/ANcpLua.Agents.Foundry/ANcpLua.Agents.Foundry.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-rc1 --no-build
+        run: |
+          dotnet pack src/ANcpLua.Agents.Foundry/ANcpLua.Agents.Foundry.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-rc1 --no-build
+          dotnet pack src/ANcpLua.Agents.Workflows.Declarative/ANcpLua.Agents.Workflows.Declarative.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-rc1 --no-build
 
       # Alpha channel: OpenAI hosting consumes MAF alpha hosting; BitNet hosting bundles a
       # source generator that drives auto-discovery of [QylBitNetEndpoint] attributes — also alpha.
