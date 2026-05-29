@@ -52,7 +52,7 @@ public static class QylExecutorFactoryExtensions
         Guard.NotNullOrWhiteSpace(id);
         return new AggregatingExecutor<TInput, List<TInput>>(id, static (acc, value) =>
         {
-            List<TInput> list = acc ?? [];
+            var list = acc ?? [];
             list.Add(value);
             return list;
         });
@@ -86,7 +86,7 @@ public static class QylExecutorFactoryExtensions
         Guard.NotNull(prompt);
         return new FunctionExecutor<TInput, TOutput>(id, async (input, _, ct) =>
         {
-            AgentResponse<TOutput> response = await agent
+            var response = await agent
                 .RunAsync<TOutput>(prompt(input), cancellationToken: ct)
                 .ConfigureAwait(false);
             return response.Result;
@@ -110,7 +110,7 @@ public static class QylExecutorFactoryExtensions
         Guard.NotNull(prompt);
         return new FunctionExecutor<TInput, string>(id, async (input, _, ct) =>
         {
-            AgentResponse response = await agent
+            var response = await agent
                 .RunAsync(prompt(input), cancellationToken: ct)
                 .ConfigureAwait(false);
             return response.Text;

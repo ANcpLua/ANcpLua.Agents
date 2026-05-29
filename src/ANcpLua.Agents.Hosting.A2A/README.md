@@ -2,7 +2,7 @@
 
 Preview-channel Qyl-prefixed facades over Microsoft Agent Framework Agent2Agent (A2A) protocol hosting.
 
-Compatible with: Microsoft.Agents.AI 1.7.x
+Compatible with: Microsoft.Agents.AI 1.8.x
 Tested against: Microsoft.Agents.AI.A2A / Microsoft.Agents.AI.Hosting.A2A / Microsoft.Agents.AI.Hosting.A2A.AspNetCore 1.7.0-preview.260526.1
 Tested against: A2A / A2A.AspNetCore 1.0.0-preview2
 
@@ -55,5 +55,5 @@ var response = await remoteAgent.RunAsync("What files are in folder 'Demo1'?");
 ---
 Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing.
 
-Compatible with: Microsoft.Agents.AI 1.7.x
-Tested against: Microsoft.Agents.AI 1.7.0
+Compatible with: Microsoft.Agents.AI 1.8.x
+Tested against: Microsoft.Agents.AI 1.8.0

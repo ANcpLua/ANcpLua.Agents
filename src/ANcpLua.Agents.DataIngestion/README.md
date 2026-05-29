@@ -6,8 +6,8 @@ between `Microsoft.Extensions.DataIngestion` (which produces a
 consumes a search-callback delegate), so a `ChatClientAgent` becomes
 RAG-capable in one extension method.
 
-- Compatible with: Microsoft.Agents.AI 1.7.x
-- Tested against: Microsoft.Agents.AI 1.7.0
+- Compatible with: Microsoft.Agents.AI 1.8.x
+- Tested against: Microsoft.Agents.AI 1.8.0
 
 ## Why
 

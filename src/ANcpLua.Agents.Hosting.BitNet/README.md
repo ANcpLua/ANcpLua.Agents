@@ -4,8 +4,8 @@ Consumer toolkit for Microsoft Agent Framework — local-LLM hosting via Microso
 
 Alpha-channel package. Keep isolated from stable/preview consumers unless explicitly intended.
 
-- Compatible with: Microsoft.Agents.AI 1.7.x
-- Tested against: Microsoft.Agents.AI 1.7.0 + Microsoft.Extensions.AI 10.6.x
+- Compatible with: Microsoft.Agents.AI 1.8.x
+- Tested against: Microsoft.Agents.AI 1.8.0 + Microsoft.Extensions.AI 10.6.x
 - Capability tested against: BitNet b1.58 2B-4T weights served by Microsoft's prebuilt `bitnet.cpp` Docker image
 
 > **Naming:** `Qyl*` = consumer-facing facade / entry-point, bare = primitive consumers may compose with. See [the convention in ANcpLua.Agents](../ANcpLua.Agents/README.md#naming-convention).

@@ -55,7 +55,7 @@ public sealed class QylBitNetEndpointGenerator : IIncrementalGenerator
 
         string? model = null;
         string? apiPath = null;
-        bool enableOpenTelemetry = true;
+        var enableOpenTelemetry = true;
         string? openTelemetrySourceName = null;
 
         foreach (var named in attr.NamedArguments)

@@ -38,8 +38,8 @@ internal sealed class ChannelAgentResponseHandler(DurableAgentStreamRegistry reg
     {
         Guard.NotNull(messageStream);
 
-        string sessionKey = DurableAgentContext.Current.EntityContext.Id.ToString();
-        var channel = this._registry.GetOrCreateForProducer(sessionKey, out CancellationToken consumerDisconnect);
+        var sessionKey = DurableAgentContext.Current.EntityContext.Id.ToString();
+        var channel = this._registry.GetOrCreateForProducer(sessionKey, out var consumerDisconnect);
 
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, consumerDisconnect);
 

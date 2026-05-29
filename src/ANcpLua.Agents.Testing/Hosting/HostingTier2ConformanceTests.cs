@@ -88,7 +88,7 @@ public abstract class HostingTier2ConformanceTests
     public async Task ChatClientRunEmitsExpectedTelemetryAcrossHostsAsync(IHostFlavor host)
     {
         // Arrange
-        if (ExpectedActivitySources.Count == 0)
+        if (ExpectedActivitySources.Count is 0)
             return;
 
         using var fake = new FakeChatClient().WithResponse(ScriptedFakeResponse);

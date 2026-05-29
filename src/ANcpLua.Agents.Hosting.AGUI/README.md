@@ -56,5 +56,5 @@ IChatClient client = http.AsQylAGUIChatClient(new Uri("http://localhost:5000"));
 ---
 Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing.
 
-Compatible with: Microsoft.Agents.AI 1.7.x
-Tested against: Microsoft.Agents.AI 1.7.0
+Compatible with: Microsoft.Agents.AI 1.8.x
+Tested against: Microsoft.Agents.AI 1.8.0

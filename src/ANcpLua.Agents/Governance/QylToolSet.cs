@@ -67,7 +67,7 @@ public static class QylToolSet
         List<AITool> tools = [];
         foreach (var method in methods)
         {
-            AIFunction fn = AIFunctionFactory.Create(method, instance);
+            var fn = AIFunctionFactory.Create(method, instance);
 
             if (govern)
             {

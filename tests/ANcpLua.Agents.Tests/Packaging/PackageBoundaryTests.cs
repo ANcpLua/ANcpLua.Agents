@@ -46,8 +46,6 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.DataIngestion",
     ];
 
-    private static readonly HashSet<string> s_nonStablePackageIds = s_expectedPackageIds.Except(s_stablePackageIds, StringComparer.Ordinal).ToHashSet(StringComparer.Ordinal);
-
     private static readonly Dictionary<string, string[]> s_expectedDirectMafReferences = new(StringComparer.Ordinal)
     {
         ["ANcpLua.Agents"] = ["Microsoft.Agents.AI"],
@@ -114,6 +112,29 @@ public sealed partial class PackageBoundaryTests
     }
 
     [Fact]
+    public void SourcePackages_ShouldUseRecognizedMafDependencyVersions()
+    {
+        var centralVersions = LoadCentralPackageVersions();
+        var violations = new List<(string Project, string Package, string Version, string Channel)>();
+
+        foreach (var project in LoadSourceProjects())
+        {
+            var unrecognizedMafReferences = project.PackageReferences
+                .Where(static package => StringComparisonExtensions.StartsWithOrdinal(package, "Microsoft.Agents."))
+                .Select(package => (Package: package, Version: centralVersions.GetValueOrDefault(package, "")))
+                .Select(reference => (reference.Package, reference.Version, Channel: ParseMafDependencyChannel(reference.Version)))
+                .Where(reference => reference.Channel is MafDependencyChannel.Missing or MafDependencyChannel.UnknownPrerelease)
+                .Select(reference => (project.PackageId, reference.Package, reference.Version, reference.Channel.ToString()));
+
+            violations.AddRange(unrecognizedMafReferences);
+        }
+
+        violations.Should().BeEmpty(
+            $"MAF package references must use pinned versions with a recognized channel (stable, preview, rc, alpha). Found: " +
+            string.Join(", ", violations.Select(reference => $"{reference.Project}:{reference.Package}@{reference.Version} [{reference.Channel}]")));
+    }
+
+    [Fact]
     public void StablePackages_DoNotReferencePrereleaseOrUnpinnedMafPackages()
     {
         var centralVersions = LoadCentralPackageVersions();
@@ -134,24 +155,6 @@ public sealed partial class PackageBoundaryTests
         violations.Should().BeEmpty(
             $"Stable packages must not reference preview/rc/alpha (or unpinned) MAF packages. Found: " +
             string.Join(", ", violations.Select(reference => $"{reference.Project}:{reference.Package}@{reference.Version} [{reference.Channel}]")));
-    }
-
-    [Fact]
-    public void NonStablePackages_ShouldKeepAtLeastOneNonStableMafDependencyChannel()
-    {
-        var centralVersions = LoadCentralPackageVersions();
-
-        foreach (var project in LoadSourceProjects().Where(project => s_nonStablePackageIds.Contains(project.PackageId)))
-        {
-            var mafDependencies = project.PackageReferences
-                .Where(static package => StringComparisonExtensions.StartsWithOrdinal(package, "Microsoft.Agents."))
-                .Select(package => (Package: package, Version: centralVersions.GetValueOrDefault(package, "")))
-                .Select(reference => (reference.Package, reference.Version, Channel: ParseMafDependencyChannel(reference.Version)));
-
-            mafDependencies.Should().Contain(
-                static reference => reference.Channel != MafDependencyChannel.Stable,
-                $"{project.PackageId} is classified as non-stable and must include at least one non-stable or prerelease MAF dependency channel");
-        }
     }
 
     [Fact]
@@ -210,8 +213,8 @@ public sealed partial class PackageBoundaryTests
 
             var readme = File.ReadAllText(readmePath);
             readme.Should().Contain("Consumer toolkit for Microsoft Agent Framework");
-            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.7.x");
-            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.7.0");
+            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.8.x");
+            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.8.0");
         }
     }
 
@@ -283,8 +286,7 @@ public sealed partial class PackageBoundaryTests
             return MafDependencyChannel.Preview;
         }
 
-        if (string.Equals(firstIdentifier, "rc", StringComparison.OrdinalIgnoreCase) ||
-            StringComparisonExtensions.StartsWithIgnoreCase(firstIdentifier, "rc."))
+        if (StringComparisonExtensions.StartsWithIgnoreCase(firstIdentifier, "rc"))
         {
             return MafDependencyChannel.ReleaseCandidate;
         }

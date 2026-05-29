@@ -34,7 +34,7 @@ public class GoogleGeminiChatCompletionFixture : IChatClientAgentFixture
         var apiKey = TestConfiguration.GetRequiredValue(TestSettings.GoogleGeminiApiKey);
         var modelName = TestConfiguration.GetRequiredValue(TestSettings.GoogleGeminiChatModelName);
 
-        IChatClient chatClient = new Client(apiKey: apiKey).AsIChatClient(modelName);
+        var chatClient = new Client(apiKey: apiKey).AsIChatClient(modelName);
 
         return Task.FromResult(new ChatClientAgent(chatClient, new ChatClientAgentOptions
         {
