@@ -1,4 +1,4 @@
-using ANcpLua.Agents.Mcp.Hosting.Hosting;
+using ANcpLua.Agents.Mcp.Hosting.WebHost;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

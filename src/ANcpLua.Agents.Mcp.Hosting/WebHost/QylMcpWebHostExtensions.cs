@@ -2,7 +2,7 @@ using ANcpLua.Roslyn.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
-namespace ANcpLua.Agents.Mcp.Hosting.Hosting;
+namespace ANcpLua.Agents.Mcp.Hosting.WebHost;
 
 /// <summary>
 /// Web-host bootstrap facades for MCP servers running on Kestrel.
@@ -28,6 +28,11 @@ public static class QylMcpWebHostExtensions
     /// wins and this method is a no-op. Otherwise — when <c>PORT</c> parses
     /// to a positive integer — Kestrel is bound to
     /// <c>http://0.0.0.0:{port}</c>.
+    /// </para>
+    /// <para>
+    /// Binding <c>0.0.0.0</c> does not validate inbound <c>Host</c> headers.
+    /// Configure <c>AllowedHosts</c> to your known public host name to guard
+    /// against DNS rebinding; edge TLS termination (Heroku/Railway) is assumed.
     /// </para>
     /// </remarks>
     public static IWebHostBuilder UseQylMcpPortFallback(
