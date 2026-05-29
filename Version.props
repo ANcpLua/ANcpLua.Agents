@@ -75,10 +75,6 @@
     <MicrosoftSemanticKernelConnectorsInMemoryVersion>1.74.0-preview</MicrosoftSemanticKernelConnectorsInMemoryVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="A2A (Agent2Agent protocol SDK — a2aproject/a2a-dotnet)">
-    <A2AVersion>1.0.0-preview2</A2AVersion>
-    <A2AAspNetCoreVersion>1.0.0-preview2</A2AAspNetCoreVersion>
-  </PropertyGroup>
 
   <PropertyGroup Label="ModelContextProtocol (MCP SDK — modelcontextprotocol/csharp-sdk)">
     <ModelContextProtocolVersion>1.3.0</ModelContextProtocolVersion>
