@@ -48,12 +48,12 @@ public sealed partial class PackageBoundaryTests
 
     private static readonly Dictionary<string, string[]> s_expectedDirectMafReferences = new(StringComparer.Ordinal)
     {
-        ["ANcpLua.Agents"] = ["Microsoft.Agents.AI"],
-        ["ANcpLua.Agents.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Workflows"],
-        ["ANcpLua.Agents.Testing"] = ["Microsoft.Agents.AI"],
-        ["ANcpLua.Agents.Testing.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Workflows"],
-        ["ANcpLua.Agents.Hosting.Azure"] = ["Microsoft.Agents.AI.Hosting.AzureFunctions"],
-        ["ANcpLua.Agents.Hosting.Foundry"] = ["Microsoft.Agents.AI.Foundry.Hosting"],
+        ["ANcpLua.Agents"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions"],
+        ["ANcpLua.Agents.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions", "Microsoft.Agents.AI.Workflows"],
+        ["ANcpLua.Agents.Testing"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions"],
+        ["ANcpLua.Agents.Testing.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions", "Microsoft.Agents.AI.Workflows"],
+        ["ANcpLua.Agents.Hosting.Azure"] = ["Microsoft.Agents.AI.Abstractions", "Microsoft.Agents.AI.Hosting.AzureFunctions"],
+        ["ANcpLua.Agents.Hosting.Foundry"] = ["Microsoft.Agents.AI.Abstractions", "Microsoft.Agents.AI.Foundry.Hosting"],
         ["ANcpLua.Agents.Hosting.Anthropic"] = ["Microsoft.Agents.AI.Anthropic"],
         ["ANcpLua.Agents.Hosting.DevUI"] = ["Microsoft.Agents.AI.DevUI"],
         ["ANcpLua.Agents.Foundry"] =
@@ -64,6 +64,7 @@ public sealed partial class PackageBoundaryTests
         ["ANcpLua.Agents.Hosting.OpenAI"] =
         [
             "Microsoft.Agents.AI",
+            "Microsoft.Agents.AI.Abstractions",
             "Microsoft.Agents.AI.OpenAI",
             "Microsoft.Agents.AI.Hosting.OpenAI",
         ],
@@ -72,6 +73,7 @@ public sealed partial class PackageBoundaryTests
         ["ANcpLua.Agents.Hosting.A2A"] =
         [
             "Microsoft.Agents.AI",
+            "Microsoft.Agents.AI.Abstractions",
             "Microsoft.Agents.AI.A2A",
             "Microsoft.Agents.AI.Hosting.A2A",
             "Microsoft.Agents.AI.Hosting.A2A.AspNetCore",
@@ -79,6 +81,7 @@ public sealed partial class PackageBoundaryTests
         ["ANcpLua.Agents.Hosting.AGUI"] =
         [
             "Microsoft.Agents.AI",
+            "Microsoft.Agents.AI.Abstractions",
             "Microsoft.Agents.AI.AGUI",
             "Microsoft.Agents.AI.DurableTask",
             "Microsoft.Agents.AI.Hosting.AGUI.AspNetCore",
@@ -86,7 +89,7 @@ public sealed partial class PackageBoundaryTests
         ["ANcpLua.Agents.Hosting.GoogleGemini"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Mcp"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Mcp.Hosting"] = [],
-        ["ANcpLua.Agents.DataIngestion"] = ["Microsoft.Agents.AI"],
+        ["ANcpLua.Agents.DataIngestion"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions"],
     };
 
     [Fact]

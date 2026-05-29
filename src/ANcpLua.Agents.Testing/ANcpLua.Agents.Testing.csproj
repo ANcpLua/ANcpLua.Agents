@@ -36,6 +36,7 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
         <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
         <PackageReference Include="Microsoft.Agents.AI"/>
+        <PackageReference Include="Microsoft.Agents.AI.Abstractions"/>
         <PackageReference Include="xunit.v3.extensibility.core"/>
         <PackageReference Include="xunit.v3.assert"/>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
