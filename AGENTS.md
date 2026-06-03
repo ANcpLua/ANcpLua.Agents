@@ -57,7 +57,7 @@ Imported from `ANcpLua.NET.Sdk` (global `AGENTS.md`). Key house rules:
 
 - **Runtime vs test surface split**: `ANcpLua.Agents` is the runtime package (no test-only types). `ANcpLua.Agents.Testing` adds fakes + fixtures. Keep them separate — consumers should never need both in production.
 - **No dogfooded analyzers on the test package**: `ANcpLua.Agents.Testing` relaxes rules that don't fit test-double patterns.
-- **MAF version discipline**: bump `Microsoft.Agents.AI.*` in `Version.props` as a group. The numeric base ships in lock-step from upstream (currently `1.7.0`), but the family spans mixed release tracks — stable for `core`/`Workflows`/`OpenAI`, `-preview` for `Foundry`/`Hosting`/`AzureFunctions`/`Foundry.Hosting`/`Anthropic`/`DevUI`/`DurableTask`/`Harness`/`AGUI`/`A2A`, `-alpha` for `Hosting.OpenAI`, `-rc1` for `Workflows.Declarative`/`.Foundry`. Mismatched numeric bases break assembly binding; mismatched tracks within the same numeric base are what upstream actually ships, so keep them aligned but accept the suffix variance.
+- **MAF version discipline**: bump `Microsoft.Agents.AI.*` in `Version.props` as a group. The numeric base ships in lock-step from upstream (currently `1.8.0`), but the family spans mixed release tracks — stable for `core`/`Workflows`/`OpenAI`, `-preview` for `Foundry`/`Hosting`/`AzureFunctions`/`Foundry.Hosting`/`Anthropic`/`DevUI`/`DurableTask`/`AGUI`/`A2A`, `-alpha` for `Hosting.OpenAI`, `-rc1` for `Workflows.Declarative`/`.Foundry`. Mismatched numeric bases break assembly binding; mismatched tracks within the same numeric base are what upstream actually ships, so keep them aligned but accept the suffix variance.
 
 ## Cross-Repo Awareness — was passiert, wenn du Versionen anfasst
 
