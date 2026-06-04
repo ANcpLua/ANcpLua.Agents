@@ -20,8 +20,7 @@ public sealed class QylDurableAgentsGenerator : IIncrementalGenerator
                 OrchestratorAnalyzer.MetadataName,
                 OrchestratorAnalyzer.CouldBeOrchestratorMethod,
                 OrchestratorAnalyzer.Extract)
-            .Where(static e => e is not null)
-            .Select(static (e, _) => e!)
+            .WhereNotNull()
             .Collect();
 
         var activities = context.SyntaxProvider
@@ -29,8 +28,7 @@ public sealed class QylDurableAgentsGenerator : IIncrementalGenerator
                 ActivityAnalyzer.MetadataName,
                 ActivityAnalyzer.CouldBeActivityMethod,
                 ActivityAnalyzer.Extract)
-            .Where(static e => e is not null)
-            .Select(static (e, _) => e!)
+            .WhereNotNull()
             .Collect();
 
         var endpoints = context.SyntaxProvider
@@ -38,8 +36,7 @@ public sealed class QylDurableAgentsGenerator : IIncrementalGenerator
                 AgentEndpointAnalyzer.MetadataName,
                 AgentEndpointAnalyzer.CouldBeEndpointMethod,
                 AgentEndpointAnalyzer.Extract)
-            .Where(static e => e is not null)
-            .Select(static (e, _) => e!)
+            .WhereNotNull()
             .Collect();
 
         var combined = orchestrators
