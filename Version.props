@@ -2,85 +2,33 @@
   <!--
     LOCAL OVERRIDE — ANcpLua.Agents
 
-    Imported by Directory.Packages.props at the top, BEFORE the SDK-shipped
-    Version.props is in scope (the SDK only imports its own Version.props
-    once a project enters <Project Sdk="ANcpLua.NET.Sdk">). Therefore this
-    file must define every $(...Version) variable that Directory.Packages.props
-    references — pruning to "ahead-only" breaks restore.
-
-    Values mirror SDK truth (numeric base 1.8.0; experimental tracks where
-    upstream ships them). Deviations from truth:
-      - Google.GenAI (not in truth)
+    Directory.Packages.props imports this file before the SDK-shipped truth is
+    in scope, so every referenced version variable must be defined here.
   -->
 
-  <PropertyGroup Label="Roslyn.Utilities (consumed from sibling repo)">
+  <PropertyGroup Label="Roslyn.Utilities">
     <ANcpLuaRoslynUtilitiesVersion>2.2.24</ANcpLuaRoslynUtilitiesVersion>
     <ANcpLuaRoslynUtilitiesTestingVersion>2.2.24</ANcpLuaRoslynUtilitiesTestingVersion>
-    <ANcpLuaRoslynUtilitiesSourcesVersion>2.2.24</ANcpLuaRoslynUtilitiesSourcesVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF 1.8.0 — mirrors SDK truth, per-package channel)">
-    <!-- Core/Workflows/OpenAI align on the 1.8.0 release line; platform-specific packages follow published channels. -->
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.8.0)">
     <MicrosoftAgentsAIVersion>1.8.0</MicrosoftAgentsAIVersion>
     <MicrosoftAgentsAIWorkflowsVersion>1.8.0</MicrosoftAgentsAIWorkflowsVersion>
-    <MicrosoftAgentsAIOpenAIVersion>1.8.0</MicrosoftAgentsAIOpenAIVersion>
-    <MicrosoftAgentsAIFoundryVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIFoundryVersion>
-    <MicrosoftAgentsAIHostingVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingVersion>
-    <MicrosoftAgentsAIHostingAzureFunctionsVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingAzureFunctionsVersion>
-    <MicrosoftAgentsAIFoundryHostingVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIFoundryHostingVersion>
-    <MicrosoftAgentsAIAnthropicVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIAnthropicVersion>
-    <MicrosoftAgentsAIDevUIVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIDevUIVersion>
-    <MicrosoftAgentsAIAGUIVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIAGUIVersion>
-    <MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingAGUIAspNetCoreVersion>
-    <MicrosoftAgentsAIA2AVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIA2AVersion>
-    <MicrosoftAgentsAIHostingA2AVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingA2AVersion>
-    <MicrosoftAgentsAIHostingA2AAspNetCoreVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIHostingA2AAspNetCoreVersion>
-    <!-- Declarative workflows channel -->
-    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.8.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
-    <MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>1.8.0-rc1</MicrosoftAgentsAIWorkflowsDeclarativeFoundryVersion>
-    <!-- OpenAI hosting channel -->
-    <MicrosoftAgentsAIHostingOpenAIVersion>1.8.0-alpha.260528.1</MicrosoftAgentsAIHostingOpenAIVersion>
-    <!-- DurableTask integration channel -->
-    <MicrosoftAgentsAIDurableTaskVersion>1.8.0-preview.260528.1</MicrosoftAgentsAIDurableTaskVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.DurableTask (host-agnostic worker + client; gRPC sidecar backend)">
-    <MicrosoftDurableTaskGrpcVersion>1.24.1</MicrosoftDurableTaskGrpcVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Grpc.AspNetCore (server-streaming surface for durable agent updates)">
-    <GrpcAspNetCoreVersion>2.76.0</GrpcAspNetCoreVersion>
-    <GrpcToolsVersion>2.80.0</GrpcToolsVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Label="ManagedAgentTelemetry.Host sample (Foundry persistent agents + Teams + RAG + AzMon)">
-    <AzureAIProjectsVersion>2.1.0-beta.2</AzureAIProjectsVersion>
-    <MicrosoftGraphVersion>5.104.0</MicrosoftGraphVersion>
-    <AzureSearchDocumentsVersion>11.7.0</AzureSearchDocumentsVersion>
-    <AzureMonitorOpenTelemetryAspNetCoreVersion>1.4.0</AzureMonitorOpenTelemetryAspNetCoreVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Microsoft.Extensions.AI">
+  <PropertyGroup Label="Microsoft.Extensions">
     <MicrosoftExtensionsAIVersion>10.6.0</MicrosoftExtensionsAIVersion>
     <MicrosoftExtensionsAIAbstractionsVersion>10.6.0</MicrosoftExtensionsAIAbstractionsVersion>
     <MicrosoftExtensionsAIOpenAIVersion>10.6.0</MicrosoftExtensionsAIOpenAIVersion>
+    <MicrosoftExtensionsHostingAbstractionsVersion>10.0.8</MicrosoftExtensionsHostingAbstractionsVersion>
     <MicrosoftBclAsyncInterfacesVersion>10.0.8</MicrosoftBclAsyncInterfacesVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Extensions.DataIngestion (RAG ingestion building blocks — ANcpLua.Agents.DataIngestion facades)">
-    <MicrosoftExtensionsDataIngestionVersion>10.6.0-preview.1.26261.4</MicrosoftExtensionsDataIngestionVersion>
-    <MicrosoftExtensionsDataIngestionMarkdigVersion>10.6.0-preview.1.26261.4</MicrosoftExtensionsDataIngestionMarkdigVersion>
-    <MicrosoftMLTokenizersVersion>2.0.0</MicrosoftMLTokenizersVersion>
-    <MicrosoftSemanticKernelConnectorsInMemoryVersion>1.74.0-preview</MicrosoftSemanticKernelConnectorsInMemoryVersion>
+  <PropertyGroup Label="OpenTelemetry">
+    <OpenTelemetryVersion>1.15.3</OpenTelemetryVersion>
   </PropertyGroup>
 
-
-  <PropertyGroup Label="ModelContextProtocol (MCP SDK — modelcontextprotocol/csharp-sdk)">
-    <ModelContextProtocolVersion>1.3.0</ModelContextProtocolVersion>
-    <ModelContextProtocolAspNetCoreVersion>1.3.0</ModelContextProtocolAspNetCoreVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Label="LLM Provider SDKs (AgentTesting Conformance/Examples fixtures)">
+  <PropertyGroup Label="LLM Provider SDKs (Testing fixtures)">
     <OpenAIVersion>2.10.0</OpenAIVersion>
     <AzureAIOpenAIVersion>2.1.0</AzureAIOpenAIVersion>
     <AzureIdentityVersion>1.21.0</AzureIdentityVersion>
@@ -96,12 +44,7 @@
     <MoqVersion>4.20.72</MoqVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Roslyn (SyntaxTreeFluentExtensions + analyzer framework)">
-    <RoslynVersion>5.3.0</RoslynVersion>
-    <RoslynAnalyzersVersion>5.3.0</RoslynAnalyzersVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Label="ASP.NET Core (Microsoft.AspNetCore.Mvc.Testing — AgentTesting Hosting/ folder)">
+  <PropertyGroup Label="ASP.NET Core">
     <AspNetCoreVersion>10.0.8</AspNetCoreVersion>
   </PropertyGroup>
 </Project>

@@ -1,5 +1,6 @@
 [![CI](https://github.com/ANcpLua/ANcpLua.Agents/actions/workflows/nuget-publish.yml/badge.svg)](https://github.com/ANcpLua/ANcpLua.Agents/actions/workflows/nuget-publish.yml)
 [![NuGet ANcpLua.Agents](https://img.shields.io/nuget/v/ANcpLua.Agents?label=ANcpLua.Agents&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Agents/)
+[![NuGet ANcpLua.Agents.Instrumentation](https://img.shields.io/nuget/v/ANcpLua.Agents.Instrumentation?label=.Instrumentation&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Agents.Instrumentation/)
 [![NuGet ANcpLua.Agents.Workflows](https://img.shields.io/nuget/v/ANcpLua.Agents.Workflows?label=.Workflows&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Agents.Workflows/)
 [![NuGet ANcpLua.Agents.Testing](https://img.shields.io/nuget/v/ANcpLua.Agents.Testing?label=.Testing&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Agents.Testing/)
 [![NuGet ANcpLua.Agents.Testing.Workflows](https://img.shields.io/nuget/v/ANcpLua.Agents.Testing.Workflows?label=.Testing.Workflows&color=0891B2)](https://www.nuget.org/packages/ANcpLua.Agents.Testing.Workflows/)
@@ -8,27 +9,39 @@
 
 # ANcpLua.Agents
 
-Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing.
+Lean toolkit for Microsoft Agent Framework 1.8.x.
+
+The repo is intentionally small: runtime governance primitives, Agent Framework OpenTelemetry middleware, service defaults, workflow helpers, and test infrastructure. Provider-specific facades, MCP wrappers, Qyl Durable experiments, and demo product hosts were removed instead of kept alive as compatibility shims.
 
 Compatible with: Microsoft.Agents.AI 1.8.x
 Tested against: Microsoft.Agents.AI 1.8.0
 
-`ANcpLua.Agents` mirrors the Microsoft Agent Framework package shape without the redundant `.AI` segment:
-`Microsoft.Agents.AI.X` maps to `ANcpLua.Agents.X`.
+## Packages
 
-| Channel | Package | Contents |
-|---|---|---|
-| stable | [`ANcpLua.Agents`](https://www.nuget.org/packages/ANcpLua.Agents/) | Core facades, governance primitives, instrumentation helpers |
-| stable | [`ANcpLua.Agents.Workflows`](https://www.nuget.org/packages/ANcpLua.Agents.Workflows/) | Workflow facades and execution helpers |
-| stable | [`ANcpLua.Agents.Testing`](https://www.nuget.org/packages/ANcpLua.Agents.Testing/) | `FakeChatClient`, conformance bases, 6 provider fixtures |
-| stable | [`ANcpLua.Agents.Testing.Workflows`](https://www.nuget.org/packages/ANcpLua.Agents.Testing.Workflows/) | Workflow harness and framework-internals mirror |
-| preview | [`ANcpLua.Agents.Hosting.Azure`](https://www.nuget.org/packages/ANcpLua.Agents.Hosting.Azure/) | Azure Functions hosting facades |
-| preview | [`ANcpLua.Agents.Hosting.Foundry`](https://www.nuget.org/packages/ANcpLua.Agents.Hosting.Foundry/) | Foundry hosted-agent facades |
-| preview | [`ANcpLua.Agents.Hosting.Anthropic`](https://www.nuget.org/packages/ANcpLua.Agents.Hosting.Anthropic/) | Anthropic agent facades |
-| preview | [`ANcpLua.Agents.Hosting.DevUI`](https://www.nuget.org/packages/ANcpLua.Agents.Hosting.DevUI/) | DevUI facades |
-| rc1 | [`ANcpLua.Agents.Foundry`](https://www.nuget.org/packages/ANcpLua.Agents.Foundry/) | Foundry and declarative Foundry facades |
-| alpha | [`ANcpLua.Agents.Hosting.OpenAI`](https://www.nuget.org/packages/ANcpLua.Agents.Hosting.OpenAI/) | OpenAI-compatible hosting facades and client factory |
+| Package | Contents |
+|---|---|
+| [`ANcpLua.Agents`](https://www.nuget.org/packages/ANcpLua.Agents/) | Core runtime helpers and governance primitives |
+| [`ANcpLua.Agents.Instrumentation`](https://www.nuget.org/packages/ANcpLua.Agents.Instrumentation/) | MAF run/tool telemetry middleware and OpenTelemetry registration helpers |
+| [`ANcpLua.Agents.Hosting.ServiceDefaults`](https://www.nuget.org/packages/ANcpLua.Agents.Hosting.ServiceDefaults/) | Health endpoints plus MAF ActivitySource registration helpers |
+| [`ANcpLua.Agents.Workflows`](https://www.nuget.org/packages/ANcpLua.Agents.Workflows/) | Workflow facades and execution helpers |
+| [`ANcpLua.Agents.Testing`](https://www.nuget.org/packages/ANcpLua.Agents.Testing/) | Fake agents, fake chat clients, diagnostics, conformance fixtures |
+| [`ANcpLua.Agents.Testing.Workflows`](https://www.nuget.org/packages/ANcpLua.Agents.Testing.Workflows/) | Workflow fixtures and workflow harnesses |
 
-Stable packages do not reference Microsoft Agent Framework preview, RC, or alpha packages. Channel isolation is enforced by tests in `tests/ANcpLua.Agents.Tests/Packaging`.
+## Instrumentation
 
-Siblings: [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) · [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) · [ANcpLua.Analyzers](https://github.com/ANcpLua/ANcpLua.Analyzers) · [Qyl.OpenTelemetry.SemanticConventions](https://github.com/ANcpLua/Qyl.OpenTelemetry.SemanticConventions)
+```csharp
+builder.AddAgentTelemetry();
+
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing.AddAgentFrameworkSources())
+    .WithMetrics(metrics => metrics.AddAgentFrameworkMeters());
+
+var agent = baseAgent.AsBuilder()
+    .UseAgentRunTelemetry()
+    .UseAgentToolTelemetry()
+    .Build();
+```
+
+The telemetry package instruments Agent Framework middleware. It emits bounded run/tool spans and bounded metrics. It does not emit raw prompts, message content, tool arguments, tool results, API keys, or exception messages.
+
+Siblings: [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) · [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) · [ANcpLua.Analyzers](https://github.com/ANcpLua/ANcpLua.Analyzers)

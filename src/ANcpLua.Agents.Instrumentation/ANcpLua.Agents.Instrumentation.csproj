@@ -1,0 +1,23 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>ANcpLua.Agents.Instrumentation</RootNamespace>
+        <PackageId>ANcpLua.Agents.Instrumentation</PackageId>
+        <Description>OpenTelemetry instrumentation middleware for Microsoft Agent Framework agents: run spans, tool-call spans, and bounded metrics.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>maf;agents;microsoft-agents;instrumentation;opentelemetry;metrics;tracing</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ANcpLua.Roslyn.Utilities"/>
+        <PackageReference Include="Microsoft.Agents.AI"/>
+        <PackageReference Include="Microsoft.Extensions.AI"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
+        <PackageReference Include="OpenTelemetry"/>
+        <PackageReference Include="OpenTelemetry.Api"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+</Project>

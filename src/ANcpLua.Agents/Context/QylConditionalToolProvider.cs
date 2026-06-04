@@ -12,10 +12,9 @@ namespace ANcpLua.Agents.Context;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Distinct from <c>ToolDecoratingChatClient</c>: that decorator rewrites the tools
-///         registered on the agent. This provider <em>injects</em> tools the agent never owned,
-///         scoped to the turn that needed them. Pairs with <see cref="Governance.GovernedAIFunction"/>
-///         because the injected tools can be pre-wrapped before the rule's factory returns them.
+///         This provider <em>injects</em> tools the agent never owned, scoped to the turn that
+///         needed them. Pairs with <see cref="Governance.GovernedAIFunction"/> because injected
+///         tools can be pre-wrapped before the rule's factory returns them.
 ///     </para>
 ///     <code>
 ///     var router = new QylConditionalToolProvider()

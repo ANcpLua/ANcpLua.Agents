@@ -7,31 +7,17 @@
             CA1707 — underscores in identifiers: convention for test names (Method_Condition_Expected).
             xUnit1051 — TestContext.Current.CancellationToken: stylistic, not bug-catching.
             CS1591  — XML doc comments not required on test methods.
-            OPENAI001 / MEAI001 / MAAI001 — upstream MAF/MEAI/OpenAI experimental API markers
-            referenced by hosting-surface reflection tests; mirrors the alpha hosting csproj.
+            MEAI001 / MAAI001 — upstream MAF/MEAI experimental API markers in MAF agent tests.
         -->
-        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051;OPENAI001;MEAI001;MAAI001</NoWarn>
+        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051;MEAI001;MAAI001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Foundry\ANcpLua.Agents.Foundry.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Anthropic\ANcpLua.Agents.Hosting.Anthropic.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Azure\ANcpLua.Agents.Hosting.Azure.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.DevUI\ANcpLua.Agents.Hosting.DevUI.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.AGUI\ANcpLua.Agents.Hosting.AGUI.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.Foundry\ANcpLua.Agents.Hosting.Foundry.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.GoogleGemini\ANcpLua.Agents.Hosting.GoogleGemini.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.OpenAI\ANcpLua.Agents.Hosting.OpenAI.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Mcp\ANcpLua.Agents.Mcp.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Mcp.Hosting\ANcpLua.Agents.Mcp.Hosting.csproj"/>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.DataIngestion\ANcpLua.Agents.DataIngestion.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Instrumentation\ANcpLua.Agents.Instrumentation.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.ServiceDefaults\ANcpLua.Agents.Hosting.ServiceDefaults.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing.Workflows\ANcpLua.Agents.Testing.Workflows.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Workflows\ANcpLua.Agents.Workflows.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup Label="DataIngestion tests need an InMemory vector store fixture">
-        <PackageReference Include="Microsoft.SemanticKernel.Connectors.InMemory"/>
     </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@ on:
         description: 'Version override (without v prefix). Leave empty to auto-bump from latest tag.'
         required: false
       force_publish:
-        description: 'Force publish even when the Must-Publish gate sees no src/tests/publish-workflow changes.'
+        description: 'Force publish even when the Must-Publish gate sees no source/test/workflow changes.'
         required: false
         type: boolean
         default: false
@@ -29,11 +29,6 @@ env:
   CI: true
 
 jobs:
-  # Compute version by reading the latest v* tag and bumping the patch.
-  # ANcpLua.Agents tracks the MAF stable major/minor, so the auto path floors
-  # new releases to 1.8.x now that this repo is pinned to Microsoft.Agents.AI 1.8.0.
-  # If HEAD is exactly the tag, reuse the version (re-run safe).
-  # workflow_dispatch with an explicit version overrides the auto-bump.
   version:
     runs-on: ubuntu-latest
     outputs:
@@ -47,7 +42,6 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION="${{ github.event.inputs.version }}"
-            echo "Workflow dispatch override: $VERSION"
           else
             BASE_MAJOR=1
             BASE_MINOR=8
@@ -58,24 +52,18 @@ jobs:
               PATCH=${BASH_REMATCH[3]}
               if (( MAJOR < BASE_MAJOR || (MAJOR == BASE_MAJOR && MINOR < BASE_MINOR) )); then
                 VERSION="$BASE_MAJOR.$BASE_MINOR.0"
-                echo "Latest tag $LATEST_TAG is below MAF $BASE_MAJOR.$BASE_MINOR.x — starting at: $VERSION"
               elif git tag --points-at HEAD | grep -qFx "$LATEST_TAG"; then
                 VERSION="$MAJOR.$MINOR.$PATCH"
-                echo "HEAD is tagged $LATEST_TAG — reusing version: $VERSION"
               else
                 PATCH=$((PATCH + 1))
                 VERSION="$MAJOR.$MINOR.$PATCH"
-                echo "Commits after $LATEST_TAG — bumped to: $VERSION"
               fi
             else
-              VERSION="$BASE_MAJOR.$BASE_MINOR.0"
-              echo "No v* tag found — defaulting to MAF base: $VERSION"
+              VERSION="1.8.9"
             fi
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-  # Build on both Linux and Windows to catch platform-specific issues early.
-  # Pack/upload only from Linux to avoid duplicate artifacts.
   build:
     needs: version
     strategy:
@@ -94,41 +82,15 @@ jobs:
         run: dotnet build ANcpLua.Agents.slnx -c Release --no-restore -p:Version=${{ needs.version.outputs.version }}
       - name: Test
         run: dotnet test --project tests/ANcpLua.Agents.Tests/ANcpLua.Agents.Tests.csproj -c Release --no-restore --no-build
-
-      # Stable channel: no MAF prerelease deps.
-      - name: Pack (stable channel)
+      - name: Pack
         if: matrix.os == 'ubuntu-latest'
         run: |
           dotnet pack src/ANcpLua.Agents/ANcpLua.Agents.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
+          dotnet pack src/ANcpLua.Agents.Instrumentation/ANcpLua.Agents.Instrumentation.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
+          dotnet pack src/ANcpLua.Agents.Hosting.ServiceDefaults/ANcpLua.Agents.Hosting.ServiceDefaults.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Workflows/ANcpLua.Agents.Workflows.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
-
-      # Preview channel: provider hosting packages that directly consume MAF preview packages.
-      - name: Pack (preview channel)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          dotnet pack src/ANcpLua.Agents.Hosting.Azure/ANcpLua.Agents.Hosting.Azure.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
-          dotnet pack src/ANcpLua.Agents.Hosting.Foundry/ANcpLua.Agents.Hosting.Foundry.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
-          dotnet pack src/ANcpLua.Agents.Hosting.Anthropic/ANcpLua.Agents.Hosting.Anthropic.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
-          dotnet pack src/ANcpLua.Agents.Hosting.DevUI/ANcpLua.Agents.Hosting.DevUI.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-preview.1 --no-build
-
-      # RC1 channel: Foundry consumes MAF declarative Foundry rc1; Workflows.Declarative consumes
-      # MAF Workflows.Declarative rc1.
-      - name: Pack (rc1 channel)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          dotnet pack src/ANcpLua.Agents.Foundry/ANcpLua.Agents.Foundry.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-rc1 --no-build
-          dotnet pack src/ANcpLua.Agents.Workflows.Declarative/ANcpLua.Agents.Workflows.Declarative.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-rc1 --no-build
-
-      # Alpha channel: OpenAI hosting consumes MAF alpha hosting; BitNet hosting bundles a
-      # source generator that drives auto-discovery of [QylBitNetEndpoint] attributes — also alpha.
-      - name: Pack (alpha channel)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          dotnet pack src/ANcpLua.Agents.Hosting.OpenAI/ANcpLua.Agents.Hosting.OpenAI.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-alpha.1 --no-build
-          dotnet pack src/ANcpLua.Agents.Hosting.BitNet/ANcpLua.Agents.Hosting.BitNet.csproj   -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }}-alpha.1 --no-build
-
       - name: Upload artifacts
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -137,15 +99,6 @@ jobs:
           path: artifacts/*.nupkg
           if-no-files-found: error
 
-  # Publish on push to main (auto-bump-on-merge) or workflow_dispatch override.
-  # The `Must Publish Packages` gate diffs against the latest tag — docs-only PRs skip publish.
-  # The `nuget` environment houses the trusted-publishing config.
-  #
-  # Trusted publishing setup (one-time, per package):
-  #   1. Visit https://www.nuget.org/account/trustedpublishing
-  #   2. For each ANcpLua.Agents* package owned by ANcpLua, add a GitHub policy
-  #      pointing at this repo + workflow file (`nuget-publish.yml`) + environment (`nuget`).
-  #   3. No NUGET_API_KEY secret required — OIDC handles auth.
   publish:
     needs: [version, build]
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
@@ -159,52 +112,38 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-
-      # Publish only when there are real release-relevant changes since LATEST_TAG. "Release-
-      # relevant" is anything under src/** or tests/**, OR the publish workflow file itself
-      # (because that file controls *which* packages get packed — a missing-pack-line fix is a
-      # legitimate publish trigger, as PR #80 → v1.4.9 demonstrated when BitNet was silently
-      # dropped from the artifact bundle).
       - name: Must Publish Packages
         id: has_changes
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ github.event.inputs.force_publish }}" == "true" ]; then
-            echo "Workflow dispatch with force_publish=true — bypassing gate"
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [ -z "$LATEST_TAG" ]; then
-            echo "No previous tag — first publish, proceeding"
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
           else
-            CHANGES=$(git diff --name-only "$LATEST_TAG" HEAD -- 'src/**' 'tests/**' '.github/workflows/nuget-publish.yml' || true)
+            CHANGES=$(git diff --name-only "$LATEST_TAG" HEAD -- 'src/**' 'tests/**' 'samples/**' '.github/workflows/nuget-publish.yml' || true)
             if [ -n "$CHANGES" ]; then
-              echo "Changes since $LATEST_TAG:"
               echo "$CHANGES"
-              echo "has_changes=true" >> $GITHUB_OUTPUT
+              echo "has_changes=true" >> "$GITHUB_OUTPUT"
             else
-              echo "No src/, tests/, or publish-workflow changes since $LATEST_TAG — skipping publish"
-              echo "has_changes=false" >> $GITHUB_OUTPUT
+              echo "has_changes=false" >> "$GITHUB_OUTPUT"
             fi
           fi
-
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         if: steps.has_changes.outputs.has_changes == 'true'
         with:
           name: packages
           path: artifacts/
-
       - uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5
         if: steps.has_changes.outputs.has_changes == 'true'
-
-      - name: Authenticate to NuGet (trusted publishing)
+      - name: Authenticate to NuGet
         if: steps.has_changes.outputs.has_changes == 'true'
         id: nuget-login
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
         with:
           user: ANcpLua
-
       - name: Push to NuGet
         if: steps.has_changes.outputs.has_changes == 'true'
         run: |
@@ -214,7 +153,6 @@ jobs:
               --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
               --skip-duplicate
           done
-
       - name: Create GitHub release
         if: steps.has_changes.outputs.has_changes == 'true'
         env:

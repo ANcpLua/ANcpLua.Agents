@@ -1,38 +1,16 @@
 <Solution>
     <Folder Name="/src/">
         <Project Path="src/ANcpLua.Agents/ANcpLua.Agents.csproj" />
+        <Project Path="src/ANcpLua.Agents.Instrumentation/ANcpLua.Agents.Instrumentation.csproj" />
+        <Project Path="src/ANcpLua.Agents.Hosting.ServiceDefaults/ANcpLua.Agents.Hosting.ServiceDefaults.csproj" />
         <Project Path="src/ANcpLua.Agents.Workflows/ANcpLua.Agents.Workflows.csproj" />
-        <Project Path="src/ANcpLua.Agents.Workflows.Declarative/ANcpLua.Agents.Workflows.Declarative.csproj" />
         <Project Path="src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj" />
         <Project Path="src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.Azure/ANcpLua.Agents.Hosting.Azure.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.Foundry/ANcpLua.Agents.Hosting.Foundry.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.GoogleGemini/ANcpLua.Agents.Hosting.GoogleGemini.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.Anthropic/ANcpLua.Agents.Hosting.Anthropic.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.DevUI/ANcpLua.Agents.Hosting.DevUI.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.AGUI/ANcpLua.Agents.Hosting.AGUI.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.A2A/ANcpLua.Agents.Hosting.A2A.csproj" />
-        <Project Path="src/ANcpLua.Agents.Foundry/ANcpLua.Agents.Foundry.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.OpenAI/ANcpLua.Agents.Hosting.OpenAI.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.ServiceDefaults/ANcpLua.Agents.Hosting.ServiceDefaults.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.BitNet/ANcpLua.Agents.Hosting.BitNet.csproj" />
-        <Project Path="src/ANcpLua.Agents.Hosting.BitNet.Generators/ANcpLua.Agents.Hosting.BitNet.Generators.csproj" />
-        <Project Path="src/ANcpLua.Agents.Mcp/ANcpLua.Agents.Mcp.csproj" />
-        <Project Path="src/ANcpLua.Agents.Mcp.Hosting/ANcpLua.Agents.Mcp.Hosting.csproj" />
-        <Project Path="src/ANcpLua.Agents.DataIngestion/ANcpLua.Agents.DataIngestion.csproj" />
-        <Project Path="src/Qyl.DurableAgents.Abstractions/Qyl.DurableAgents.Abstractions.csproj" />
-        <Project Path="src/Qyl.DurableAgents.Generators/Qyl.DurableAgents.Generators.csproj" />
     </Folder>
     <Folder Name="/samples/">
-        <Project Path="samples/ManagedAgentTelemetry.Host/ManagedAgentTelemetry.Host.csproj" />
+        <Project Path="samples/AgentTelemetry.Minimal/AgentTelemetry.Minimal.csproj" />
     </Folder>
     <Folder Name="/tests/">
-        <File Path="tests\ANcpLua.Agents.Tests.Live\ANcpLua.Agents.Tests.Live.csproj" />
-        <File Path="tests\ANcpLua.Agents.Tests.Live\IntegrationEnvironment.cs" />
-        <File Path="tests\ANcpLua.Agents.Tests.Live\LiveChatClientSmokeTests.cs" />
-        <File Path="tests\ANcpLua.Agents.Tests.Live\LiveModelCapabilityDenialTests.cs" />
-        <File Path="tests\ANcpLua.Agents.Tests.Live\LiveModelToolBudgetTests.cs" />
-        <Project Path="tests/ANcpLua.Agents.Tests.Live/ANcpLua.Agents.Tests.Live.csproj" />
         <Project Path="tests/ANcpLua.Agents.Tests/ANcpLua.Agents.Tests.csproj" />
     </Folder>
 </Solution>

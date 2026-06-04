@@ -14,8 +14,8 @@ public static class QylToolScope
     /// <summary>
     ///     Resolves <typeparamref name="T"/> from <paramref name="services"/> and builds a Qyl
     ///     tool set from its public instance methods. Each tool is wrapped with
-    ///     <see cref="GovernedAIFunction"/> and <see cref="Instrumentation.TracedAIFunction"/>
-    ///     unless explicitly disabled via <see cref="QylToolSet.From{T}"/>'s parameters.
+    ///     <see cref="GovernedAIFunction"/> unless explicitly disabled via
+    ///     <see cref="QylToolSet.From{T}"/>'s parameters.
     /// </summary>
     /// <param name="services">DI container providing the tool instance and governance primitives.</param>
     /// <param name="policy">Optional uniform policy applied to every tool; defaults to <see cref="AgentToolPolicy.Permissive"/>.</param>

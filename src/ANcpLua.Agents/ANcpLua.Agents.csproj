@@ -2,9 +2,9 @@
     <PropertyGroup>
         <RootNamespace>ANcpLua.Agents</RootNamespace>
         <PackageId>ANcpLua.Agents</PackageId>
-        <Description>Consumer toolkit spine for Microsoft Agent Framework. Bundling facades plus governance primitives: call lineage, spawn tracker, budget enforcer, concurrency limiter, governed AIFunction, tracing decorators, and tool-decorating chat client.</Description>
+        <Description>Consumer toolkit spine for Microsoft Agent Framework. Bundling facades plus governance primitives: call lineage, spawn tracker, budget enforcer, concurrency limiter, and governed AIFunction.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageTags>maf;agents;microsoft-agents;governance;instrumentation;opentelemetry;helpers</PackageTags>
+        <PackageTags>maf;agents;microsoft-agents;governance;helpers</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>

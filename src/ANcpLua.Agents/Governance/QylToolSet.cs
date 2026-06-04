@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Reflection;
-using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Roslyn.Utilities;
 using Microsoft.Extensions.AI;
 
@@ -8,7 +6,7 @@ namespace ANcpLua.Agents.Governance;
 
 /// <summary>
 ///     Ergonomic projector that converts a type's public instance methods into a Qyl tool set
-///     with governance + tracing baked in. Replaces the verbose
+///     with governance baked in. Replaces the verbose
 ///     <c>AIFunctionFactory.Create(instance.MethodA, instance)</c> repetition used in MAF
 ///     samples with a single call.
 /// </summary>
@@ -19,9 +17,8 @@ namespace ANcpLua.Agents.Governance;
 ///         Property getters/setters and event accessors are skipped automatically.
 ///     </para>
 ///     <para>
-///         Wrapping order (innermost first): inner <see cref="AIFunction"/> →
-///         <see cref="GovernedAIFunction"/> (if <c>govern</c>) →
-///         <see cref="TracedAIFunction"/> (if <c>trace</c> and <c>tracer</c> non-null).
+///         Wrapping order: inner <see cref="AIFunction"/> →
+///         <see cref="GovernedAIFunction"/> when <c>govern</c> is enabled.
 ///     </para>
 /// </remarks>
 public static class QylToolSet
@@ -40,8 +37,6 @@ public static class QylToolSet
     ///     handled separately by MAF when the agent is built via <c>AsAIAgent(services:)</c>.
     /// </param>
     /// <param name="govern">Wrap each tool with <see cref="GovernedAIFunction"/>. Default <c>true</c>.</param>
-    /// <param name="trace">Wrap each tool with <see cref="TracedAIFunction"/> when <paramref name="tracer"/> is supplied. Default <c>true</c>.</param>
-    /// <param name="tracer">ActivitySource for span emission; <c>null</c> disables tracing regardless of <paramref name="trace"/>.</param>
     /// <param name="budget">Budget enforcer for governance; required if <paramref name="govern"/> is <c>true</c>.</param>
     /// <param name="concurrency">Concurrency limiter for governance; required if <paramref name="govern"/> is <c>true</c>.</param>
     /// <param name="capabilities">Capability context for governance; required if <paramref name="govern"/> is <c>true</c>.</param>
@@ -50,8 +45,6 @@ public static class QylToolSet
         AgentToolPolicy? policy = null,
         IServiceProvider? services = null,
         bool govern = true,
-        bool trace = true,
-        ActivitySource? tracer = null,
         AgentBudgetEnforcer? budget = null,
         AgentConcurrencyLimiter? concurrency = null,
         AgentCapabilityContext? capabilities = null)
@@ -84,10 +77,6 @@ public static class QylToolSet
                 fn = new GovernedAIFunction(fn, new AgentToolMetadata(fn.Name, effectivePolicy),
                     resolvedBudget, resolvedConcurrency, resolvedCapabilities);
             }
-
-            if (trace && tracer is not null)
-                fn = new TracedAIFunction(fn, tracer);
-
             tools.Add(fn);
         }
 

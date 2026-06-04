@@ -14,7 +14,7 @@ namespace ANcpLua.Agents.Governance;
 /// <remarks>
 ///     <para>
 ///         For single-call (no-multi-turn) gating, use <c>UseQylApproval(predicate)</c> from
-///         <c>QylAgentBuilderExtensions</c> instead — it throws on denial rather than driving the
+///         <c>QylAgentGovernanceExtensions</c> instead — it throws on denial rather than driving the
 ///         native loop.
 ///     </para>
 ///     <para>

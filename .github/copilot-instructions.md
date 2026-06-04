@@ -1,90 +1,40 @@
 # Copilot review instructions
 
-Microsoft Agent Framework (MAF) consumer toolkit. Ships 10 NuGet packages:
-stable spine (`ANcpLua.Agents`, `.Workflows`, `.Testing`, `.Testing.Workflows`),
-preview hosting (`.Hosting.Azure`, `.Hosting.Foundry`, `.Hosting.Anthropic`,
-`.Hosting.DevUI`), RC1 Foundry (`.Foundry`), and alpha OpenAI hosting
-(`.Hosting.OpenAI`). All target `net10.0`. Pinned to `Microsoft.Agents.AI`
-1.4.0 stable with package-specific preview, rc1, and alpha MAF dependencies in
-`Directory.Packages.props`. `Microsoft.Extensions.AI` is 10.5.0. CPM enforced.
+Microsoft Agent Framework 1.8.x toolkit. Ships six NuGet packages:
+`ANcpLua.Agents`, `ANcpLua.Agents.Instrumentation`,
+`ANcpLua.Agents.Hosting.ServiceDefaults`, `ANcpLua.Agents.Workflows`,
+`ANcpLua.Agents.Testing`, and `ANcpLua.Agents.Testing.Workflows`.
+All target `net10.0`. Provider-specific hosting facades, MCP wrappers,
+Qyl Durable experiments, and product-host samples are intentionally removed.
 
 ## Reviewer focus
 
-- Review **changes in this PR**, not the whole repo. The diff is the assignment.
-- Skip files whose first ~3 lines contain `// Ported from <upstream>`,
-  `// Generated`, or `// Auto-generated`. Their contract is the upstream's,
-  not ours; surface a one-line note instead of line-level findings.
-- Skip files in `node_modules/`, `dist/`, `build/`, `bin`, `obj`, generated
-  Roslyn artifacts (`*.g.cs`), and lockfiles (`package-lock.json`,
-  `pnpm-lock.yaml`, `yarn.lock`).
-- Skip vendored fixtures under `**/fixtures/**` and `**/test-data/**` —
-  they're deliberately broken or deliberately verbatim.
-
-## Coordinate with other reviewers
-
-- CodeRabbit and Claude Code Review run on the same PR. **Don't repeat
-  findings they've already raised** — read the existing review comments
-  before posting.
-- If CodeRabbit has labeled a finding `false_positive` or the human author
-  has marked it resolved, don't re-raise it.
+- Review changes in this PR, not the whole repo. The diff is the assignment.
+- Skip files whose first lines contain `// Ported from <upstream>`, `// Generated`, or `// Auto-generated`.
+- Skip files in `node_modules/`, `dist/`, `build/`, `bin`, `obj`, generated Roslyn artifacts (`*.g.cs`), and lockfiles.
+- Do not request compatibility shims for deleted packages or renamed APIs. This repo can break API directly.
 
 ## Package rules
 
-- Package IDs and namespaces must match. `Qyl*` method prefixes stay; `Qyl.*`
-  namespaces do not.
-- Stable packages must not reference MAF preview, RC, or alpha packages. The
-  packaging tests enforce this channel boundary.
-- MAF version pin lives in `Directory.Packages.props`. Don't bump
-  `Microsoft.Agents.AI` or `Microsoft.Extensions.AI` in a feature PR — version
-  bumps are their own commits with downstream impact analysis.
-- `LangVersion=preview` is on. C# 14 features (file-scoped namespaces, primary
-  constructors, required init, `params ReadOnlySpan<T>`) are repo defaults.
-- `ANcpLua.Agents.Testing.Workflows/Internals/` bridges MAF Workflows concepts
-  that upstream marks `internal` (no InternalsVisibleTo grant). **Design intent
-  is facade / decorator / railway / fluent / extension methods** over those
-  concepts — expressive, cohesive, loosely coupled. This is *not* a 1:1 mirror
-  of upstream sources; verbatim parity is acceptable only where the upstream
-  contract is genuinely structural. The current shape still has surface area
-  that mirrors upstream conventions; refactoring it toward idiomatic ANcpLua
-  facades is welcome and expected. `RS0030` is suppressed transitionally until
-  the migration to `Guard.NotNull`-style facades is complete.
+- Package IDs and namespaces must match.
+- Stable packages must not reference MAF preview, RC, or alpha packages.
+- `ANcpLua.Agents.Instrumentation` owns agent telemetry. Do not reintroduce legacy Qyl-branded tracing decorators.
+- Telemetry must not tag or log raw prompts, message content, tool arguments, tool results, API keys, emails, or exception messages.
+- Tool and agent names must be bounded before entering tags or metric dimensions.
+- MAF version pins live in `Version.props` through `Directory.Packages.props`; do not edit per-project `<Version>` values.
 
 ## Style
 
-- Group findings by file, not by severity, when there are >5.
-- Don't suggest renames of public exports without a clear caller-side
-  benefit. The cost of a rename is paid by every consumer.
-- Don't suggest adding tests "for completeness" — only when the changed
-  contract is uncovered by existing tests.
+- Prefer direct deletion over adapters when code no longer earns its place.
+- Do not suggest adding tests for completeness; only call out missing coverage when the changed contract is actually uncovered.
+- .NET code uses nullable enabled, central package management, file-scoped namespaces, and the repo SDK conventions.
 
 ## Allowed suppressions
 
-- Allow-listed suppressions in `ANcpLua.Agents.Testing.csproj`: `CA1002`,
-  `CA1034`, `CA1305`, `CA1707`, `CA1816`, `CA1819`, `CA1826`, `CA2000`, `CS1591`,
-  `AL0014`, `AL0025`, `AL0131`, `IDE1006`, `IDE0060`, `IDE0059` — the file's own
-  comment documents these as transitional concessions while the test surface
-  still mirrors upstream conventions; lift them per-rule as facades land.
-- `MEAI001` suppression in `Testing.Workflows` when it mirrors MAF workflow
-  experimental API diagnostics.
-- `OPENAI001` / `MEAI001` suppressions in Foundry and hosting boundary projects
-  when they mirror upstream MAF experimental API diagnostics.
-- `NU1604` in `Directory.Build.props` (CPM transitive-pin warning).
-- `RS0030` inside `Internals/` directories (transitional facade layer; lift
-  per-file as `Guard.NotNull` adoption progresses).
-- Missing XML doc comments on `internal` types or transitional bridging helpers.
+- Allow-listed suppressions in `ANcpLua.Agents.Testing.csproj` are transitional for upstream test-double patterns.
+- `MEAI001` / `MAAI001` suppressions are allowed where MAF 1.8.x still marks the consumed API experimental.
+- `NU1604` in `Directory.Build.props`.
 
-## Project conventions to respect
+## Failure behavior
 
-- Node code: ESM, Node >=20, no external runtime deps unless already declared
-  in `package.json`.
-- .NET code: nullable enabled, central package management
-  (`Directory.Packages.props`), `Version.props` is the single owner of
-  versions — never edit `<Version>` lines directly.
-- Don't suggest patterns that contradict `CLAUDE.md`, `AGENTS.md`, or the
-  repo's `.coderabbit.yaml` `path_instructions`.
-
-## Rate-limit / failure behavior
-
-If you hit a rate limit, **surface the limit and the unblock date in your
-review body** rather than the generic "encountered an error" string. The
-human author needs the date to plan, not a vague retry hint.
+If CI or NuGet publishing is blocked by quota, auth, or trusted-publishing policy, report the exact blocker and the package/version affected.

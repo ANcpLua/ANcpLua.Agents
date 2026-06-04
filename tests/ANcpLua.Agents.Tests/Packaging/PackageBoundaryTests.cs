@@ -11,84 +11,31 @@ public sealed partial class PackageBoundaryTests
     private static readonly HashSet<string> s_expectedPackageIds =
     [
         "ANcpLua.Agents",
+        "ANcpLua.Agents.Hosting.ServiceDefaults",
+        "ANcpLua.Agents.Instrumentation",
         "ANcpLua.Agents.Workflows",
-        "ANcpLua.Agents.Workflows.Declarative",
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
-        "ANcpLua.Agents.Hosting.Azure",
-        "ANcpLua.Agents.Hosting.Foundry",
-        "ANcpLua.Agents.Hosting.Anthropic",
-        "ANcpLua.Agents.Hosting.DevUI",
-        "ANcpLua.Agents.Foundry",
-        "ANcpLua.Agents.Hosting.OpenAI",
-        "ANcpLua.Agents.Hosting.BitNet",
-        "ANcpLua.Agents.Hosting.ServiceDefaults",
-        "ANcpLua.Agents.Hosting.A2A",
-        "ANcpLua.Agents.Hosting.AGUI",
-        "ANcpLua.Agents.Hosting.GoogleGemini",
-        "ANcpLua.Agents.Mcp",
-        "ANcpLua.Agents.Mcp.Hosting",
-        "ANcpLua.Agents.DataIngestion",
     ];
 
     private static readonly HashSet<string> s_stablePackageIds =
     [
         "ANcpLua.Agents",
+        "ANcpLua.Agents.Hosting.ServiceDefaults",
+        "ANcpLua.Agents.Instrumentation",
         "ANcpLua.Agents.Workflows",
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
-        // No prerelease MAF deps (ServiceDefaults is MAF-free; Mcp + Mcp.Hosting pin only stable MAF + ModelContextProtocol;
-        // Hosting.GoogleGemini pins only stable MAF + the stable Google.GenAI SDK; DataIngestion pins stable MAF + preview
-        // Microsoft.Extensions.DataIngestion which is non-MAF and out of scope of the MAF stability check).
-        "ANcpLua.Agents.Hosting.ServiceDefaults",
-        "ANcpLua.Agents.Hosting.GoogleGemini",
-        "ANcpLua.Agents.Mcp",
-        "ANcpLua.Agents.Mcp.Hosting",
-        "ANcpLua.Agents.DataIngestion",
     ];
 
     private static readonly Dictionary<string, string[]> s_expectedDirectMafReferences = new(StringComparer.Ordinal)
     {
         ["ANcpLua.Agents"] = ["Microsoft.Agents.AI"],
+        ["ANcpLua.Agents.Hosting.ServiceDefaults"] = [],
+        ["ANcpLua.Agents.Instrumentation"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Workflows"],
-        ["ANcpLua.Agents.Workflows.Declarative"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Workflows", "Microsoft.Agents.AI.Workflows.Declarative"],
         ["ANcpLua.Agents.Testing"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions"],
         ["ANcpLua.Agents.Testing.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions", "Microsoft.Agents.AI.Workflows"],
-        ["ANcpLua.Agents.Hosting.Azure"] = ["Microsoft.Agents.AI.Hosting.AzureFunctions"],
-        ["ANcpLua.Agents.Hosting.Foundry"] = ["Microsoft.Agents.AI.Foundry.Hosting"],
-        ["ANcpLua.Agents.Hosting.Anthropic"] = ["Microsoft.Agents.AI.Anthropic"],
-        ["ANcpLua.Agents.Hosting.DevUI"] = ["Microsoft.Agents.AI.DevUI"],
-        ["ANcpLua.Agents.Foundry"] =
-        [
-            "Microsoft.Agents.AI.Foundry",
-            "Microsoft.Agents.AI.Workflows.Declarative.Foundry",
-        ],
-        ["ANcpLua.Agents.Hosting.OpenAI"] =
-        [
-            "Microsoft.Agents.AI",
-            "Microsoft.Agents.AI.OpenAI",
-            "Microsoft.Agents.AI.Hosting.OpenAI",
-        ],
-        ["ANcpLua.Agents.Hosting.BitNet"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Hosting"],
-        ["ANcpLua.Agents.Hosting.ServiceDefaults"] = [],
-        ["ANcpLua.Agents.Hosting.A2A"] =
-        [
-            "Microsoft.Agents.AI",
-            "Microsoft.Agents.AI.A2A",
-            "Microsoft.Agents.AI.Hosting.A2A",
-            "Microsoft.Agents.AI.Hosting.A2A.AspNetCore",
-        ],
-        ["ANcpLua.Agents.Hosting.AGUI"] =
-        [
-            "Microsoft.Agents.AI",
-            "Microsoft.Agents.AI.AGUI",
-            "Microsoft.Agents.AI.DurableTask",
-            "Microsoft.Agents.AI.Hosting.AGUI.AspNetCore",
-        ],
-        ["ANcpLua.Agents.Hosting.GoogleGemini"] = ["Microsoft.Agents.AI"],
-        ["ANcpLua.Agents.Mcp"] = ["Microsoft.Agents.AI"],
-        ["ANcpLua.Agents.Mcp.Hosting"] = [],
-        ["ANcpLua.Agents.DataIngestion"] = ["Microsoft.Agents.AI"],
     };
 
     [Fact]
@@ -214,7 +161,6 @@ public sealed partial class PackageBoundaryTests
             File.Exists(readmePath).Should().BeTrue($"{project.PackageId} must pack a package README");
 
             var readme = File.ReadAllText(readmePath);
-            readme.Should().Contain("Consumer toolkit for Microsoft Agent Framework");
             readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.8.x");
             readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.8.0");
         }
