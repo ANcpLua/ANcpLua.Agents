@@ -1,9 +1,10 @@
 # Copilot review instructions
 
-Microsoft Agent Framework 1.8.x toolkit. Ships six NuGet packages:
+Microsoft Agent Framework 1.9.x toolkit. Ships stable NuGet packages:
 `ANcpLua.Agents`, `ANcpLua.Agents.Instrumentation`,
 `ANcpLua.Agents.Hosting.ServiceDefaults`, `ANcpLua.Agents.Workflows`,
-`ANcpLua.Agents.Testing`, and `ANcpLua.Agents.Testing.Workflows`.
+`ANcpLua.Agents.Workflows.Declarative`, `ANcpLua.Agents.Testing`,
+and `ANcpLua.Agents.Testing.Workflows`.
 All target `net10.0`. Provider-specific hosting facades, MCP wrappers,
 Qyl Durable experiments, and product-host samples are intentionally removed.
 
@@ -32,7 +33,7 @@ Qyl Durable experiments, and product-host samples are intentionally removed.
 ## Allowed suppressions
 
 - Allow-listed suppressions in `ANcpLua.Agents.Testing.csproj` are transitional for upstream test-double patterns.
-- `MEAI001` / `MAAI001` suppressions are allowed where MAF 1.8.x still marks the consumed API experimental.
+- `MEAI001` / `MAAI001` suppressions are allowed only where MAF still marks the consumed API experimental.
 - `NU1604` in `Directory.Build.props`.
 
 ## Failure behavior

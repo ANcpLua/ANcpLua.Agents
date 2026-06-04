@@ -11,9 +11,10 @@
     <ANcpLuaRoslynUtilitiesTestingVersion>2.2.24</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF 1.8.0)">
-    <MicrosoftAgentsAIVersion>1.8.0</MicrosoftAgentsAIVersion>
-    <MicrosoftAgentsAIWorkflowsVersion>1.8.0</MicrosoftAgentsAIWorkflowsVersion>
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.9.0)">
+    <MicrosoftAgentsAIVersion>1.9.0</MicrosoftAgentsAIVersion>
+    <MicrosoftAgentsAIWorkflowsVersion>1.9.0</MicrosoftAgentsAIWorkflowsVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.9.0</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions">

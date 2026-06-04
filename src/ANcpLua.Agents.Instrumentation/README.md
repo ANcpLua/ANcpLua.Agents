@@ -2,8 +2,8 @@
 
 OpenTelemetry middleware for Microsoft Agent Framework agents.
 
-Compatible with: Microsoft.Agents.AI 1.8.x
-Tested against: Microsoft.Agents.AI 1.8.0
+Compatible with: Microsoft.Agents.AI 1.9.x
+Tested against: Microsoft.Agents.AI 1.9.0
 
 Channel: stable. This package must not reference Microsoft Agent Framework preview, RC, or alpha packages.
 

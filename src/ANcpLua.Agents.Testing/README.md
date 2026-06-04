@@ -5,8 +5,8 @@ Consumer toolkit for Microsoft Agent Framework — bundling, governance, testing
 Stable test infrastructure for Microsoft Agent Framework consumers: fake chat clients, conformance bases, diagnostics, and provider fixtures for OpenAI, Azure OpenAI, Anthropic, Ollama, Google Gemini, and OpenRouter.
 Run harnesses for focused, non-inherited assertions are available via `Harnesses/AgentRunHarness`.
 
-Compatible with: Microsoft.Agents.AI 1.8.x
-Tested against: Microsoft.Agents.AI 1.8.0
+Compatible with: Microsoft.Agents.AI 1.9.x
+Tested against: Microsoft.Agents.AI 1.9.0
 
 Channel: stable. This package keeps provider fixtures free of Microsoft Agent Framework preview, RC, and alpha dependencies.
 
