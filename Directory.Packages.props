@@ -8,7 +8,6 @@
 
   <ItemGroup Label="Roslyn.Utilities (sibling repo)">
     <PackageVersion Include="ANcpLua.Roslyn.Utilities" Version="$(ANcpLuaRoslynUtilitiesVersion)"/>
-    <PackageVersion Include="ANcpLua.Roslyn.Utilities.Testing" Version="$(ANcpLuaRoslynUtilitiesTestingVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="Microsoft.Agents (MAF 1.9.x)">

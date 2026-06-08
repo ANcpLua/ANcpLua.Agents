@@ -7,8 +7,17 @@
   -->
 
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.24</ANcpLuaRoslynUtilitiesVersion>
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.24</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesVersion>2.2.26</ANcpLuaRoslynUtilitiesVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Analyzers (forward-pin ahead of SDK 3.4.40 truth = 2.0.1)">
+    <!--
+      ANcpLua.Analyzers is injected by ANcpLua.NET.Sdk via GlobalPackageReference using
+      $(ANcpLuaAnalyzersVersion). The SDK-shipped truth (3.4.40) pins 2.0.1; this local
+      override (imported last-wins) pulls the published 2.0.2. Prune once the SDK truth
+      catches up to >= 2.0.2.
+    -->
+    <ANcpLuaAnalyzersVersion>2.0.2</ANcpLuaAnalyzersVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Agents (MAF 1.9.0)">
@@ -30,12 +39,12 @@
   </PropertyGroup>
 
   <PropertyGroup Label="LLM Provider SDKs (Testing fixtures)">
-    <OpenAIVersion>2.10.0</OpenAIVersion>
+    <OpenAIVersion>2.11.0</OpenAIVersion>
     <AzureAIOpenAIVersion>2.1.0</AzureAIOpenAIVersion>
     <AzureIdentityVersion>1.21.0</AzureIdentityVersion>
     <AnthropicSDKVersion>5.10.0</AnthropicSDKVersion>
     <OllamaSharpVersion>5.4.25</OllamaSharpVersion>
-    <GoogleGenAIVersion>1.6.2</GoogleGenAIVersion>
+    <GoogleGenAIVersion>1.9.0</GoogleGenAIVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Testing">
