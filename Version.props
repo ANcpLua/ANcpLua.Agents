@@ -10,16 +10,6 @@
     <ANcpLuaRoslynUtilitiesVersion>2.2.26</ANcpLuaRoslynUtilitiesVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Analyzers (forward-pin ahead of SDK 3.4.40 truth = 2.0.1)">
-    <!--
-      ANcpLua.Analyzers is injected by ANcpLua.NET.Sdk via GlobalPackageReference using
-      $(ANcpLuaAnalyzersVersion). The SDK-shipped truth (3.4.40) pins 2.0.1; this local
-      override (imported last-wins) pulls the published 2.0.2. Prune once the SDK truth
-      catches up to >= 2.0.2.
-    -->
-    <ANcpLuaAnalyzersVersion>2.0.2</ANcpLuaAnalyzersVersion>
-  </PropertyGroup>
-
   <PropertyGroup Label="Microsoft.Agents (MAF 1.9.0)">
     <MicrosoftAgentsAIVersion>1.9.0</MicrosoftAgentsAIVersion>
     <MicrosoftAgentsAIWorkflowsVersion>1.9.0</MicrosoftAgentsAIWorkflowsVersion>
