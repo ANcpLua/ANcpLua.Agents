@@ -5,26 +5,7 @@
         <Description>Test infrastructure for Microsoft Agent Framework. Fake agents, scripted chat clients, SSE parsing, mock HTTP handlers, and IChatClientAgentFixture reference implementations for OpenAI, Azure OpenAI, Anthropic, Ollama, Google Gemini, and OpenRouter.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>agent;testing;sse;mock;streaming;microsoft-agents;conformance</PackageTags>
-        <!--
-            Minimal relaxation for the Conformance/ tree, which mirrors the
-            microsoft/agent-framework conformance test source (AGENTS.md: "No dogfooded
-            analyzers on the test package"). Reformatting it to satisfy these style/resource
-            rules would diverge from upstream without catching a real bug in our code.
-
-            Scope verified via `dotnet build -c Release` with NoWarn cleared (warnaserror +
-            EnforceCodeStyleInBuild are both on in Release): of the rules formerly listed here,
-            ONLY these four still fire, all inside Conformance/:
-                CA2000  — provider clients in Examples/*Fixture.cs outlive the local scope
-                          (the fixture owns client lifetime for the test run)
-                IDE1006 — '_'-prefixed locals (ChatClientAgentRunTests.cs, RunStreamingTests.cs)
-                IDE0060 — unused 'menuItem' parameter in MenuPlugin.cs (kept for signature shape)
-                IDE0059 — throwaway '_update' assignment in RunStreamingTests.cs
-
-            Removed as inert (suppressed nothing): CA1002/CA1034/CA1305/CA1707/CA1816/CA1819/
-            CA1826 never trigger on this code; CS1591 is already in the SDK baseline NoWarn;
-            AL0014/AL0025/AL0131 are pre-2.0.0 IDs renumbered to the AL1xxx range at
-            ANcpLua.Analyzers 2.0.0 and no longer exist.
-        -->
+        <!-- Conformance/ mirrors microsoft/agent-framework upstream; not reformatted to satisfy these rules. -->
         <NoWarn>$(NoWarn);CA2000;IDE0059;IDE0060;IDE1006</NoWarn>
     </PropertyGroup>
 
