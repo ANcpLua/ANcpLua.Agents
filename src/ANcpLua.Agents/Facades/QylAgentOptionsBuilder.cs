@@ -17,6 +17,8 @@ namespace ANcpLua.Agents.Facades;
 /// </remarks>
 public sealed class QylAgentOptionsBuilder
 {
+    private const string AGUIProviderName = "ag-ui";
+
     private readonly ChatClientAgentOptions _options = new();
 
     /// <summary>Sets <see cref="ChatClientAgentOptions.Name"/>.</summary>
@@ -78,8 +80,18 @@ public sealed class QylAgentOptionsBuilder
     public ChatClientAgent BuildAgent(IChatClient client)
     {
         Guard.NotNull(client);
+
+        if (client.GetService(typeof(ChatClientMetadata)) is ChatClientMetadata metadata &&
+            IsAGUIProviderName(metadata.ProviderName))
+        {
+            _options.ThrowOnChatHistoryProviderConflict = false;
+        }
+
         return new ChatClientAgent(client, _options);
     }
+
+    private static bool IsAGUIProviderName(string? providerName) =>
+        string.Equals(providerName, AGUIProviderName, StringComparison.Ordinal);
 
     private ChatOptions EnsureChatOptions() => _options.ChatOptions ??= new ChatOptions();
 }
