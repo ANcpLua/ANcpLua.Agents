@@ -14,6 +14,7 @@
   <PropertyGroup Label="Microsoft.Agents (MAF 1.10.0)">
     <MicrosoftAgentsAIVersion>1.10.0</MicrosoftAgentsAIVersion>
     <MicrosoftAgentsAIWorkflowsVersion>1.10.0</MicrosoftAgentsAIWorkflowsVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.10.0</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions">
