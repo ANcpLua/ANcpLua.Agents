@@ -1,12 +1,9 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Source: microsoft/agent-framework dotnet/tests — WorkflowEvents.cs
 //
-// Modifications from upstream: removed the declarative-specific event projections
-// (DeclarativeActionInvokedEvent, DeclarativeActionCompletedEvent,
-// ConversationUpdateEvent, AgentResponseEvent) because those types are currently
-// internal in the Microsoft.Agents.AI.Workflows.Declarative 1.0.0-rc6 public surface.
-// Only the public base-workflow event projections are kept. Re-add the declarative
-// ones once they graduate to public.
+// Modifications from upstream: keeps only the event projections that are public
+// in the stable Microsoft.Agents.AI.Workflows 1.9.0 line and its stable
+// declarative workflow companion.
 
 namespace ANcpLua.Agents.Testing.Workflows.Framework;
 
@@ -27,6 +24,10 @@ public sealed class WorkflowEvents
         SuperStepEvents = workflowEvents.OfType<SuperStepCompletedEvent>().ToList();
         ErrorEvents = workflowEvents.OfType<WorkflowErrorEvent>().ToList();
         OutputEvents = workflowEvents.OfType<WorkflowOutputEvent>().ToList();
+        AgentResponseEvents = workflowEvents.OfType<AgentResponseEvent>().ToList();
+        DeclarativeActionInvokeEvents = workflowEvents.OfType<DeclarativeActionInvokedEvent>().ToList();
+        DeclarativeActionCompleteEvents = workflowEvents.OfType<DeclarativeActionCompletedEvent>().ToList();
+        ConversationUpdateEvents = workflowEvents.OfType<ConversationUpdateEvent>().ToList();
     }
 
     public IReadOnlyList<WorkflowEvent> Events { get; }
@@ -37,4 +38,8 @@ public sealed class WorkflowEvents
     public IReadOnlyList<SuperStepCompletedEvent> SuperStepEvents { get; }
     public IReadOnlyList<WorkflowErrorEvent> ErrorEvents { get; }
     public IReadOnlyList<WorkflowOutputEvent> OutputEvents { get; }
+    public IReadOnlyList<AgentResponseEvent> AgentResponseEvents { get; }
+    public IReadOnlyList<DeclarativeActionInvokedEvent> DeclarativeActionInvokeEvents { get; }
+    public IReadOnlyList<DeclarativeActionCompletedEvent> DeclarativeActionCompleteEvents { get; }
+    public IReadOnlyList<ConversationUpdateEvent> ConversationUpdateEvents { get; }
 }

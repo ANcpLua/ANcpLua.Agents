@@ -13,6 +13,7 @@
         <PackageReference Include="Microsoft.Agents.AI"/>
         <PackageReference Include="Microsoft.Agents.AI.Abstractions"/>
         <PackageReference Include="Microsoft.Agents.AI.Workflows"/>
+        <PackageReference Include="Microsoft.Agents.AI.Workflows.Declarative"/>
         <PackageReference Include="Microsoft.Extensions.AI.Abstractions"/>
         <PackageReference Include="Moq"/>
         <PackageReference Include="AwesomeAssertions" VersionOverride="$(AwesomeAssertionsVersion)"/>
@@ -27,6 +28,7 @@
     <ItemGroup Label="Global usings">
         <Using Include="Microsoft.Agents.AI"/>
         <Using Include="Microsoft.Agents.AI.Workflows"/>
+        <Using Include="Microsoft.Agents.AI.Workflows.Declarative"/>
         <Using Include="Microsoft.Extensions.AI"/>
         <Using Include="Xunit"/>
         <Using Include="ANcpLua.Agents.Testing.Agents"/>

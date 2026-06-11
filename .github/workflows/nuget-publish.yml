@@ -44,7 +44,7 @@ jobs:
             VERSION="${{ github.event.inputs.version }}"
           else
             BASE_MAJOR=1
-            BASE_MINOR=8
+            BASE_MINOR=9
             LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
             if [[ "$LATEST_TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
               MAJOR=${BASH_REMATCH[1]}
@@ -59,7 +59,7 @@ jobs:
                 VERSION="$MAJOR.$MINOR.$PATCH"
               fi
             else
-              VERSION="1.8.9"
+              VERSION="1.9.0"
             fi
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
@@ -89,6 +89,7 @@ jobs:
           dotnet pack src/ANcpLua.Agents.Instrumentation/ANcpLua.Agents.Instrumentation.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Hosting.ServiceDefaults/ANcpLua.Agents.Hosting.ServiceDefaults.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Workflows/ANcpLua.Agents.Workflows.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
+          dotnet pack src/ANcpLua.Agents.Workflows.Declarative/ANcpLua.Agents.Workflows.Declarative.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Testing/ANcpLua.Agents.Testing.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
       - name: Upload artifacts
@@ -123,7 +124,15 @@ jobs:
           if [ -z "$LATEST_TAG" ]; then
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
           else
-            CHANGES=$(git diff --name-only "$LATEST_TAG" HEAD -- 'src/**' 'tests/**' 'samples/**' '.github/workflows/nuget-publish.yml' || true)
+            COMPARE_TAG="$LATEST_TAG"
+            if git tag --points-at HEAD | grep -qFx "$LATEST_TAG"; then
+              COMPARE_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+            fi
+            if [ -z "$COMPARE_TAG" ]; then
+              echo "has_changes=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            CHANGES=$(git diff --name-only "$COMPARE_TAG" HEAD -- 'src/**' 'tests/**' 'samples/**' '.github/workflows/nuget-publish.yml' || true)
             if [ -n "$CHANGES" ]; then
               echo "$CHANGES"
               echo "has_changes=true" >> "$GITHUB_OUTPUT"

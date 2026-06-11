@@ -5,31 +5,8 @@
         <Description>Test infrastructure for Microsoft Agent Framework. Fake agents, scripted chat clients, SSE parsing, mock HTTP handlers, and IChatClientAgentFixture reference implementations for OpenAI, Azure OpenAI, Anthropic, Ollama, Google Gemini, and OpenRouter.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>agent;testing;sse;mock;streaming;microsoft-agents;conformance</PackageTags>
-        <!--
-            Harvested upstream exception (~/.claude/CLAUDE.md "upstream sample repos" clause):
-            ChatClients/ChatClientAgentTestHelper.cs + ChatClients/FakeChatClient.cs +
-            ChatClients/MockChatClients.cs + Conformance/Examples/* +
-            Conformance/ChatClientAgentRunStreamingTests.cs originate from
-            microsoft/agent-framework test tree. These CA / AL / IDE style rules don't catch
-            bugs in OUR code — they enforce conventions upstream writes differently.
-            Real-bug CA rules stay on.
-                CA1002 — exposed List<T> on public surface (upstream uses List<T> directly)
-                CA1034 — nested public types (upstream nests test helper records)
-                CA1305 — culture-sensitive formatting (upstream uses invariant)
-                CA1707 — underscores in identifier
-                CA1816 — Dispose should call GC.SuppressFinalize
-                CA1819 — properties returning arrays (upstream's expected-content shape)
-                CA1826 — Enumerable on indexable collections
-                CA2000 — IDisposable not disposed (upstream fixtures own client lifetime)
-                CS1591 — missing XML doc on public members
-                AL0014 — pattern-match length checks (upstream uses == 0)
-                AL0025 — static lambdas (upstream non-static lambdas)
-                AL0131 — direct provider SDK calls (upstream conformance examples)
-                IDE1006 — naming style (s_/_ prefix locals upstream uses different convention)
-                IDE0060 — unused parameter (upstream demo APIs keep all params for signature stability)
-                IDE0059 — unnecessary value assignment (upstream initializes for clarity)
-        -->
-        <NoWarn>$(NoWarn);CA1002;CA1034;CA1305;CA1707;CA1816;CA1819;CA1826;CA2000;CS1591;AL0014;AL0025;AL0131;IDE1006;IDE0060;IDE0059</NoWarn>
+        <!-- Conformance/ mirrors microsoft/agent-framework upstream; not reformatted to satisfy these rules. -->
+        <NoWarn>$(NoWarn);CA2000;IDE0059;IDE0060;IDE1006</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
