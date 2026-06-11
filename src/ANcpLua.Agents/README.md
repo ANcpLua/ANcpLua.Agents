@@ -4,8 +4,8 @@ Consumer toolkit for Microsoft Agent Framework.
 
 Stable spine package: runtime helpers and governance primitives.
 
-Compatible with: Microsoft.Agents.AI 1.8.x
-Tested against: Microsoft.Agents.AI 1.8.0
+Compatible with: Microsoft.Agents.AI 1.10.x
+Tested against: Microsoft.Agents.AI 1.10.0
 
 Channel: stable. This package must not reference Microsoft Agent Framework preview, RC, or alpha packages.
 

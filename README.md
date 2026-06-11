@@ -9,12 +9,13 @@
 
 # ANcpLua.Agents
 
-Lean toolkit for Microsoft Agent Framework 1.8.x.
+Lean toolkit for Microsoft Agent Framework 1.10.x.
 
 The repo is intentionally small: runtime governance primitives, Agent Framework OpenTelemetry middleware, service defaults, workflow helpers, and test infrastructure. Provider-specific facades, MCP wrappers, Qyl Durable experiments, and demo product hosts were removed instead of kept alive as compatibility shims.
 
-Compatible with: Microsoft.Agents.AI 1.8.x
-Tested against: Microsoft.Agents.AI 1.8.0
+Compatible with: Microsoft.Agents.AI 1.10.x
+Tested against: Microsoft.Agents.AI 1.10.0
+Upstream harvest: Microsoft Agent Framework #5463 fixed `ChatOptions.Reasoning` merge behavior in `ChatClientAgent`; this repo consumes it through the 1.10.0 package floor.
 
 ## Packages
 
