@@ -14,7 +14,6 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Hosting.ServiceDefaults",
         "ANcpLua.Agents.Instrumentation",
         "ANcpLua.Agents.Workflows",
-        "ANcpLua.Agents.Workflows.Declarative",
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
     ];
@@ -25,7 +24,6 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Hosting.ServiceDefaults",
         "ANcpLua.Agents.Instrumentation",
         "ANcpLua.Agents.Workflows",
-        "ANcpLua.Agents.Workflows.Declarative",
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
     ];
