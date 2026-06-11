@@ -7,19 +7,19 @@
   -->
 
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.26</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesVersion>2.2.24</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.24</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF 1.9.0)">
-    <MicrosoftAgentsAIVersion>1.9.0</MicrosoftAgentsAIVersion>
-    <MicrosoftAgentsAIWorkflowsVersion>1.9.0</MicrosoftAgentsAIWorkflowsVersion>
-    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.9.0</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.10.0)">
+    <MicrosoftAgentsAIVersion>1.10.0</MicrosoftAgentsAIVersion>
+    <MicrosoftAgentsAIWorkflowsVersion>1.10.0</MicrosoftAgentsAIWorkflowsVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions">
-    <MicrosoftExtensionsAIVersion>10.6.0</MicrosoftExtensionsAIVersion>
-    <MicrosoftExtensionsAIAbstractionsVersion>10.6.0</MicrosoftExtensionsAIAbstractionsVersion>
-    <MicrosoftExtensionsAIOpenAIVersion>10.6.0</MicrosoftExtensionsAIOpenAIVersion>
+    <MicrosoftExtensionsAIVersion>10.7.0</MicrosoftExtensionsAIVersion>
+    <MicrosoftExtensionsAIAbstractionsVersion>10.7.0</MicrosoftExtensionsAIAbstractionsVersion>
+    <MicrosoftExtensionsAIOpenAIVersion>10.7.0</MicrosoftExtensionsAIOpenAIVersion>
     <MicrosoftExtensionsHostingAbstractionsVersion>10.0.8</MicrosoftExtensionsHostingAbstractionsVersion>
     <MicrosoftBclAsyncInterfacesVersion>10.0.8</MicrosoftBclAsyncInterfacesVersion>
   </PropertyGroup>
@@ -34,7 +34,7 @@
     <AzureIdentityVersion>1.21.0</AzureIdentityVersion>
     <AnthropicSDKVersion>5.10.0</AnthropicSDKVersion>
     <OllamaSharpVersion>5.4.25</OllamaSharpVersion>
-    <GoogleGenAIVersion>1.9.0</GoogleGenAIVersion>
+    <GoogleGenAIVersion>1.6.2</GoogleGenAIVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Testing">

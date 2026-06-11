@@ -8,13 +8,13 @@
 
   <ItemGroup Label="Roslyn.Utilities (sibling repo)">
     <PackageVersion Include="ANcpLua.Roslyn.Utilities" Version="$(ANcpLuaRoslynUtilitiesVersion)"/>
+    <PackageVersion Include="ANcpLua.Roslyn.Utilities.Testing" Version="$(ANcpLuaRoslynUtilitiesTestingVersion)"/>
   </ItemGroup>
 
-  <ItemGroup Label="Microsoft.Agents (MAF 1.9.x)">
+  <ItemGroup Label="Microsoft.Agents (MAF 1.10.x)">
     <PackageVersion Include="Microsoft.Agents.AI" Version="$(MicrosoftAgentsAIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Abstractions" Version="$(MicrosoftAgentsAIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Workflows" Version="$(MicrosoftAgentsAIWorkflowsVersion)"/>
-    <PackageVersion Include="Microsoft.Agents.AI.Workflows.Declarative" Version="$(MicrosoftAgentsAIWorkflowsDeclarativeVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="Microsoft.Extensions">

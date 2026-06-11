@@ -14,7 +14,6 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Hosting.ServiceDefaults",
         "ANcpLua.Agents.Instrumentation",
         "ANcpLua.Agents.Workflows",
-        "ANcpLua.Agents.Workflows.Declarative",
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
     ];
@@ -25,7 +24,6 @@ public sealed partial class PackageBoundaryTests
         "ANcpLua.Agents.Hosting.ServiceDefaults",
         "ANcpLua.Agents.Instrumentation",
         "ANcpLua.Agents.Workflows",
-        "ANcpLua.Agents.Workflows.Declarative",
         "ANcpLua.Agents.Testing",
         "ANcpLua.Agents.Testing.Workflows",
     ];
@@ -36,9 +34,8 @@ public sealed partial class PackageBoundaryTests
         ["ANcpLua.Agents.Hosting.ServiceDefaults"] = [],
         ["ANcpLua.Agents.Instrumentation"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Workflows"],
-        ["ANcpLua.Agents.Workflows.Declarative"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Workflows", "Microsoft.Agents.AI.Workflows.Declarative"],
         ["ANcpLua.Agents.Testing"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions"],
-        ["ANcpLua.Agents.Testing.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions", "Microsoft.Agents.AI.Workflows", "Microsoft.Agents.AI.Workflows.Declarative"],
+        ["ANcpLua.Agents.Testing.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions", "Microsoft.Agents.AI.Workflows"],
     };
 
     [Fact]
@@ -164,8 +161,8 @@ public sealed partial class PackageBoundaryTests
             File.Exists(readmePath).Should().BeTrue($"{project.PackageId} must pack a package README");
 
             var readme = File.ReadAllText(readmePath);
-            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.9.x");
-            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.9.0");
+            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.10.x");
+            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.10.0");
         }
     }
 
