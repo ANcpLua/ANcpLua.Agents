@@ -1,6 +1,6 @@
 # Copilot review instructions
 
-Microsoft Agent Framework 1.9.x toolkit. Ships stable NuGet packages:
+Microsoft Agent Framework 1.11.x toolkit. Ships stable NuGet packages:
 `ANcpLua.Agents`, `ANcpLua.Agents.Instrumentation`,
 `ANcpLua.Agents.Hosting.ServiceDefaults`, `ANcpLua.Agents.Workflows`,
 `ANcpLua.Agents.Workflows.Declarative`, `ANcpLua.Agents.Testing`,

@@ -21,8 +21,9 @@ public static class AgentTelemetryExtensions
 
     /// <summary>
     ///     Wraps the agent in MAF-native <c>OpenTelemetryAgent</c>, emitting semconv <c>invoke_agent</c> /
-    ///     <c>execute_tool</c> spans on <see cref="AgentFrameworkSourceName"/>. Sensitive data is off by
-    ///     default; <paramref name="configure"/> runs last and may re-enable it.
+    ///     <c>execute_tool</c> spans on <see cref="AgentFrameworkSourceName"/>. Sensitive data is always
+    ///     off — <paramref name="configure"/> may tune other options but cannot re-enable it (this helper's
+    ///     bounded contract). Consumers that need sensitive data call MAF's <c>UseOpenTelemetry</c> directly.
     /// </summary>
     public static AIAgentBuilder UseAgentTelemetry(
         this AIAgentBuilder builder,
@@ -33,8 +34,10 @@ public static class AgentTelemetryExtensions
             AgentFrameworkSourceName,
             agent =>
             {
-                agent.EnableSensitiveData = false;
                 configure?.Invoke(agent);
+                // Bounded contract: this helper never emits sensitive data. Enforced last so a caller's
+                // configure cannot turn it back on — consumers that need it call UseOpenTelemetry directly.
+                agent.EnableSensitiveData = false;
             });
     }
 
