@@ -21,5 +21,7 @@
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
         <!-- WorkflowFixture<T>, WorkflowRunResult, WorkflowRunAssertions. -->
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing.Workflows\ANcpLua.Agents.Testing.Workflows.csproj"/>
+        <!-- AddQylChain / AddQylSwitch + QylExecutorFactoryExtensions for the folded workflow-composition rows. -->
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Workflows\ANcpLua.Agents.Workflows.csproj"/>
     </ItemGroup>
 </Project>

@@ -27,18 +27,14 @@ Every sample is **offline** (no API keys) via `ANcpLua.Agents.Testing.FakeChatCl
 | `AgentBuilder.Fluent` | `QylAgentOptionsBuilder` → `ChatClientAgent` |
 | `AgentTools.Governed` | `QylToolSet.From` + `UseQylGovernance` (`AgentBudgetEnforcer`/`AgentConcurrencyLimiter`/`AgentCapabilityContext`) |
 | `AgentApproval.Gate` | `QylApprovalGate.RequireQylApproval` / `UseQylApproval` |
-| `AgentStructuredOutput` | `RunQylWithSchemaAsync<T>` |
-| `AgentConditionalTools` | `WithQylConditionalTools` (`AIContextProvider`) |
 | `AgentGovernance.Lineage` | `AgentCallLineage` + `AgentSpawnTracker` + `AgentCallGuard` |
 | `AgentTelemetry.SemConv` | MAF `.UseOpenTelemetry()` (`invoke_agent`/`execute_tool`) + one qyl `gen_ai.evaluation.*` enrichment span (Incubating `GenAiAttributes`) + OTLP |
 | `AgentApiContracts` | `RunQylWithSchemaAsync<T>` producing `Qyl.Api.Contracts` DTOs |
 | `AgentServiceDefaults.Web` | `AddQylAgentServiceDefaults` + `MapQylAgentEndpoints` (ASP.NET) |
 | `AgentDevUI.Governed` | DevUI + OpenAI endpoints + governance + MAF-native `UseOpenTelemetry` |
-| `AgentWorkflow.Chain` | `AddQylChain` |
-| `AgentWorkflow.Switch` | `AddQylSwitch` |
 | `AgentWorkflow.HumanInLoop` | `AddQylHumanInTheLoop` + checkpoint/resume |
 | `AgentWorkflow.Declarative` | `QylDeclarativeAgent.Build` (YAML) |
-| `AgentTesting.Harness` (test) | `.Testing` (`AgentRunHarness`, `ActivityAssert`) + `.Testing.Workflows` (`WorkflowFixture<T>`) |
+| `AgentTesting.Harness` (test) | `.Testing` (`AgentRunHarness`, `ActivityAssert`) + `.Testing.Workflows` (`WorkflowFixture<T>`); asserts the folded chain / switch / conditional-tools / structured-output rows |
 | `AgentWorkflow.Generators.Tested` (test) | MAF `ExecutorRouteGenerator` via ANcpLua `Test<TGenerator>` → `.Compiles().HasNoForbiddenTypes().IsCached().Produces()` + `Compile` + `TrimAssert`/`AotRuntime` |
 
 Plus `samples/README.md` (full combination matrix + documented AutoInstrumentation/Aspire patterns) and `docs/showcase/maf-nuget-channel-matrix.md` (the 34-package channel matrix incl. `Declarative @ 1.11.0-rc1`).

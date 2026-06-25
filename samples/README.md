@@ -2,7 +2,7 @@
 
 Runnable samples demonstrating every meaningful combination of **Microsoft Agent Framework (MAF) 1.11.0**,
 the **ANcpLua.Agents** helper layers, and **qyl** building blocks. Every sample is **offline** — it runs
-over `ANcpLua.Agents.Testing.ChatClients.FakeChatClient`, needs no API keys, and is CI-safe.
+over `ANcpLua.Agents.Testing.ChatClients.FakeChatClient`, needs no API keys, and is CI-safe. Four one-combinator combinations (chain, switch, conditional tools, structured-output enum round-trip) are asserted offline in `AgentTesting.Harness` rather than shipped as standalone apps.
 
 ```bash
 dotnet build ANcpLua.Agents.slnx              # all samples
@@ -17,8 +17,6 @@ dotnet test samples/AgentTesting.Harness/AgentTesting.Harness.csproj
 | **AgentBuilder.Fluent** | `ChatClientAgent`, `RunAsync` | `QylAgentOptionsBuilder` | — | exe |
 | **AgentTools.Governed** | `AIFunctionFactory`, tool loop | `QylToolSet.From`, `UseQylGovernance` (budget · concurrency · capability) | — | exe |
 | **AgentApproval.Gate** | `FunctionInvocation` | `QylApprovalGate` / `UseQylApproval`, `AgentApprovalDeniedException` | — | exe |
-| **AgentStructuredOutput** | `AgentResponse<T>` | `RunQylWithSchemaAsync<T>` (auto enum converter) | — | exe |
-| **AgentConditionalTools** | `AIContextProvider`, `ChatOptions.Tools` | `WithQylConditionalTools`, `QylConditionalToolProvider` | — | exe |
 | **AgentGovernance.Lineage** | multi-agent run | `AgentCallLineage`, `AgentSpawnTracker`, `AgentCallGuard` | — | exe |
 | **AgentTelemetry.Minimal** | agent spans/meters | MAF-native `.UseOpenTelemetry` (`invoke_agent`/`execute_tool`) | — | exe |
 | **AgentTelemetry.SemConv** | agent spans | MAF-native `.UseOpenTelemetry` (`invoke_agent`/`execute_tool`) | **SemanticConventions(.Incubating)** `gen_ai.evaluation.*` enrichment span | exe |
@@ -26,11 +24,9 @@ dotnet test samples/AgentTesting.Harness/AgentTesting.Harness.csproj
 | **AgentServiceDefaults.Web** | MAF Hosting | `AddQylAgentServiceDefaults`, `MapQylAgentEndpoints` | — | web |
 | **AgentDevUI** | DevUI + OpenAI endpoints | `.Instrumentation`, `.Testing` | — | web |
 | **AgentDevUI.Governed** | DevUI + OpenAI endpoints | `UseQylGovernance` + MAF-native `.UseOpenTelemetry` (`invoke_agent`/`execute_tool`) | — | web |
-| **AgentWorkflow.Chain** | `Workflows` | `AddQylChain` | — | exe |
-| **AgentWorkflow.Switch** | `Workflows` | `AddQylSwitch` | — | exe |
 | **AgentWorkflow.HumanInLoop** | `Workflows` checkpoint/resume | `AddQylHumanInTheLoop` | — | exe |
 | **AgentWorkflow.Declarative** | `Workflows.Declarative` (YAML) | `QylDeclarativeAgent.Build` | — | exe |
-| **AgentTesting.Harness** | — | `.Testing` (`AgentRunHarness`, `FakeChatClient`, `ActivityCollector`/`ActivityAssert`) + `.Testing.Workflows` (`WorkflowFixture<T>`) | — | test |
+| **AgentTesting.Harness** | — | `.Testing` (`AgentRunHarness`, `FakeChatClient`, `ActivityCollector`/`ActivityAssert`) + `.Testing.Workflows` (`WorkflowFixture<T>`); also asserts the folded rows — chain ordering, switch routing, conditional-tool exposure, structured-output enum round-trip | — | test |
 | **AgentWorkflow.Generators.Tested** | `ExecutorRouteGenerator` (MAF source generator) | `ANcpLua.Roslyn.Utilities.Testing` (`GeneratorResult`, `GeneratorCachingReport`, `Compile`) + `.Testing.Aot` (`AotRuntime`) | — | test |
 
 ## Notable findings surfaced by the showcase

@@ -1,9 +1,11 @@
 using System.Diagnostics;
+using ANcpLua.Agents.Context;
 using ANcpLua.Agents.Facades;
 using ANcpLua.Agents.Testing.ChatClients;
 using ANcpLua.Agents.Testing.Diagnostics;
 using ANcpLua.Agents.Testing.Harnesses;
 using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
 using Xunit;
 
 namespace AgentTesting.Harness;
@@ -94,5 +96,63 @@ public sealed class AgentTestingHarnessShowcaseTests
             .AssertTag("gen_ai.operation.name", "invoke_agent")
             .AssertTag("gen_ai.agent.name", "support-agent")
             .AssertHasTag("gen_ai.agent.id");
+    }
+
+    // (d) Folded from the former AgentConditionalTools sample: the billing pack is attached only on
+    //     the billing turn. The standalone sample printed LastOptions.Tools; here that read is the
+    //     assertion — present on the refund turn, absent on the unrelated one.
+    [Fact]
+    public async Task ConditionalTools_AttachesBillingPack_OnlyOnBillingTurn()
+    {
+        using var chatClient = new FakeChatClient();
+        chatClient.WithResponse("Refund queued.").WithResponse("Vienna is the capital of Austria.");
+
+        var options = new ChatClientAgentOptions { Name = "support-agent" };
+        options.WithQylConditionalTools(router => router.Register(
+            name: "billing",
+            matcher: messages => messages.Any(m => m.Text.Contains("refund", StringComparison.OrdinalIgnoreCase)),
+            toolFactory: () => [AIFunctionFactory.Create(static () => "ok", new AIFunctionFactoryOptions { Name = "refund_order" })],
+            instructions: "Use the billing tools for refunds."));
+        var agent = new ChatClientAgent(chatClient, options);
+
+        await agent.RunAsync("I'd like a refund for order A-1001.", await agent.CreateSessionAsync());
+        chatClient.LastOptions.Should().NotBeNull();
+        chatClient.LastOptions.Tools.Should().ContainSingle(tool => tool.Name == "refund_order");
+
+        await agent.RunAsync("What is the capital of Austria?", await agent.CreateSessionAsync());
+        // No billing mention -> the provider attaches nothing, so LastOptions may be null; the
+        // coalesce keeps the assertion live (it runs on the empty list rather than being skipped).
+        (chatClient.LastOptions?.Tools ?? []).Should().BeEmpty();
+    }
+
+    // (e) Folded from the former AgentStructuredOutput sample: the enum field round-trips through
+    //     RunQylWithSchemaAsync<T>'s enum-aware serializer. A missing converter would leave Condition
+    //     at its default (Unknown), so this is a real round-trip assertion, not a presence check.
+    [Fact]
+    public async Task StructuredOutput_RoundTripsEnumField()
+    {
+        using var chatClient = new FakeChatClient();
+        chatClient.WithResponse("""{ "city": "Vienna", "temperatureC": 21, "condition": "Sunny" }""");
+
+        ChatClientAgent agent = new QylAgentOptionsBuilder()
+            .WithName("weather-reporter")
+            .BuildAgent(chatClient);
+
+        AgentResponse<WeatherReport> response =
+            await agent.RunQylWithSchemaAsync<WeatherReport>("What's the weather in Vienna?");
+
+        response.Result.City.Should().Be("Vienna");
+        response.Result.TemperatureC.Should().Be(21);
+        response.Result.Condition.Should().Be(WeatherCondition.Sunny);
+    }
+
+    private sealed record WeatherReport(string City, int TemperatureC, WeatherCondition Condition);
+
+    private enum WeatherCondition
+    {
+        Unknown,
+        Sunny,
+        Cloudy,
+        Rainy
     }
 }
