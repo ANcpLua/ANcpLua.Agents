@@ -25,6 +25,7 @@ dotnet test samples/AgentTesting.Harness/AgentTesting.Harness.csproj
 | **AgentDevUI** | DevUI + OpenAI endpoints | `.Instrumentation`, `.Testing` | — | web |
 | **AgentDevUI.Governed** | DevUI + OpenAI endpoints | `UseQylGovernance` + MAF-native `.UseOpenTelemetry` (`invoke_agent`/`execute_tool`) | — | web |
 | **AgentWorkflow.HumanInLoop** | `Workflows` checkpoint/resume | `AddQylHumanInTheLoop` | — | exe |
+| **AgentWorkflow.TriageAutofix** | `Workflows` raw graph: conditioned `AddEdge<T>` edges · `IResettableExecutor` · structured `AIAgent.RunAsync<T>` · custom `WorkflowEvent` | `QylAgentOptionsBuilder` over `.Testing` `FakeChatClient` | — | exe |
 | **AgentWorkflow.Declarative** | `Workflows.Declarative` (YAML) | `QylDeclarativeAgent.Build` | — | exe |
 | **AgentTesting.Harness** | — | `.Testing` (`AgentRunHarness`, `FakeChatClient`, `ActivityCollector`/`ActivityAssert`) + `.Testing.Workflows` (`WorkflowFixture<T>`); also asserts the folded rows — chain ordering, switch routing, conditional-tool exposure, structured-output enum round-trip | — | test |
 | **AgentWorkflow.Generators.Tested** | `ExecutorRouteGenerator` (MAF source generator) | `ANcpLua.Roslyn.Utilities.Testing` (`GeneratorResult`, `GeneratorCachingReport`, `Compile`) + `.Testing.Aot` (`AotRuntime`) | — | test |

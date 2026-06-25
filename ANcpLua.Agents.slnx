@@ -23,6 +23,7 @@
         <Project Path="samples/AgentWorkflow.Declarative/AgentWorkflow.Declarative.csproj" />
         <Project Path="samples/AgentWorkflow.Generators.Tested/AgentWorkflow.Generators.Tested.csproj" />
         <Project Path="samples/AgentWorkflow.HumanInLoop/AgentWorkflow.HumanInLoop.csproj" />
+        <Project Path="samples/AgentWorkflow.TriageAutofix/AgentWorkflow.TriageAutofix.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/ANcpLua.Agents.Tests/ANcpLua.Agents.Tests.csproj" />
