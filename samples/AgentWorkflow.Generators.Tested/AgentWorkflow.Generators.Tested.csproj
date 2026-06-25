@@ -1,0 +1,25 @@
+<Project Sdk="ANcpLua.NET.Sdk.Test">
+    <PropertyGroup>
+        <RootNamespace>AgentWorkflow.Generators.Tested</RootNamespace>
+        <OutputType>Exe</OutputType>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <!-- Test-name underscores, TestContext token, XML docs not required in a sample test.
+             TUXU0001: the .Testing harness transitively ships the TUnit analyzer, which nudges
+             xUnit->TUnit; this repo is xUnit, so the suggestion is suppressed. -->
+        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051;TUXU0001</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup Label="ANcpLua generator + AOT test harness (sibling repo, brings Microsoft.CodeAnalysis transitively)">
+        <PackageReference Include="ANcpLua.Roslyn.Utilities.Testing"/>
+        <PackageReference Include="ANcpLua.Roslyn.Utilities.Testing.Aot"/>
+    </ItemGroup>
+
+    <ItemGroup Label="MAF Workflows runtime — Executor base type for the test compilation">
+        <PackageReference Include="Microsoft.Agents.AI.Workflows"/>
+    </ItemGroup>
+
+    <ItemGroup Label="MAF source generator under test — analyzer-only pkg, loaded as a plain reference to obtain the public ExecutorRouteGenerator type">
+        <PackageReference Include="Microsoft.Agents.AI.Workflows.Generators" GeneratePathProperty="true" ExcludeAssets="analyzers"/>
+        <Reference Include="$(PkgMicrosoft_Agents_AI_Workflows_Generators)/analyzers/dotnet/cs/Microsoft.Agents.AI.Workflows.Generators.dll"/>
+    </ItemGroup>
+</Project>

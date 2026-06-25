@@ -7,8 +7,9 @@
   -->
 
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.24</ANcpLuaRoslynUtilitiesVersion>
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.24</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesVersion>2.2.27</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.27</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingAotVersion>2.2.27</ANcpLuaRoslynUtilitiesTestingAotVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Agents (MAF 1.11.0)">
@@ -39,6 +40,16 @@
 
   <PropertyGroup Label="OpenTelemetry">
     <OpenTelemetryVersion>1.15.3</OpenTelemetryVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="qyl (live showcase dependencies — samples only, never packed)">
+    <!--
+      qyl packages restorable from nuget.org. SemanticConventions + .Incubating share a
+      version line (3.0.2). The Qyl AutoInstrumentation suite is NOT published to nuget.org,
+      so it is showcased as a documented pattern (samples/README.md), not a live dependency.
+    -->
+    <QylSemanticConventionsVersion>3.0.2</QylSemanticConventionsVersion>
+    <QylApiContractsVersion>0.2.0</QylApiContractsVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="LLM Provider SDKs (Testing fixtures)">

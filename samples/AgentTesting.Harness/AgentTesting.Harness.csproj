@@ -1,0 +1,27 @@
+<Project Sdk="ANcpLua.NET.Sdk.Test">
+    <PropertyGroup>
+        <RootNamespace>AgentTesting.Harness</RootNamespace>
+        <OutputType>Exe</OutputType>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <!--
+            CS1591   — XML docs not required on sample test methods.
+            CA1707   — underscores in identifiers: convention for test names (Method_Condition_Expected).
+            xUnit1051 — TestContext.Current.CancellationToken: stylistic, not bug-catching in a sample.
+            TUXU0001 — the .Testing harness transitively ships the TUnit analyzer, which nudges xUnit->TUnit;
+                       this repo is xUnit, so the suggestion is suppressed.
+            MEAI001 / MAAI001 — upstream MAF/MEAI experimental API markers surfaced via agent telemetry.
+        -->
+        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051;TUXU0001;MEAI001;MAAI001</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- QylAgentOptionsBuilder facade used to build the ChatClientAgent under test. -->
+        <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
+        <!-- UseAgentRunTelemetry + AgentTelemetryNames for the captured agent span. -->
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Instrumentation\ANcpLua.Agents.Instrumentation.csproj"/>
+        <!-- AgentRunHarness, FakeChatClient, ActivityCollector, ActivityAssert. -->
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
+        <!-- WorkflowFixture<T>, WorkflowRunResult, WorkflowRunAssertions. -->
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing.Workflows\ANcpLua.Agents.Testing.Workflows.csproj"/>
+    </ItemGroup>
+</Project>

@@ -9,8 +9,24 @@
         <Project Path="src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj" />
     </Folder>
     <Folder Name="/samples/">
+        <Project Path="samples/AgentApiContracts/AgentApiContracts.csproj" />
+        <Project Path="samples/AgentApproval.Gate/AgentApproval.Gate.csproj" />
+        <Project Path="samples/AgentBuilder.Fluent/AgentBuilder.Fluent.csproj" />
+        <Project Path="samples/AgentConditionalTools/AgentConditionalTools.csproj" />
         <Project Path="samples/AgentDevUI/AgentDevUI.csproj" />
+        <Project Path="samples/AgentDevUI.Governed/AgentDevUI.Governed.csproj" />
+        <Project Path="samples/AgentGovernance.Lineage/AgentGovernance.Lineage.csproj" />
+        <Project Path="samples/AgentServiceDefaults.Web/AgentServiceDefaults.Web.csproj" />
+        <Project Path="samples/AgentStructuredOutput/AgentStructuredOutput.csproj" />
         <Project Path="samples/AgentTelemetry.Minimal/AgentTelemetry.Minimal.csproj" />
+        <Project Path="samples/AgentTelemetry.SemConv/AgentTelemetry.SemConv.csproj" />
+        <Project Path="samples/AgentTesting.Harness/AgentTesting.Harness.csproj" />
+        <Project Path="samples/AgentTools.Governed/AgentTools.Governed.csproj" />
+        <Project Path="samples/AgentWorkflow.Chain/AgentWorkflow.Chain.csproj" />
+        <Project Path="samples/AgentWorkflow.Declarative/AgentWorkflow.Declarative.csproj" />
+        <Project Path="samples/AgentWorkflow.Generators.Tested/AgentWorkflow.Generators.Tested.csproj" />
+        <Project Path="samples/AgentWorkflow.HumanInLoop/AgentWorkflow.HumanInLoop.csproj" />
+        <Project Path="samples/AgentWorkflow.Switch/AgentWorkflow.Switch.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/ANcpLua.Agents.Tests/ANcpLua.Agents.Tests.csproj" />

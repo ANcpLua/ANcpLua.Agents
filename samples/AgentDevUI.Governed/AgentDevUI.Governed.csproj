@@ -1,0 +1,23 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>AgentDevUI.Governed</RootNamespace>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Instrumentation\ANcpLua.Agents.Instrumentation.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Agents.AI.Hosting"/>
+        <PackageReference Include="Microsoft.Agents.AI.Hosting.OpenAI"/>
+        <PackageReference Include="Microsoft.Agents.AI.DevUI"/>
+    </ItemGroup>
+</Project>

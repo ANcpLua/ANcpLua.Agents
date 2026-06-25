@@ -1,0 +1,12 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>AgentWorkflow.Declarative</RootNamespace>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Workflows\ANcpLua.Agents.Workflows.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Workflows.Declarative\ANcpLua.Agents.Workflows.Declarative.csproj"/>
+    </ItemGroup>
+</Project>
