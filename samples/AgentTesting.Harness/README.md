@@ -12,10 +12,13 @@ What it demonstrates (one combination per `[Fact]`):
   `AgentRunHarness.For(agent).WithUserMessage(...).RunAsync()`. The materialized
   `AgentRunHarnessResult` is asserted with `Should().HaveTextContaining(...)`. A second fact uses
   `.RunStreamingAsync()` and asserts the concatenated streaming text.
-- **`ActivityCollector` capturing an agent span** — the agent is wrapped with
-  `UseAgentRunTelemetry`, an `ActivityCollector` listens on the configured `ActivitySource`, and the
-  captured `agent.run` span is checked with the `ActivityAssert` fluent extensions
-  (`AssertKind` / `AssertTag` / `AssertStatus`) including the `gen_ai.*` semantic-convention tags.
+- **`ActivityCollector` capturing the MAF `invoke_agent` span** — the agent is wrapped with MAF's
+  native `agent.AsBuilder().UseOpenTelemetry("Experimental.Microsoft.Agents.AI", o => o.EnableSensitiveData = false)`,
+  an `ActivityCollector` (a `System.Diagnostics.ActivityListener` wrapper) listens on the framework
+  `ActivitySource`, and the captured semantic-convention `invoke_agent` span is checked with the
+  `ActivityAssert` fluent extensions (`AssertKind` / `AssertTag` / `AssertHasTag`) on the `gen_ai.*`
+  tags. The collector also sees the inner `chat` span on the same source, so the agent span is selected
+  by its `gen_ai.operation.name` tag (`invoke_agent`).
 - **`WorkflowFixture<TInput>` running a tiny workflow** — a subclass overrides `BuildWorkflow()` to
   build a single-executor MAF workflow (an `Executor<string,string>` that uppercases its input and
   calls `context.YieldOutputAsync(...)`, wired with `WithOutputFrom`). `RunAsync(input)` materializes

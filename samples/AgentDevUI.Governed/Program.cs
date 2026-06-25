@@ -1,28 +1,50 @@
 // Showcase: MAF DevUI + OpenAI-compatible hosting
 //   x ANcpLua.Agents.Governance (UseQylGovernance: capability + budget + concurrency enforcement)
-//   x ANcpLua.Agents.Instrumentation (AddAgentTelemetry / UseAgentRunTelemetry / UseAgentToolTelemetry)
-//   x qyl telemetry semantic conventions (wired through AddAgentTelemetry).
+//   x MAF-native OpenTelemetry (UseOpenTelemetry -> semconv invoke_agent / execute_tool spans).
 //
 // Everything is OFFLINE: the agent is built over FakeChatClient (no API keys, no network).
-// The governance middleware sits between the run/tool telemetry layers and the inner
-// ChatClientAgent, so every tool invocation is checked against a per-tool AgentToolPolicy
+// Governance is the differentiator here: it sits between the MAF OpenTelemetry layer and the
+// inner ChatClientAgent, so every tool invocation is checked against a per-tool AgentToolPolicy
 // (required capabilities + attempt/tool-call budget + concurrency cap) before it executes.
+//
+// Telemetry is emitted natively by MAF: .UseOpenTelemetry() wraps the agent in OpenTelemetryAgent,
+// producing conformant gen_ai 'invoke_agent' spans, and because OTel sits below the framework's
+// FunctionInvokingChatClient it also gets 'execute_tool' spans on the same source. Sensitive data
+// (raw prompts/arguments/results) is OFF by default and pinned off explicitly below.
 
 using System.ComponentModel;
 using ANcpLua.Agents.Governance;
-using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.DevUI;
 using Microsoft.Agents.AI.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+
+// Default source/meter name MAF's OpenTelemetryAgent writes to (OpenTelemetryConsts.DefaultSourceName).
+const string AgentSource = "Experimental.Microsoft.Agents.AI";
 
 var builder = WebApplication.CreateBuilder(args);
 
-// qyl-flavored Agent Framework telemetry (traces + metrics sources/meters).
-builder.AddAgentTelemetry();
+// Collect the framework's native gen_ai spans/metrics. Export to OTLP when an endpoint is
+// configured; otherwise telemetry is produced in-process (still visible to ActivityListeners).
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing =>
+    {
+        tracing.AddSource(AgentSource);
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")))
+            tracing.AddOtlpExporter();
+    })
+    .WithMetrics(metrics =>
+    {
+        metrics.AddMeter(AgentSource);
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")))
+            metrics.AddOtlpExporter();
+    });
 
 builder.AddAIAgent("ticket-agent", (serviceProvider, _) =>
 {
@@ -57,8 +79,8 @@ builder.AddAIAgent("ticket-agent", (serviceProvider, _) =>
             instructions: "You look up support ticket status.",
             tools: [lookupStatus])
         .AsBuilder()
-        .UseAgentRunTelemetry()
-        .UseAgentToolTelemetry()
+        // MAF-native telemetry: invoke_agent + execute_tool spans, sensitive data off.
+        .UseOpenTelemetry(configure: agent => agent.EnableSensitiveData = false)
         // Governance wraps the inner agent's function invocation: capabilities are verified,
         // budget is reserved (rolled back on failure), and a concurrency slot is acquired
         // before each tool call runs.

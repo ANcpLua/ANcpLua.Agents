@@ -1,7 +1,8 @@
 # AgentDevUI sample
 
 Launches the **Microsoft Agent Framework DevUI** playground against a key-free
-fake agent, with this repo's run/tool telemetry middleware in front of it.
+fake agent, with MAF-native OpenTelemetry (`invoke_agent` / `execute_tool`) in
+front of it.
 
 ```bash
 dotnet run --project samples/AgentDevUI
@@ -21,8 +22,9 @@ with no live model and no API key.
   alone serves no agents without these — `Microsoft.Agents.AI.Hosting.OpenAI`.
 - `AddDevUI()` / `MapDevUI()` — the playground at `/devui`, mapped only in the
   Development environment — `Microsoft.Agents.AI.DevUI`.
-- `UseAgentRunTelemetry()` / `UseAgentToolTelemetry()` — this repo's
-  instrumentation, composed onto the discovered agent.
+- `UseAgentTelemetry()` — wraps the discovered agent in MAF-native
+  `OpenTelemetryAgent` (semconv `invoke_agent` / `execute_tool` spans, sensitive
+  data off) — `ANcpLua.Agents.Instrumentation`.
 
 ## Why preview packages
 

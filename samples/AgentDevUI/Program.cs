@@ -10,8 +10,6 @@ using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddAgentTelemetry();
-
 builder.AddAIAgent("ticket-agent", (serviceProvider, _) =>
 {
     var lookupStatus = AIFunctionFactory.Create(
@@ -32,8 +30,7 @@ builder.AddAIAgent("ticket-agent", (serviceProvider, _) =>
             instructions: "You look up support ticket status.",
             tools: [lookupStatus])
         .AsBuilder()
-        .UseAgentRunTelemetry()
-        .UseAgentToolTelemetry()
+        .UseAgentTelemetry()
         .Build(serviceProvider);
 });
 

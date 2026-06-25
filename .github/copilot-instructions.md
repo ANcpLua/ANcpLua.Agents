@@ -19,7 +19,7 @@ Qyl Durable experiments, and product-host samples are intentionally removed.
 
 - Package IDs and namespaces must match.
 - Stable packages must not reference MAF preview, RC, or alpha packages.
-- `ANcpLua.Agents.Instrumentation` owns agent telemetry. Do not reintroduce legacy Qyl-branded tracing decorators.
+- Agent telemetry is MAF-native (`UseOpenTelemetry`); `ANcpLua.Agents.Instrumentation` only registers the framework source/meter and pins bounded, sensitive-data-off defaults. Do not reintroduce hand-rolled run/tool decorators or legacy Qyl-branded tracing decorators.
 - Telemetry must not tag or log raw prompts, message content, tool arguments, tool results, API keys, emails, or exception messages.
 - Tool and agent names must be bounded before entering tags or metric dimensions.
 - MAF version pins live in `Version.props` through `Directory.Packages.props`; do not edit per-project `<Version>` values.

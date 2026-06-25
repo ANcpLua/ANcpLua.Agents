@@ -12,8 +12,7 @@ namespace ANcpLua.Agents.Hosting.ServiceDefaults;
 
 /// <summary>
 ///     Aspire-style service-defaults extensions tuned for Microsoft Agent Framework consumers.
-///     Provides health checks plus telemetry registration helpers for the current MAF source
-///     family and this repo's instrumentation source.
+///     Provides health checks plus MAF-native telemetry source/meter registration helpers.
 /// </summary>
 /// <remarks>
 ///     Intentionally does NOT configure OTLP exporters, service discovery, or resilience policies
@@ -22,17 +21,14 @@ namespace ANcpLua.Agents.Hosting.ServiceDefaults;
 /// </remarks>
 public static class QylAgentServiceDefaultsExtensions
 {
-    /// <summary>Canonical MAF agent ActivitySource name.</summary>
-    public const string AgentActivitySource = "Microsoft.Agents.AI";
+    /// <summary>Canonical MAF agent ActivitySource name — emits both invoke_agent and execute_tool spans.</summary>
+    public const string AgentActivitySource = AgentTelemetryExtensions.AgentFrameworkSourceName;
 
     /// <summary>Canonical MAF DurableTask ActivitySource name.</summary>
     public const string DurableTaskActivitySource = "Microsoft.Agents.AI.DurableTask";
 
     /// <summary>Canonical Microsoft.Extensions.AI experimental ActivitySource name.</summary>
     public const string ExtensionsActivitySource = "Experimental.Microsoft.Extensions.AI";
-
-    /// <summary>ActivitySource emitted by ANcpLua.Agents.Instrumentation.</summary>
-    public const string InstrumentationActivitySource = AgentTelemetryOptions.DefaultActivitySourceName;
 
     /// <summary>
     ///     Registers default health checks. Wire this from <c>WebApplicationBuilder</c> alongside
@@ -41,13 +37,12 @@ public static class QylAgentServiceDefaultsExtensions
     public static IHostApplicationBuilder AddQylAgentServiceDefaults(this IHostApplicationBuilder builder)
     {
         Guard.NotNull(builder);
-        builder.AddAgentTelemetry();
         builder.Services.AddHealthChecks();
         return builder;
     }
 
     /// <summary>
-    ///     Adds both canonical MAF ActivitySources to a <see cref="TracerProviderBuilder"/>. Use
+    ///     Adds the canonical MAF agent ActivitySource to a <see cref="TracerProviderBuilder"/>. Use
     ///     inside <c>builder.Services.AddOpenTelemetry().WithTracing(t =&gt; t.AddQylAgentSources())</c>.
     /// </summary>
     public static TracerProviderBuilder AddQylAgentSources(this TracerProviderBuilder builder)
@@ -57,7 +52,7 @@ public static class QylAgentServiceDefaultsExtensions
     }
 
     /// <summary>
-    ///     Adds MAF and ANcpLua agent meters to a <see cref="MeterProviderBuilder"/>.
+    ///     Adds the MAF agent meter to a <see cref="MeterProviderBuilder"/>.
     /// </summary>
     public static MeterProviderBuilder AddQylAgentMeters(this MeterProviderBuilder builder)
     {

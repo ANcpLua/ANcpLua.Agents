@@ -23,4 +23,4 @@ app.MapQylAgentEndpoints();
 app.Run();
 ```
 
-`ANcpLua.Agents.Instrumentation` owns run/tool telemetry. ServiceDefaults wires its source and meter registration helpers while staying limited to health endpoints and OpenTelemetry setup glue.
+Agent telemetry is MAF-native (`UseOpenTelemetry`). `AddQylAgentServiceDefaults` registers health checks only; the agent telemetry source and meter come from `AddQylAgentSources` / `AddQylAgentMeters`, which register the MAF `Experimental.Microsoft.Agents.AI` source via the `ANcpLua.Agents.Instrumentation` helpers. ServiceDefaults stays limited to health endpoints and OpenTelemetry setup glue.

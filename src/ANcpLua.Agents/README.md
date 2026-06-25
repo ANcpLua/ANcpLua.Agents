@@ -17,4 +17,4 @@ Channel: stable. This package must not reference Microsoft Agent Framework previ
 | Tool composition | `QylToolSet`, `QylToolScope`, `QylConditionalToolProvider` |
 | Agent options | `QylAgentOptionsBuilder`, `QylSchemaExtensions`, `QylBackgroundAgentsExtensions` |
 
-Telemetry lives in `ANcpLua.Agents.Instrumentation`. This package does not contain tracing decorators, tool-decorating chat clients, or OpenTelemetry middleware.
+Telemetry is MAF-native: wrap the agent with `UseOpenTelemetry` (or the `UseAgentTelemetry` / `AddAgentFrameworkSources` / `AddAgentFrameworkMeters` registration helpers in `ANcpLua.Agents.Instrumentation`). This package does not contain tracing decorators, tool-decorating chat clients, or OpenTelemetry middleware.

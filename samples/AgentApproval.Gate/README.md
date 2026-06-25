@@ -1,18 +1,35 @@
 # AgentApproval.Gate
 
-Showcases human-in-the-loop tool approval for a Microsoft Agent Framework agent using the
-ANcpLua.Agents single-call approval gate. A `ChatClientAgent` is built over an offline
-`FakeChatClient` (seeded to request an `issue_refund` tool call) and wrapped with
-`AIAgentBuilder.UseQylApproval(predicate)` from `ANcpLua.Agents.Governance`. Before every tool
-invocation the predicate decides whether the call is approved: when it returns `true` the real
-tool runs and the agent answers; when it returns `false` the gate throws
-`AgentApprovalDeniedException` (carrying the offending `ToolName`) before the tool can execute.
-The program runs the agent twice — once granting approval, once denying it — and prints both
-outcomes. No API keys or network access are required.
+Two ways to gate a side-effecting Microsoft Agent Framework tool, side by side, and when to use each.
 
-Combination: MAF `ChatClientAgent` function-invocation middleware x
-`ANcpLua.Agents.Governance` (`UseQylApproval` / `AgentApprovalDeniedException`) x
-`ANcpLua.Agents.Testing` (`FakeChatClient`).
+## Path A — deterministic gate (`UseQylApproval`)
+
+`ANcpLua.Agents.Governance.UseQylApproval(predicate)` runs a predicate before every tool call.
+Denial throws `AgentApprovalDeniedException` straight to the caller and the tool never runs.
+Single-call, no extra round trip, no conversation state. Reach for it when approval is a
+synchronous in-process decision (feature flag, RBAC claim, kill switch) and a denied call should
+fail the run.
+
+The gate is function-invocation middleware, so it runs inside the `FunctionInvokingChatClient`
+(FICC) loop. FICC normally captures a tool exception and feeds it back to the model
+(`MaximumConsecutiveErrorsPerRequest = 3` by default), which would swallow a denial. The sample
+pre-builds the FICC with `MaximumConsecutiveErrorsPerRequest = 0` so it rethrows immediately —
+`ChatClientAgent` reuses a FICC already present on the chat client rather than inserting its own.
+
+## Path B — native human-in-the-loop (`ApprovalRequiredAIFunction`)
+
+Wrapping a tool in MEAI's `ApprovalRequiredAIFunction` makes the agent **pause** on the tool call:
+the run returns a `ToolApprovalRequestContent` instead of a result. A human decides out of band, then
+the caller resumes the same `AgentSession` by sending each request's
+`CreateResponse(approved, reason)` back as a user message — the MAF `ToolApprovalRequestContent`
+protocol. Multi-turn. Reach for it when approval needs a person, an external system, or time the
+request can't block on.
+
+The sample uses `new ApprovalRequiredAIFunction(tool)` directly — that is the whole of what the
+`QylApprovalGate.RequireQylApproval` wrapper does.
+
+Both paths run fully offline against a seeded `ANcpLua.Agents.Testing.FakeChatClient`. No API keys or
+network access are required.
 
 ## Run
 

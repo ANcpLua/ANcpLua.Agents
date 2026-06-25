@@ -17,8 +17,6 @@
     <ItemGroup>
         <!-- QylAgentOptionsBuilder facade used to build the ChatClientAgent under test. -->
         <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
-        <!-- UseAgentRunTelemetry + AgentTelemetryNames for the captured agent span. -->
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Instrumentation\ANcpLua.Agents.Instrumentation.csproj"/>
         <!-- AgentRunHarness, FakeChatClient, ActivityCollector, ActivityAssert. -->
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
         <!-- WorkflowFixture<T>, WorkflowRunResult, WorkflowRunAssertions. -->

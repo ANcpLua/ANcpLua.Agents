@@ -20,12 +20,12 @@ dotnet test samples/AgentTesting.Harness/AgentTesting.Harness.csproj
 | **AgentStructuredOutput** | `AgentResponse<T>` | `RunQylWithSchemaAsync<T>` (auto enum converter) | — | exe |
 | **AgentConditionalTools** | `AIContextProvider`, `ChatOptions.Tools` | `WithQylConditionalTools`, `QylConditionalToolProvider` | — | exe |
 | **AgentGovernance.Lineage** | multi-agent run | `AgentCallLineage`, `AgentSpawnTracker`, `AgentCallGuard` | — | exe |
-| **AgentTelemetry.Minimal** | agent spans/meters | `.Instrumentation` (`AddAgentTelemetry`, `UseAgentRunTelemetry`) | — | exe |
-| **AgentTelemetry.SemConv** | agent spans | `.Instrumentation` | **SemanticConventions(.Incubating)** `gen_ai.*` | exe |
+| **AgentTelemetry.Minimal** | agent spans/meters | MAF-native `.UseOpenTelemetry` (`invoke_agent`/`execute_tool`) | — | exe |
+| **AgentTelemetry.SemConv** | agent spans | MAF-native `.UseOpenTelemetry` (`invoke_agent`/`execute_tool`) | **SemanticConventions(.Incubating)** `gen_ai.evaluation.*` enrichment span | exe |
 | **AgentApiContracts** | structured output | `RunQylWithSchemaAsync<T>` | **Qyl.Api.Contracts** DTO | exe |
 | **AgentServiceDefaults.Web** | MAF Hosting | `AddQylAgentServiceDefaults`, `MapQylAgentEndpoints` | — | web |
 | **AgentDevUI** | DevUI + OpenAI endpoints | `.Instrumentation`, `.Testing` | — | web |
-| **AgentDevUI.Governed** | DevUI + OpenAI endpoints | `UseQylGovernance` + run/tool telemetry | — | web |
+| **AgentDevUI.Governed** | DevUI + OpenAI endpoints | `UseQylGovernance` + MAF-native `.UseOpenTelemetry` (`invoke_agent`/`execute_tool`) | — | web |
 | **AgentWorkflow.Chain** | `Workflows` | `AddQylChain` | — | exe |
 | **AgentWorkflow.Switch** | `Workflows` | `AddQylSwitch` | — | exe |
 | **AgentWorkflow.HumanInLoop** | `Workflows` checkpoint/resume | `AddQylHumanInTheLoop` | — | exe |
@@ -40,7 +40,9 @@ dotnet test samples/AgentTesting.Harness/AgentTesting.Harness.csproj
   state** (ANcpLua's forbidden-type analyzer flags them) — a real incrementality characteristic, surfaced
   rather than asserted away. The generated executor route is then compiled against real MAF types via
   `Compile`, and AOT posture is observed via `AotRuntime`.
-- **`AgentTelemetry.SemConv`** uses the typed `GenAiAttributes` constants, which surface the OTel semantic-
+- **`AgentTelemetry.SemConv`** gets its `invoke_agent` / `execute_tool` framework spans from MAF's native
+  `.UseOpenTelemetry()` (no hand-rolled decorators); qyl's Incubating `GenAiAttributes` constants earn their
+  place only on the one `gen_ai.evaluation.*` enrichment span MAF does not emit, surfacing the OTel semantic-
   convention rename `gen_ai.system` → `gen_ai.provider.name` at compile time — staying conformant by construction.
 - **`AgentTools.Governed`** proves governance is real, not cosmetic: a capability-gated tool body runs **0**
   times when the capability is not granted, and a `MaxAttempts=1` budget trips `AgentBudgetExceededException`

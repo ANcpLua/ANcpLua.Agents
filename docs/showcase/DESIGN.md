@@ -30,10 +30,10 @@ Every sample is **offline** (no API keys) via `ANcpLua.Agents.Testing.FakeChatCl
 | `AgentStructuredOutput` | `RunQylWithSchemaAsync<T>` |
 | `AgentConditionalTools` | `WithQylConditionalTools` (`AIContextProvider`) |
 | `AgentGovernance.Lineage` | `AgentCallLineage` + `AgentSpawnTracker` + `AgentCallGuard` |
-| `AgentTelemetry.SemConv` | `.Instrumentation` + Qyl SemanticConventions/Incubating (`gen_ai.*`) + OTLP |
+| `AgentTelemetry.SemConv` | MAF `.UseOpenTelemetry()` (`invoke_agent`/`execute_tool`) + one qyl `gen_ai.evaluation.*` enrichment span (Incubating `GenAiAttributes`) + OTLP |
 | `AgentApiContracts` | `RunQylWithSchemaAsync<T>` producing `Qyl.Api.Contracts` DTOs |
 | `AgentServiceDefaults.Web` | `AddQylAgentServiceDefaults` + `MapQylAgentEndpoints` (ASP.NET) |
-| `AgentDevUI.Governed` | DevUI + OpenAI endpoints + governance + telemetry middleware |
+| `AgentDevUI.Governed` | DevUI + OpenAI endpoints + governance + MAF-native `UseOpenTelemetry` |
 | `AgentWorkflow.Chain` | `AddQylChain` |
 | `AgentWorkflow.Switch` | `AddQylSwitch` |
 | `AgentWorkflow.HumanInLoop` | `AddQylHumanInTheLoop` + checkpoint/resume |
