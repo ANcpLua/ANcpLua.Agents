@@ -11,10 +11,22 @@
     <ANcpLuaRoslynUtilitiesTestingVersion>2.2.24</ANcpLuaRoslynUtilitiesTestingVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF 1.10.0)">
-    <MicrosoftAgentsAIVersion>1.10.0</MicrosoftAgentsAIVersion>
-    <MicrosoftAgentsAIWorkflowsVersion>1.10.0</MicrosoftAgentsAIWorkflowsVersion>
-    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.10.0</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.11.0)">
+    <MicrosoftAgentsAIVersion>1.11.0</MicrosoftAgentsAIVersion>
+    <MicrosoftAgentsAIWorkflowsVersion>1.11.0</MicrosoftAgentsAIWorkflowsVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.11.0</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="MAF DevUI (preview-only — consumed solely by samples/AgentDevUI)">
+    <!--
+      DevUI/Hosting ship preview/alpha only; no stable release exists. These
+      1.11.0-* builds depend on the STABLE 1.11.0 core pinned above, so the
+      transitive closure stays on 1.11.0. Keep aligned to MicrosoftAgentsAIVersion;
+      do NOT "fix" to a stable that isn't published. Sample-only — never packed.
+    -->
+    <MicrosoftAgentsAIHostingVersion>1.11.0-preview.260623.1</MicrosoftAgentsAIHostingVersion>
+    <MicrosoftAgentsAIHostingOpenAIVersion>1.11.0-alpha.260623.1</MicrosoftAgentsAIHostingOpenAIVersion>
+    <MicrosoftAgentsAIDevUIVersion>1.11.0-preview.260623.1</MicrosoftAgentsAIDevUIVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions">

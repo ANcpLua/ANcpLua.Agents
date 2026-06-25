@@ -9,6 +9,7 @@
         <Project Path="src/ANcpLua.Agents.Testing.Workflows/ANcpLua.Agents.Testing.Workflows.csproj" />
     </Folder>
     <Folder Name="/samples/">
+        <Project Path="samples/AgentDevUI/AgentDevUI.csproj" />
         <Project Path="samples/AgentTelemetry.Minimal/AgentTelemetry.Minimal.csproj" />
     </Folder>
     <Folder Name="/tests/">
