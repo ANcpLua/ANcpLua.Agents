@@ -6,12 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\ANcpLua.Agents.Instrumentation\ANcpLua.Agents.Instrumentation.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="OpenTelemetry"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"/>
     </ItemGroup>

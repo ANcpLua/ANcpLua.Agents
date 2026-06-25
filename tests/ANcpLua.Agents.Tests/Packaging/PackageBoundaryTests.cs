@@ -126,6 +126,23 @@ public sealed partial class PackageBoundaryTests
     }
 
     [Fact]
+    public void SourcePackages_DoNotReferenceSampleOnlyQylPackages()
+    {
+        var violations = new List<(string Project, string Package)>();
+
+        foreach (var project in LoadSourceProjects())
+        {
+            violations.AddRange(project.PackageReferences
+                .Where(static package => StringComparisonExtensions.StartsWithOrdinal(package, "Qyl."))
+                .Select(package => (project.PackageId, package)));
+        }
+
+        violations.Should().BeEmpty(
+            "Packable source packages must not reference sample-only Qyl.* packages (those pins are samples-only). Found: " +
+            string.Join(", ", violations.Select(reference => $"{reference.Project}:{reference.Package}")));
+    }
+
+    [Fact]
     public void PublicQylFacadeRules_AppliesToFacadesFolders()
     {
         foreach (var project in LoadSourceProjects())
@@ -164,8 +181,8 @@ public sealed partial class PackageBoundaryTests
             File.Exists(readmePath).Should().BeTrue($"{project.PackageId} must pack a package README");
 
             var readme = File.ReadAllText(readmePath);
-            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.10.x");
-            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.10.0");
+            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.11.x");
+            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.11.0");
         }
     }
 

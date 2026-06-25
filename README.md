@@ -9,20 +9,20 @@
 
 # ANcpLua.Agents
 
-Lean toolkit for Microsoft Agent Framework 1.10.x.
+Lean toolkit for Microsoft Agent Framework 1.11.x.
 
-The repo is intentionally small: runtime governance primitives, Agent Framework OpenTelemetry middleware, service defaults, workflow helpers, and test infrastructure. Provider-specific facades, MCP wrappers, Qyl Durable experiments, and demo product hosts were removed instead of kept alive as compatibility shims.
+The repo is intentionally small: runtime governance primitives, MAF-native OpenTelemetry helpers, service defaults, workflow helpers, and test infrastructure. Provider-specific facades, MCP wrappers, Qyl Durable experiments, and demo product hosts were removed instead of kept alive as compatibility shims.
 
-Compatible with: Microsoft.Agents.AI 1.10.x
-Tested against: Microsoft.Agents.AI 1.10.0
-Upstream harvest: Microsoft Agent Framework #5463 fixed `ChatOptions.Reasoning` merge behavior in `ChatClientAgent`; this repo consumes it through the 1.10.0 package floor.
+Compatible with: Microsoft.Agents.AI 1.11.x
+Tested against: Microsoft.Agents.AI 1.11.0
+Upstream harvest: Microsoft Agent Framework #5463 fixed `ChatOptions.Reasoning` merge behavior in `ChatClientAgent`; this repo consumes it through the 1.11.0 package floor.
 
 ## Packages
 
 | Package | Contents |
 |---|---|
 | [`ANcpLua.Agents`](https://www.nuget.org/packages/ANcpLua.Agents/) | Core runtime helpers and governance primitives |
-| [`ANcpLua.Agents.Instrumentation`](https://www.nuget.org/packages/ANcpLua.Agents.Instrumentation/) | MAF run/tool telemetry middleware and OpenTelemetry registration helpers |
+| [`ANcpLua.Agents.Instrumentation`](https://www.nuget.org/packages/ANcpLua.Agents.Instrumentation/) | MAF-native OpenTelemetry registration helpers |
 | [`ANcpLua.Agents.Hosting.ServiceDefaults`](https://www.nuget.org/packages/ANcpLua.Agents.Hosting.ServiceDefaults/) | Health endpoints plus MAF ActivitySource registration helpers |
 | [`ANcpLua.Agents.Workflows`](https://www.nuget.org/packages/ANcpLua.Agents.Workflows/) | Workflow facades and execution helpers |
 | [`ANcpLua.Agents.Testing`](https://www.nuget.org/packages/ANcpLua.Agents.Testing/) | Fake agents, fake chat clients, diagnostics, conformance fixtures |
@@ -31,18 +31,15 @@ Upstream harvest: Microsoft Agent Framework #5463 fixed `ChatOptions.Reasoning` 
 ## Instrumentation
 
 ```csharp
-builder.AddAgentTelemetry();
-
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracing => tracing.AddAgentFrameworkSources())
     .WithMetrics(metrics => metrics.AddAgentFrameworkMeters());
 
 var agent = baseAgent.AsBuilder()
-    .UseAgentRunTelemetry()
-    .UseAgentToolTelemetry()
+    .UseAgentTelemetry()
     .Build();
 ```
 
-The telemetry package instruments Agent Framework middleware. It emits bounded run/tool spans and bounded metrics. It does not emit raw prompts, message content, tool arguments, tool results, API keys, or exception messages.
+The telemetry package wraps the agent in MAF-native `OpenTelemetryAgent` (`invoke_agent` / `execute_tool` spans on the `Experimental.Microsoft.Agents.AI` source); sensitive data is off by default. It does not emit raw prompts, message content, tool arguments, tool results, API keys, or exception messages.
 
 Siblings: [ANcpLua.Roslyn.Utilities](https://github.com/ANcpLua/ANcpLua.Roslyn.Utilities) · [ANcpLua.NET.Sdk](https://github.com/ANcpLua/ANcpLua.NET.Sdk) · [ANcpLua.Analyzers](https://github.com/ANcpLua/ANcpLua.Analyzers)

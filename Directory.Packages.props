@@ -9,13 +9,29 @@
   <ItemGroup Label="Roslyn.Utilities (sibling repo)">
     <PackageVersion Include="ANcpLua.Roslyn.Utilities" Version="$(ANcpLuaRoslynUtilitiesVersion)"/>
     <PackageVersion Include="ANcpLua.Roslyn.Utilities.Testing" Version="$(ANcpLuaRoslynUtilitiesTestingVersion)"/>
+    <PackageVersion Include="ANcpLua.Roslyn.Utilities.Testing.Aot" Version="$(ANcpLuaRoslynUtilitiesTestingAotVersion)"/>
   </ItemGroup>
 
-  <ItemGroup Label="Microsoft.Agents (MAF 1.10.x)">
+  <ItemGroup Label="Microsoft.Agents (MAF 1.11.x)">
     <PackageVersion Include="Microsoft.Agents.AI" Version="$(MicrosoftAgentsAIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Abstractions" Version="$(MicrosoftAgentsAIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Workflows" Version="$(MicrosoftAgentsAIWorkflowsVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Workflows.Declarative" Version="$(MicrosoftAgentsAIWorkflowsDeclarativeVersion)"/>
+    <!-- Source generator (analyzer-only pkg). Referenced by samples/AgentWorkflow.Generators.Tested
+         via GeneratePathProperty to load the ExecutorRouteGenerator type for generator testing. -->
+    <PackageVersion Include="Microsoft.Agents.AI.Workflows.Generators" Version="$(MicrosoftAgentsAIVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="qyl (live showcase dependencies — samples only, never packed)">
+    <PackageVersion Include="Qyl.OpenTelemetry.SemanticConventions" Version="$(QylSemanticConventionsVersion)"/>
+    <PackageVersion Include="Qyl.OpenTelemetry.SemanticConventions.Incubating" Version="$(QylSemanticConventionsVersion)"/>
+    <PackageVersion Include="Qyl.Api.Contracts" Version="$(QylApiContractsVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup Label="MAF DevUI (preview-only — samples/AgentDevUI; closure rests on stable 1.11.0 core above)">
+    <PackageVersion Include="Microsoft.Agents.AI.Hosting" Version="$(MicrosoftAgentsAIHostingVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.Hosting.OpenAI" Version="$(MicrosoftAgentsAIHostingOpenAIVersion)"/>
+    <PackageVersion Include="Microsoft.Agents.AI.DevUI" Version="$(MicrosoftAgentsAIDevUIVersion)"/>
   </ItemGroup>
 
   <ItemGroup Label="Microsoft.Extensions">

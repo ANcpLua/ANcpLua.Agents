@@ -1,0 +1,21 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>AgentTelemetry.SemConv</RootNamespace>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup Label="qyl live dependency: typed OpenTelemetry GenAI semantic conventions">
+        <PackageReference Include="Qyl.OpenTelemetry.SemanticConventions"/>
+        <PackageReference Include="Qyl.OpenTelemetry.SemanticConventions.Incubating"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"/>
+    </ItemGroup>
+</Project>

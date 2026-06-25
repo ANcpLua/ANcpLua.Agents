@@ -12,7 +12,7 @@ This file documents conventions specific to this repo only.
 
 ## What this repo is
 
-MAF-specific runtime helpers, instrumentation middleware, workflow helpers, service defaults, and test infrastructure. Split out of `ANcpLua.Roslyn.Utilities` so Roslyn-only consumers (analyzers, generators, foundation libs) don't pull MAF transitively.
+MAF-specific runtime helpers, telemetry registration helpers, workflow helpers, service defaults, and test infrastructure. Split out of `ANcpLua.Roslyn.Utilities` so Roslyn-only consumers (analyzers, generators, foundation libs) don't pull MAF transitively.
 
 ## Package layout
 
@@ -25,8 +25,8 @@ src/
                                     # AgentBudgetEnforcer, AgentConcurrencyLimiter,
                                     # AgentCapabilityContext, GovernedAIFunction, AgentToolPolicy
     AgentsHelper, ColorHelper
-  ANcpLua.Agents.Instrumentation/   # AddAgentTelemetry, AddAgentFrameworkSources/Meters,
-                                    # UseAgentRunTelemetry, UseAgentToolTelemetry
+  ANcpLua.Agents.Instrumentation/   # UseAgentTelemetry, AddAgentFrameworkSources/Meters
+                                    # (thin MAF-native OpenTelemetry registration)
   ANcpLua.Agents.Hosting.ServiceDefaults/ # Health endpoints + MAF ActivitySource helpers
   ANcpLua.Agents.Workflows/         # Workflow facades and execution helpers
   ANcpLua.Agents.Workflows.Declarative/ # Stable declarative workflow helpers
@@ -41,7 +41,7 @@ samples/
 ### Module guide
 
 - **Governance** — bounded-autonomy primitives. `AgentCallLineage` enforces depth + spawn budgets via `AsyncLocal`. `AgentBudgetEnforcer` tracks per-tool attempts and tool-call counts with rollback-on-failure reservations. `AgentConcurrencyLimiter` is a per-tool semaphore. `GovernedAIFunction` composes capability check + budget reservation + concurrency slot in front of any `AIFunction`. Producers project their richer descriptors down to the minimal `AgentToolPolicy` record. Human approval is orthogonal — wrap tools in `ApprovalRequiredAIFunction` from `Microsoft.Agents.AI` to drive the native `ToolApprovalRequestContent` loop.
-- **Instrumentation** — separate package. `AddAgentTelemetry`, `AddAgentFrameworkSources`, `AddAgentFrameworkMeters`, `UseAgentRunTelemetry`, and `UseAgentToolTelemetry` instrument MAF middleware with bounded spans and metrics. Never reintroduce raw-argument/result logging or legacy Qyl-branded telemetry decorators.
+- **Instrumentation** — separate package. Thin MAF-native registration helpers: `UseAgentTelemetry` (MAF's `UseOpenTelemetry` on the `Experimental.Microsoft.Agents.AI` source, sensitive data off) plus `AddAgentFrameworkSources`/`AddAgentFrameworkMeters` for the tracer/meter providers. MAF 1.11 emits the `invoke_agent`/`execute_tool` spans itself; the hand-rolled run/tool decorators were removed. Never reintroduce raw-argument/result logging or legacy Qyl-branded telemetry decorators.
 - **Provider facades** — removed. Do not add compatibility shims for deleted hosting facades, MCP wrappers, data-ingestion helpers, Durable generator experiments, or product-host samples. Declarative workflows may exist only as a stable workflow package, not as a provider facade.
 
 All packages target `net10.0`. Foundation Roslyn helpers live in the sibling `ANcpLua.Roslyn.Utilities` repo and are consumed here via plain `<PackageReference>` pinned in `Directory.Packages.props`.
@@ -60,9 +60,9 @@ Imported from `ANcpLua.NET.Sdk` (global `AGENTS.md`). Key house rules:
 
 ## Key design choices
 
-- **Runtime vs instrumentation vs test split**: `ANcpLua.Agents` is the runtime/governance package, `ANcpLua.Agents.Instrumentation` is telemetry middleware, and `ANcpLua.Agents.Testing` adds fakes + fixtures. Keep them separate.
+- **Runtime vs instrumentation vs test split**: `ANcpLua.Agents` is the runtime/governance package, `ANcpLua.Agents.Instrumentation` is MAF-native telemetry registration helpers, and `ANcpLua.Agents.Testing` adds fakes + fixtures. Keep them separate.
 - **No dogfooded analyzers on the test package**: `ANcpLua.Agents.Testing` relaxes rules that don't fit test-double patterns.
-- **MAF version discipline**: bump the remaining stable `Microsoft.Agents.AI.*` pins in `Version.props` as a group. The active toolkit is on the stable 1.9.0 line: `Microsoft.Agents.AI`, `Microsoft.Agents.AI.Abstractions`, `Microsoft.Agents.AI.Workflows`, and `Microsoft.Agents.AI.Workflows.Declarative`.
+- **MAF version discipline**: bump the remaining stable `Microsoft.Agents.AI.*` pins in `Version.props` as a group. The active toolkit is on the stable 1.11.0 line: `Microsoft.Agents.AI`, `Microsoft.Agents.AI.Abstractions`, `Microsoft.Agents.AI.Workflows`, and `Microsoft.Agents.AI.Workflows.Declarative`.
 
 ## Cross-Repo Awareness — was passiert, wenn du Versionen anfasst
 

@@ -2,8 +2,8 @@
 
 Aspire-style service defaults for Microsoft Agent Framework services.
 
-Compatible with: Microsoft.Agents.AI 1.10.x
-Tested against: Microsoft.Agents.AI 1.10.0
+Compatible with: Microsoft.Agents.AI 1.11.x
+Tested against: Microsoft.Agents.AI 1.11.0
 
 Channel: stable. This package must not reference Microsoft Agent Framework preview, RC, or alpha packages.
 
@@ -23,4 +23,4 @@ app.MapQylAgentEndpoints();
 app.Run();
 ```
 
-`ANcpLua.Agents.Instrumentation` owns run/tool telemetry. ServiceDefaults wires its source and meter registration helpers while staying limited to health endpoints and OpenTelemetry setup glue.
+Agent telemetry is MAF-native (`UseOpenTelemetry`). `AddQylAgentServiceDefaults` registers health checks only; the agent telemetry source and meter come from `AddQylAgentSources` / `AddQylAgentMeters`, which register the MAF `Experimental.Microsoft.Agents.AI` source via the `ANcpLua.Agents.Instrumentation` helpers. ServiceDefaults stays limited to health endpoints and OpenTelemetry setup glue.

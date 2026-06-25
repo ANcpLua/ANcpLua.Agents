@@ -7,14 +7,27 @@
   -->
 
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.24</ANcpLuaRoslynUtilitiesVersion>
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.24</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesVersion>2.2.27</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.27</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingAotVersion>2.2.27</ANcpLuaRoslynUtilitiesTestingAotVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="Microsoft.Agents (MAF 1.10.0)">
-    <MicrosoftAgentsAIVersion>1.10.0</MicrosoftAgentsAIVersion>
-    <MicrosoftAgentsAIWorkflowsVersion>1.10.0</MicrosoftAgentsAIWorkflowsVersion>
-    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.10.0</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+  <PropertyGroup Label="Microsoft.Agents (MAF 1.11.0)">
+    <MicrosoftAgentsAIVersion>1.11.0</MicrosoftAgentsAIVersion>
+    <MicrosoftAgentsAIWorkflowsVersion>1.11.0</MicrosoftAgentsAIWorkflowsVersion>
+    <MicrosoftAgentsAIWorkflowsDeclarativeVersion>1.11.0</MicrosoftAgentsAIWorkflowsDeclarativeVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="MAF DevUI (preview-only — consumed solely by samples/AgentDevUI)">
+    <!--
+      DevUI/Hosting ship preview/alpha only; no stable release exists. These
+      1.11.0-* builds depend on the STABLE 1.11.0 core pinned above, so the
+      transitive closure stays on 1.11.0. Keep aligned to MicrosoftAgentsAIVersion;
+      do NOT "fix" to a stable that isn't published. Sample-only — never packed.
+    -->
+    <MicrosoftAgentsAIHostingVersion>1.11.0-preview.260623.1</MicrosoftAgentsAIHostingVersion>
+    <MicrosoftAgentsAIHostingOpenAIVersion>1.11.0-alpha.260623.1</MicrosoftAgentsAIHostingOpenAIVersion>
+    <MicrosoftAgentsAIDevUIVersion>1.11.0-preview.260623.1</MicrosoftAgentsAIDevUIVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions">
@@ -27,6 +40,16 @@
 
   <PropertyGroup Label="OpenTelemetry">
     <OpenTelemetryVersion>1.15.3</OpenTelemetryVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="qyl (live showcase dependencies — samples only, never packed)">
+    <!--
+      qyl packages restorable from nuget.org. SemanticConventions + .Incubating share a
+      version line (3.0.2). The Qyl AutoInstrumentation suite is NOT published to nuget.org,
+      so it is showcased as a documented pattern (samples/README.md), not a live dependency.
+    -->
+    <QylSemanticConventionsVersion>3.0.2</QylSemanticConventionsVersion>
+    <QylApiContractsVersion>0.2.0</QylApiContractsVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="LLM Provider SDKs (Testing fixtures)">
