@@ -39,7 +39,7 @@ inline YAML you must use the `TextReader` overloads (a `StringReader`), which is
 ## Run
 
 ```bash
-cd /Users/ancplua/ANcpLua.Agents
+cd /Users/ancplua/RiderProjects/ancplua-workspace/ANcpLua.Agents
 dotnet run --project samples/AgentWorkflow.Declarative/AgentWorkflow.Declarative.csproj -c Debug
 ```
 

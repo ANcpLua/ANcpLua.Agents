@@ -21,7 +21,7 @@ DTO's `[JsonPropertyName]` declarations.
 ## Run
 
 ```bash
-cd /Users/ancplua/ANcpLua.Agents
+cd /Users/ancplua/RiderProjects/ancplua-workspace/ANcpLua.Agents
 dotnet run --project samples/AgentApiContracts/AgentApiContracts.csproj
 ```
 

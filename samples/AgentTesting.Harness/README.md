@@ -27,6 +27,6 @@ What it demonstrates (one combination per `[Fact]`):
 ## Run
 
 ```bash
-cd /Users/ancplua/ANcpLua.Agents
+cd /Users/ancplua/RiderProjects/ancplua-workspace/ANcpLua.Agents
 dotnet test samples/AgentTesting.Harness/AgentTesting.Harness.csproj -c Debug
 ```

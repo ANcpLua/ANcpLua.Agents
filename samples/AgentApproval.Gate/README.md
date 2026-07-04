@@ -34,6 +34,6 @@ network access are required.
 ## Run
 
 ```bash
-cd /Users/ancplua/ANcpLua.Agents
+cd /Users/ancplua/RiderProjects/ancplua-workspace/ANcpLua.Agents
 dotnet run --project samples/AgentApproval.Gate/AgentApproval.Gate.csproj
 ```
