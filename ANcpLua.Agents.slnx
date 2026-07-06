@@ -16,6 +16,7 @@
         <Project Path="samples/AgentDevUI.Governed/AgentDevUI.Governed.csproj" />
         <Project Path="samples/AgentGovernance.Lineage/AgentGovernance.Lineage.csproj" />
         <Project Path="samples/AgentServiceDefaults.Web/AgentServiceDefaults.Web.csproj" />
+        <Project Path="samples/AgentTelemetry.AutoInstrumented/AgentTelemetry.AutoInstrumented.csproj" />
         <Project Path="samples/AgentTelemetry.Minimal/AgentTelemetry.Minimal.csproj" />
         <Project Path="samples/AgentTelemetry.SemConv/AgentTelemetry.SemConv.csproj" />
         <Project Path="samples/AgentTesting.Harness/AgentTesting.Harness.csproj" />

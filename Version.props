@@ -11,7 +11,7 @@
     <ANcpLuaRoslynUtilitiesTestingVersion>2.2.29</ANcpLuaRoslynUtilitiesTestingVersion>
     <ANcpLuaRoslynUtilitiesTestingAotVersion>2.2.29</ANcpLuaRoslynUtilitiesTestingAotVersion>
   </PropertyGroup>
-
+  
   <PropertyGroup Label="Microsoft.Agents (MAF 1.13.0)">
     <MicrosoftAgentsAIVersion>1.13.0</MicrosoftAgentsAIVersion>
     <MicrosoftAgentsAIWorkflowsVersion>1.13.0</MicrosoftAgentsAIWorkflowsVersion>

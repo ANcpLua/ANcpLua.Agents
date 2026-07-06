@@ -25,11 +25,14 @@ only Qyl consumes them.
 
 ## Checklist
 - [x] Branch `feat/maf-1.13-upgrade`
-- [ ] Version.props: MAF 1.13.0, DevUI previews, Roslyn 2.2.29, Qyl 3.1.0/0.2.2
-- [ ] Reword absolutist comments in Version.props + Directory.Packages.props
-- [ ] Restore + build; fix 1.13 breaks
-- [ ] Adopt 1.13 features where they fit (checkpoint upgrade-survival, execute_tool spans,
-      chainOnlyAgentResponses facade); add tests
-- [ ] Update CLAUDE.md 1.11.0 references → 1.13.0
-- [ ] Full test run green
+- [x] Version.props: MAF 1.13.0, DevUI previews 260703.1, Roslyn 2.2.29, Qyl 3.1.0/0.2.2,
+      servicing line 10.0.8 → 10.0.9 (NU1109 fix: MAF 1.13 floors Bcl.AsyncInterfaces at 10.0.9)
+- [x] Reword absolutist comments (Version.props, Directory.Packages.props, AGENTS.md, matrix doc)
+- [x] Restore + build green — no source breaks (repo doesn't touch FileAccess/Skills/Foundry surfaces)
+- [x] chainOnlyAgentResponses (#6554) surfaced via BuildQylSequential/AsQylSequentialAgent + 3 behavioral tests
+- [x] Qyl.OpenTelemetry.AutoInstrumentation 4.0.3 is now on nuget.org → new live sample
+      samples/AgentTelemetry.AutoInstrumented (replaces "documented-only" pattern)
+- [x] Microsoft.Agents.AI.LocalCodeAct: still unpublished on nuget.org — skipped (external blocker)
+- [x] AGENTS.md/READMEs/PackageBoundaryTests/channel-matrix 1.11 → 1.13
+- [x] Full test run green (158+ tests)
 - [ ] PR opened, CodeRabbit loop, merge when green

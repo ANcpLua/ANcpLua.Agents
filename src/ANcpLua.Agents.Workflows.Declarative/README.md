@@ -2,9 +2,9 @@
 
 Stable declarative workflow helpers for Microsoft Agent Framework.
 
-Compatible with: Microsoft.Agents.AI 1.11.x
-Tested against: Microsoft.Agents.AI 1.11.0
-Capability tested against: Microsoft.Agents.AI.Workflows.Declarative 1.11.0
+Compatible with: Microsoft.Agents.AI 1.13.x
+Tested against: Microsoft.Agents.AI 1.13.0
+Capability tested against: Microsoft.Agents.AI.Workflows.Declarative 1.13.0
 
 Channel: stable. This package wraps the stable Microsoft Agent Framework declarative workflow surface. It must not reference preview, RC, alpha, provider-hosting, or product-host packages.
 

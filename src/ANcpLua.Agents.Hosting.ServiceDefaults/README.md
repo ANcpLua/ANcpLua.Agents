@@ -2,8 +2,8 @@
 
 Aspire-style service defaults for Microsoft Agent Framework services.
 
-Compatible with: Microsoft.Agents.AI 1.11.x
-Tested against: Microsoft.Agents.AI 1.11.0
+Compatible with: Microsoft.Agents.AI 1.13.x
+Tested against: Microsoft.Agents.AI 1.13.0
 
 Channel: stable. This package must not reference Microsoft Agent Framework preview, RC, or alpha packages.
 

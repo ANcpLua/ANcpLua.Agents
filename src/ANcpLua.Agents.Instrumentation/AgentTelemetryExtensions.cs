@@ -6,7 +6,7 @@ using OpenTelemetry.Trace;
 namespace ANcpLua.Agents.Instrumentation;
 
 /// <summary>
-///     Thin registration helpers over MAF-native OpenTelemetry. MAF 1.11 emits semconv-correct spans
+///     Thin registration helpers over MAF-native OpenTelemetry. MAF 1.13 emits semconv-correct spans
 ///     itself — <c>UseOpenTelemetry()</c> produces <c>invoke_agent</c> spans, and FunctionInvokingChatClient
 ///     produces <c>execute_tool</c> spans on the same source — so this package no longer ships hand-rolled
 ///     run/tool decorators; it registers the framework source/meter and pins sensitive data off.

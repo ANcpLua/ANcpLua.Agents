@@ -1,6 +1,6 @@
 # ANcpLua.Agents — Combination Showcase
 
-Runnable samples demonstrating every meaningful combination of **Microsoft Agent Framework (MAF) 1.11.0**,
+Runnable samples demonstrating every meaningful combination of **Microsoft Agent Framework (MAF) 1.13.0**,
 the **ANcpLua.Agents** helper layers, and **qyl** building blocks. Every sample is **offline** — it runs
 over `ANcpLua.Agents.Testing.ChatClients.FakeChatClient`, needs no API keys, and is CI-safe. Four one-combinator combinations (chain, switch, conditional tools, structured-output enum round-trip) are asserted offline in `AgentTesting.Harness` rather than shipped as standalone apps.
 
@@ -20,6 +20,7 @@ dotnet test samples/AgentTesting.Harness/AgentTesting.Harness.csproj
 | **AgentGovernance.Lineage** | multi-agent run | `AgentCallLineage`, `AgentSpawnTracker`, `AgentCallGuard` | — | exe |
 | **AgentTelemetry.Minimal** | agent spans/meters | MAF-native `.UseOpenTelemetry` (`invoke_agent`/`execute_tool`) | — | exe |
 | **AgentTelemetry.SemConv** | agent spans | MAF-native `.UseOpenTelemetry` (`invoke_agent`/`execute_tool`) | **SemanticConventions(.Incubating)** `gen_ai.evaluation.*` enrichment span | exe |
+| **AgentTelemetry.AutoInstrumented** | agent spans + hosting | `AddQylAgentServiceDefaults`, MAF-native `.UseOpenTelemetry` | **AutoInstrumentation.Hosting** zero-code source-interceptor telemetry | web |
 | **AgentApiContracts** | structured output | `RunQylWithSchemaAsync<T>` | **Qyl.Api.Contracts** DTO | exe |
 | **AgentServiceDefaults.Web** | MAF Hosting | `AddQylAgentServiceDefaults`, `MapQylAgentEndpoints` | — | web |
 | **AgentDevUI** | DevUI + OpenAI endpoints | `.Instrumentation`, `.Testing` | — | web |
@@ -45,17 +46,19 @@ dotnet test samples/AgentTesting.Harness/AgentTesting.Harness.csproj
   times when the capability is not granted, and a `MaxAttempts=1` budget trips `AgentBudgetExceededException`
   on the second call (body runs exactly once).
 
-## Documented-only combination: qyl AutoInstrumentation
+## Live combination: qyl AutoInstrumentation
 
 The **Qyl.OpenTelemetry.AutoInstrumentation** suite (zero-code, AOT-native instrumentation for HttpClient,
-EF Core, SqlClient, messaging, …) is **not published to nuget.org**, so it is not a live dependency here.
-To combine it with an agent host you would, in your own app:
+EF Core, SqlClient, messaging, …) is published to nuget.org as of 4.0.x, so **`AgentTelemetry.AutoInstrumented`**
+consumes it live — previously this combination could only be documented here as a pattern:
 
 ```csharp
-// In an app that references the Qyl.OpenTelemetry.AutoInstrumentation.Hosting package:
-builder.AddQylAutoInstrumentation();        // [ModuleInitializer] activates source-interceptor telemetry
-builder.AddQylAgentServiceDefaults();       // ANcpLua agent + MAF activity sources
-// Agent HTTP/DB calls are now traced with zero per-call code, alongside the agent's gen_ai.* spans.
+builder.Services.AddQylAutoInstrumentation();   // hosting wiring; [ModuleInitializer] activates the interceptors
+builder.AddQylAgentServiceDefaults();           // ANcpLua agent + MAF activity sources
+builder.Services.AddOpenTelemetry().WithTracing(t => t
+    .AddSource("Experimental.Microsoft.Agents.AI")   // MAF invoke_agent / execute_tool spans
+    .AddSource(QylActivitySource.Name));             // qyl zero-code HTTP/DB/messaging spans
+// Agent HTTP/DB calls are traced with zero per-call code, alongside the agent's gen_ai.* spans.
 ```
 
 ## Conventions
