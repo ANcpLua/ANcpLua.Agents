@@ -181,8 +181,8 @@ public sealed partial class PackageBoundaryTests
             File.Exists(readmePath).Should().BeTrue($"{project.PackageId} must pack a package README");
 
             var readme = File.ReadAllText(readmePath);
-            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.11.x");
-            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.11.0");
+            readme.Should().Contain("Compatible with: Microsoft.Agents.AI 1.13.x");
+            readme.Should().Contain("Tested against: Microsoft.Agents.AI 1.13.0");
         }
     }
 

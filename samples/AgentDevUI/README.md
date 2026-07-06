@@ -29,8 +29,8 @@ with no live model and no API key.
 ## Why preview packages
 
 DevUI, `Hosting`, and `Hosting.OpenAI` ship **preview/alpha only** — there is no
-stable release. The pins in `Version.props` are the `1.11.0-*` builds, which
-depend on the **stable** `Microsoft.Agents.AI 1.11.0` core the rest of the repo
+stable release. The pins in `Version.props` are the `1.13.0-*` builds, which
+depend on the **stable** `Microsoft.Agents.AI 1.13.0` core the rest of the repo
 already uses, so nothing else moves off the stable line. These packages are
 referenced **only** by this sample (`IsPackable=false`); no shipped library
 takes a DevUI dependency.

@@ -41,7 +41,7 @@ samples/
 ### Module guide
 
 - **Governance** — bounded-autonomy primitives. `AgentCallLineage` enforces depth + spawn budgets via `AsyncLocal`. `AgentBudgetEnforcer` tracks per-tool attempts and tool-call counts with rollback-on-failure reservations. `AgentConcurrencyLimiter` is a per-tool semaphore. `GovernedAIFunction` composes capability check + budget reservation + concurrency slot in front of any `AIFunction`. Producers project their richer descriptors down to the minimal `AgentToolPolicy` record. Human approval is orthogonal — wrap tools in `ApprovalRequiredAIFunction` from `Microsoft.Agents.AI` to drive the native `ToolApprovalRequestContent` loop.
-- **Instrumentation** — separate package. Thin MAF-native registration helpers: `UseAgentTelemetry` (MAF's `UseOpenTelemetry` on the `Experimental.Microsoft.Agents.AI` source, sensitive data off) plus `AddAgentFrameworkSources`/`AddAgentFrameworkMeters` for the tracer/meter providers. MAF 1.11 emits the `invoke_agent`/`execute_tool` spans itself; the hand-rolled run/tool decorators were removed. Never reintroduce raw-argument/result logging or legacy Qyl-branded telemetry decorators.
+- **Instrumentation** — separate package. Thin MAF-native registration helpers: `UseAgentTelemetry` (MAF's `UseOpenTelemetry` on the `Experimental.Microsoft.Agents.AI` source, sensitive data off) plus `AddAgentFrameworkSources`/`AddAgentFrameworkMeters` for the tracer/meter providers. MAF 1.13 emits the `invoke_agent`/`execute_tool` spans itself (OTel sits below `FunctionInvokingChatClient` since upstream #6667, so tool spans parent under `invoke_agent`); the hand-rolled run/tool decorators were removed. Raw-argument/result logging and legacy Qyl-branded telemetry decorators are intentionally absent — removed, not forgotten.
 - **Provider facades** — removed. Do not add compatibility shims for deleted hosting facades, MCP wrappers, data-ingestion helpers, Durable generator experiments, or product-host samples. Declarative workflows may exist only as a stable workflow package, not as a provider facade.
 
 All packages target `net10.0`. Foundation Roslyn helpers live in the sibling `ANcpLua.Roslyn.Utilities` repo and are consumed here via plain `<PackageReference>` pinned in `Directory.Packages.props`.
@@ -62,7 +62,7 @@ Imported from `ANcpLua.NET.Sdk` (global `AGENTS.md`). Key house rules:
 
 - **Runtime vs instrumentation vs test split**: `ANcpLua.Agents` is the runtime/governance package, `ANcpLua.Agents.Instrumentation` is MAF-native telemetry registration helpers, and `ANcpLua.Agents.Testing` adds fakes + fixtures. Keep them separate.
 - **No dogfooded analyzers on the test package**: `ANcpLua.Agents.Testing` relaxes rules that don't fit test-double patterns.
-- **MAF version discipline**: bump the remaining stable `Microsoft.Agents.AI.*` pins in `Version.props` as a group. The active toolkit is on the stable 1.11.0 line: `Microsoft.Agents.AI`, `Microsoft.Agents.AI.Abstractions`, `Microsoft.Agents.AI.Workflows`, and `Microsoft.Agents.AI.Workflows.Declarative`.
+- **MAF version discipline**: bump the remaining stable `Microsoft.Agents.AI.*` pins in `Version.props` as a group. The active toolkit is currently on the stable 1.13.0 line: `Microsoft.Agents.AI`, `Microsoft.Agents.AI.Abstractions`, `Microsoft.Agents.AI.Workflows`, and `Microsoft.Agents.AI.Workflows.Declarative`.
 
 ## Cross-Repo Awareness — was passiert, wenn du Versionen anfasst
 

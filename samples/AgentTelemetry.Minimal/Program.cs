@@ -1,6 +1,6 @@
 // Showcase: the no-qyl floor for agent telemetry — MAF-native gen_ai spans, zero custom code.
 //
-// MAF 1.11 emits conformant OpenTelemetry GenAI spans natively; you do NOT hand-roll any
+// MAF 1.13 emits conformant OpenTelemetry GenAI spans natively; you do NOT hand-roll any
 // run/tool decorator. One call, .UseOpenTelemetry(), wraps the agent in OpenTelemetryAgent,
 // which emits 'invoke_agent' spans. Because the OTel layer sits BELOW the framework's
 // FunctionInvokingChatClient, the same source also gets 'execute_tool' spans for every tool

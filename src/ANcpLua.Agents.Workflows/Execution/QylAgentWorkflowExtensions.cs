@@ -12,14 +12,18 @@ namespace ANcpLua.Agents.Workflows;
 public static class QylAgentWorkflowExtensions
 {
     /// <summary>
-    /// Builds a sequential workflow from the supplied agents.
+    /// Builds a sequential workflow from the supplied agents. When
+    /// <paramref name="chainOnlyAgentResponses"/> is <see langword="true"/>, each agent
+    /// receives only the previous agent's own output instead of the accumulated
+    /// conversation (MAF 1.13 <c>SequentialWorkflowBuilder.WithChainOnlyAgentResponses</c>).
     /// </summary>
     /// <param name="agents">The agents to run in order.</param>
+    /// <param name="chainOnlyAgentResponses">Whether to pass only each agent's own response downstream.</param>
     /// <returns>The sequential workflow.</returns>
-    public static Workflow BuildQylSequential(this IEnumerable<AIAgent> agents)
+    public static Workflow BuildQylSequential(this IEnumerable<AIAgent> agents, bool chainOnlyAgentResponses = false)
     {
         Guard.NotNull(agents);
-        return AgentWorkflowBuilder.BuildSequential(agents);
+        return AgentWorkflowBuilder.BuildSequential(chainOnlyAgentResponses, agents);
     }
 
     /// <summary>
@@ -27,12 +31,16 @@ public static class QylAgentWorkflowExtensions
     /// </summary>
     /// <param name="agents">The agents to run in order.</param>
     /// <param name="workflowName">The workflow name.</param>
+    /// <param name="chainOnlyAgentResponses">Whether to pass only each agent's own response downstream.</param>
     /// <returns>The sequential workflow.</returns>
-    public static Workflow BuildQylSequential(this IEnumerable<AIAgent> agents, string workflowName)
+    public static Workflow BuildQylSequential(
+        this IEnumerable<AIAgent> agents,
+        string workflowName,
+        bool chainOnlyAgentResponses = false)
     {
         Guard.NotNull(agents);
         Guard.NotNullOrWhiteSpace(workflowName);
-        return AgentWorkflowBuilder.BuildSequential(workflowName, agents);
+        return AgentWorkflowBuilder.BuildSequential(workflowName, chainOnlyAgentResponses, agents);
     }
 
     /// <summary>
@@ -99,12 +107,16 @@ public static class QylAgentWorkflowExtensions
     /// </summary>
     /// <param name="agents">The agents to run in order.</param>
     /// <param name="name">The resulting workflow-agent name.</param>
+    /// <param name="chainOnlyAgentResponses">Whether to pass only each agent's own response downstream.</param>
     /// <returns>The sequential workflow exposed as an agent.</returns>
-    public static AIAgent AsQylSequentialAgent(this IEnumerable<AIAgent> agents, string name)
+    public static AIAgent AsQylSequentialAgent(
+        this IEnumerable<AIAgent> agents,
+        string name,
+        bool chainOnlyAgentResponses = false)
     {
         Guard.NotNull(agents);
         Guard.NotNullOrWhiteSpace(name);
-        return AgentWorkflowBuilder.BuildSequential(agents).AsAIAgent(name: name);
+        return AgentWorkflowBuilder.BuildSequential(chainOnlyAgentResponses, agents).AsAIAgent(name: name);
     }
 
     /// <summary>

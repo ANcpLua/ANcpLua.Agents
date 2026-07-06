@@ -9,13 +9,13 @@
 
 # ANcpLua.Agents
 
-Lean toolkit for Microsoft Agent Framework 1.11.x.
+Lean toolkit for Microsoft Agent Framework 1.13.x.
 
 The repo is intentionally small: runtime governance primitives, MAF-native OpenTelemetry helpers, service defaults, workflow helpers, and test infrastructure. Provider-specific facades, MCP wrappers, Qyl Durable experiments, and demo product hosts were removed instead of kept alive as compatibility shims.
 
-Compatible with: Microsoft.Agents.AI 1.11.x
-Tested against: Microsoft.Agents.AI 1.11.0
-Upstream harvest: Microsoft Agent Framework #5463 fixed `ChatOptions.Reasoning` merge behavior in `ChatClientAgent`; this repo consumes it through the 1.11.0 package floor.
+Compatible with: Microsoft.Agents.AI 1.13.x
+Tested against: Microsoft.Agents.AI 1.13.0
+Upstream harvest: MAF 1.13 repositions OpenTelemetry below `FunctionInvokingChatClient` (#6667), so tool-calling agents emit `execute_tool` spans parented under `invoke_agent`; checkpoints survive package upgrades (`TypeId` ignores assembly version, #6636/#6670) and fan-in state persists correctly (#6491/#6574). Sequential orchestration gains `chainOnlyAgentResponses` (#6554), surfaced here through `BuildQylSequential`/`AsQylSequentialAgent`.
 
 ## Packages
 

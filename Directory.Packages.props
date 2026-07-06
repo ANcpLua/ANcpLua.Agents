@@ -12,7 +12,7 @@
     <PackageVersion Include="ANcpLua.Roslyn.Utilities.Testing.Aot" Version="$(ANcpLuaRoslynUtilitiesTestingAotVersion)"/>
   </ItemGroup>
 
-  <ItemGroup Label="Microsoft.Agents (MAF 1.11.x)">
+  <ItemGroup Label="Microsoft.Agents (MAF 1.13.x)">
     <PackageVersion Include="Microsoft.Agents.AI" Version="$(MicrosoftAgentsAIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Abstractions" Version="$(MicrosoftAgentsAIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Workflows" Version="$(MicrosoftAgentsAIWorkflowsVersion)"/>
@@ -22,13 +22,15 @@
     <PackageVersion Include="Microsoft.Agents.AI.Workflows.Generators" Version="$(MicrosoftAgentsAIVersion)"/>
   </ItemGroup>
 
-  <ItemGroup Label="qyl (live showcase dependencies — samples only, never packed)">
+  <ItemGroup Label="qyl (live showcase dependencies — currently samples-only)">
     <PackageVersion Include="Qyl.OpenTelemetry.SemanticConventions" Version="$(QylSemanticConventionsVersion)"/>
     <PackageVersion Include="Qyl.OpenTelemetry.SemanticConventions.Incubating" Version="$(QylSemanticConventionsVersion)"/>
     <PackageVersion Include="Qyl.Api.Contracts" Version="$(QylApiContractsVersion)"/>
+    <PackageVersion Include="Qyl.OpenTelemetry.AutoInstrumentation" Version="$(QylAutoInstrumentationVersion)"/>
+    <PackageVersion Include="Qyl.OpenTelemetry.AutoInstrumentation.Hosting" Version="$(QylAutoInstrumentationVersion)"/>
   </ItemGroup>
 
-  <ItemGroup Label="MAF DevUI (preview-only — samples/AgentDevUI; closure rests on stable 1.11.0 core above)">
+  <ItemGroup Label="MAF DevUI (preview-only — samples/AgentDevUI; closure rests on stable 1.13.0 core above)">
     <PackageVersion Include="Microsoft.Agents.AI.Hosting" Version="$(MicrosoftAgentsAIHostingVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.Hosting.OpenAI" Version="$(MicrosoftAgentsAIHostingOpenAIVersion)"/>
     <PackageVersion Include="Microsoft.Agents.AI.DevUI" Version="$(MicrosoftAgentsAIDevUIVersion)"/>
