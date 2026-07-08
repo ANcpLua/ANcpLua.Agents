@@ -1,0 +1,14 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>CoordinatorTeam.CostSplit</RootNamespace>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <!--
+      Self-contained Managed Agents REST client: BCL only (HttpClient + System.Text.Json).
+      No ProjectReference/PackageReference on purpose — this sample talks to
+      api.anthropic.com directly so it stays faithful to the documented payloads and
+      does not depend on an SDK exposing the managed-agents-2026-04-01 beta.
+    -->
+</Project>

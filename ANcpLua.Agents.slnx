@@ -10,6 +10,7 @@
     </Folder>
     <Folder Name="/samples/">
         <Project Path="samples/AgentApiContracts/AgentApiContracts.csproj" />
+        <Project Path="samples/CoordinatorTeam.CostSplit/CoordinatorTeam.CostSplit.csproj" />
         <Project Path="samples/AgentApproval.Gate/AgentApproval.Gate.csproj" />
         <Project Path="samples/AgentBuilder.Fluent/AgentBuilder.Fluent.csproj" />
         <Project Path="samples/AgentDevUI/AgentDevUI.csproj" />
