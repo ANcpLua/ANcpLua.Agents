@@ -5,10 +5,9 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
-    <!--
-      Self-contained Managed Agents REST client: BCL only (HttpClient + System.Text.Json).
-      No ProjectReference/PackageReference on purpose — this sample talks to
-      api.anthropic.com directly so it stays faithful to the documented payloads and
-      does not depend on an SDK exposing the managed-agents-2026-04-01 beta.
-    -->
+    <!-- Uses the official Anthropic .NET SDK, which exposes the Managed Agents beta.
+         No hand-rolled transport — the SDK owns auth, retries, and (de)serialization. -->
+    <ItemGroup>
+        <PackageReference Include="Anthropic"/>
+    </ItemGroup>
 </Project>

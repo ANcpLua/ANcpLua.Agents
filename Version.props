@@ -58,6 +58,8 @@
     <AzureAIOpenAIVersion>2.1.0</AzureAIOpenAIVersion>
     <AzureIdentityVersion>1.21.0</AzureIdentityVersion>
     <AnthropicSDKVersion>5.10.0</AnthropicSDKVersion>
+    <!-- Official Anthropic .NET SDK — exposes the Managed Agents beta (agents/environments/sessions/multiagent). -->
+    <AnthropicOfficialVersion>12.35.1</AnthropicOfficialVersion>
     <OllamaSharpVersion>5.4.25</OllamaSharpVersion>
     <GoogleGenAIVersion>1.6.2</GoogleGenAIVersion>
   </PropertyGroup>

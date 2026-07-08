@@ -32,12 +32,12 @@ TEAM_WORKER_MODEL=claude-sonnet-5 RUN_SOLO_CONTROL=1 \
 
 It streams the delegation live (`[spawn]` / `[delegate ->]` / `[report <-]` / `[coordinator]`), prints the synthesized answer, then meters each thread from the API's per-thread cumulative `usage` and prices the run. Prices live in `Program.cs` (`prices`) — the `/v1/models` endpoint reports capabilities but not pricing, so update those two numbers per model when rates change.
 
-## What the API gives you (no SDK required)
+## What the API gives you (via the official SDK)
 
-This sample is BCL-only (`HttpClient` + `System.Text.Json`) and mirrors the documented REST payloads directly, so it doesn't depend on any SDK exposing the `managed-agents-2026-04-01` beta.
+Built on the official **`Anthropic`** .NET SDK (`client.Beta.Agents` / `Environments` / `Sessions`), which exposes the Managed Agents beta and sets the `managed-agents-2026-04-01` header automatically. No hand-rolled transport — the SDK owns auth, retries, streaming, and (de)serialization; this sample just wires up the two-model team and meters the typed per-thread `usage`.
 
-- Coordinator = an agent with `tools: [{ type: agent_toolset_20260401 }]` **and** `multiagent: { type: coordinator, agents: [...] }`. The server auto-provides `create_agent` / `send_to_agent` / `wait_for_agents` / `list_agents`; workers get `submit_result` / `send_to_parent`. You define none of them.
-- Workers are ordinary agents with their own `model` and a scoped toolset (here: `web_search` + `web_fetch` only — that scope is also the security boundary, since workers read untrusted web pages).
+- Coordinator = an agent with `Tools = [ agent_toolset_20260401 ]` **and** `Multiagent = { Type = coordinator, Agents = [...] }`. The server auto-provides `create_agent` / `send_to_agent` / `wait_for_agents` / `list_agents`; workers get `submit_result` / `send_to_parent`. You define none of them.
+- Workers are ordinary agents with their own `Model` and a scoped toolset (here: `web_search` + `web_fetch` only — that scope is also the security boundary, since workers read untrusted web pages).
 
 ## Limits worth remembering
 
