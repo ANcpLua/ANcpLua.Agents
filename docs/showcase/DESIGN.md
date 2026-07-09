@@ -1,5 +1,7 @@
 # ANcpLua.Agents — Combination Showcase (design spec)
 
+> **Historical spec — frozen at approval, not maintained.** Captures the design as approved on 2026-06-25 against the MAF **1.11.0** base. The repo has since moved to MAF **1.13.0** (see `Version.props`), qyl SemanticConventions **3.1.0** / Api.Contracts **0.2.2**, and grew more samples (17 total, incl. `CoordinatorTeam.CostSplit`); the `.Hosting.DevUI` layer named below was not shipped as a separate src project. For current state read the root `README.md`, `samples/README.md`, and `Version.props` — the versions and counts below are the point-in-time record only.
+
 Status: approved 2026-06-25. Base: MAF **1.11.0** bump (`deps:` commit). Branch: `feat/combination-showcase`.
 
 ## Goal

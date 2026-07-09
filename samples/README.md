@@ -1,8 +1,8 @@
 # ANcpLua.Agents — Combination Showcase
 
 Runnable samples demonstrating every meaningful combination of **Microsoft Agent Framework (MAF) 1.13.0**,
-the **ANcpLua.Agents** helper layers, and **qyl** building blocks. Every sample is **offline** — it runs
-over `ANcpLua.Agents.Testing.ChatClients.FakeChatClient`, needs no API keys, and is CI-safe. Four one-combinator combinations (chain, switch, conditional tools, structured-output enum round-trip) are asserted offline in `AgentTesting.Harness` rather than shipped as standalone apps.
+the **ANcpLua.Agents** helper layers, and **qyl** building blocks. Every sample **except `CoordinatorTeam.CostSplit`** is **offline** — it runs
+over `ANcpLua.Agents.Testing.ChatClients.FakeChatClient`, needs no API keys, and is CI-safe. Four one-combinator combinations (chain, switch, conditional tools, structured-output enum round-trip) are asserted offline in `AgentTesting.Harness` rather than shipped as standalone apps. `CoordinatorTeam.CostSplit` is the one live-API sample — it calls the Anthropic Managed Agents API and needs `ANTHROPIC_API_KEY` (see its own README).
 
 ```bash
 dotnet build ANcpLua.Agents.slnx              # all samples
@@ -30,6 +30,7 @@ dotnet test samples/AgentTesting.Harness/AgentTesting.Harness.csproj
 | **AgentWorkflow.Declarative** | `Workflows.Declarative` (YAML) | `QylDeclarativeAgent.Build` | — | exe |
 | **AgentTesting.Harness** | — | `.Testing` (`AgentRunHarness`, `FakeChatClient`, `ActivityCollector`/`ActivityAssert`) + `.Testing.Workflows` (`WorkflowFixture<T>`); also asserts the folded rows — chain ordering, switch routing, conditional-tool exposure, structured-output enum round-trip | — | test |
 | **AgentWorkflow.Generators.Tested** | `ExecutorRouteGenerator` (MAF source generator) | `ANcpLua.Roslyn.Utilities.Testing` (`GeneratorResult`, `GeneratorCachingReport`, `Compile`) + `.Testing.Aot` (`AotRuntime`) | — | test |
+| **CoordinatorTeam.CostSplit** | Anthropic **Managed Agents** API — frontier coordinator + cheap workers (outside the MAF/ANcpLua/qyl triad) | — (standalone; official `Anthropic` SDK) | — | exe · **live API** |
 
 ## Notable findings surfaced by the showcase
 
