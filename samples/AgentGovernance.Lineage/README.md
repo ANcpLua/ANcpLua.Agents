@@ -15,7 +15,8 @@ three independent governance mechanisms each enforce a different limit and print
   `Wrap` makes the agent's own tool loop self-record; `RecordCall` against a tiny `FromEnvironment`
   cap trips an `OperationCanceledException` carrying a partial-results summary.
 
-Combination: MAF `ChatClientAgent` x `ANcpLua.Agents.Governance` x
+Combination: MAF `AIAgent` built by `ANcpLua.Agents.Instrumentation.QylAgentFactory` x
+`ANcpLua.Agents.Governance` x
 `ANcpLua.Agents.Testing.ChatClients.FakeChatClient`. No API keys, no network.
 
 ## Run

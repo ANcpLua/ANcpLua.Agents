@@ -1,5 +1,5 @@
-﻿using System.Xml.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using StringComparisonExtensions = ANcpLua.Roslyn.Utilities.StringComparisonExtensions;
 
 namespace ANcpLua.Agents.Tests.Packaging;
@@ -173,6 +173,28 @@ public sealed partial class PackageBoundaryTests
     }
 
     [Fact]
+    public void Samples_UseOnlyQylAgentFactoryForChatClientAgents()
+    {
+        var violations = Directory
+            .EnumerateFiles(Path.Combine(s_repoRoot, "samples"), "*.cs", SearchOption.AllDirectories)
+            .SelectMany(path =>
+            {
+                var source = File.ReadAllText(path);
+                return SampleAgentConstructionBypassRegex()
+                    .Matches(source)
+                    .Cast<Match>()
+                    .Select(match => (
+                        Path: Path.GetRelativePath(s_repoRoot, path),
+                        Line: source.Take(match.Index).Count(static character => character == '\n') + 1));
+            })
+            .ToArray();
+
+        violations.Should().BeEmpty(
+            "sample chat-client agents must be constructed by QylAgentFactory so the mandatory telemetry wrapper cannot be skipped; found: " +
+            string.Join(", ", violations.Select(static violation => $"{violation.Path}:{violation.Line}")));
+    }
+
+    [Fact]
     public void PackageReadmes_DeclareMafCompatibility()
     {
         foreach (var project in LoadSourceProjects())
@@ -294,6 +316,9 @@ public sealed partial class PackageBoundaryTests
 
     [GeneratedRegex(@"\bpublic\s+(?:(?:static|partial|sealed|abstract|readonly|ref)\s+)*(?:(?:class|interface|struct|enum)|record(?:\s+(?:class|struct))?)\s+(?<typeName>[A-Za-z_][A-Za-z0-9_]*)")]
     private static partial Regex PublicStaticClassNameRegex();
+
+    [GeneratedRegex(@"\bChatClientAgent\b|\b(?:BuildAgent|AsAIAgent|BuildAIAgent)\s*\(")]
+    private static partial Regex SampleAgentConstructionBypassRegex();
 
     private static string LocateRepoRoot()
     {

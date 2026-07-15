@@ -1,7 +1,7 @@
 # AgentTools.Governed
 
 Showcases governed agent tools, fully offline (no API keys), combining **Microsoft Agent Framework**
-(the `ChatClientAgent` function-invoking loop and `AIAgentBuilder.Use` middleware) with
+(the chat-client-agent function-invoking loop and `AIAgentBuilder.Use` middleware) with
 **ANcpLua.Agents.Governance** and **ANcpLua.Agents.Testing**'s `FakeChatClient`. Tools are wrapped
 with an `AgentToolPolicy` (max attempts + required capabilities) enforced by an
 `AgentBudgetEnforcer`, an `AgentConcurrencyLimiter`, and an `AgentCapabilityContext`. Two
@@ -13,7 +13,8 @@ wrappers, where a required-but-ungranted capability (`billing:write`) denies a r
 its body runs; **Part 2** uses `AIAgentBuilder.UseQylGovernance(...)` with a `policyResolver` so
 a `MaxAttempts: 1` budget trips on the second call to an invoice-lookup tool. The program prints,
 for each part, the agent's final reply, the governance exception types that were enforced, and how
-many times each tool body actually executed — proving the policy was honored.
+many times each tool body actually executed — proving the policy was honored. Both agents are created
+through `QylAgentFactory`, which keeps the governance pipeline inside mandatory MAF telemetry.
 
 ## Run
 

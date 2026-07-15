@@ -1,18 +1,18 @@
-﻿// Showcase: MAF ChatClientAgent  x  Qyl.OpenTelemetry.AutoInstrumentation.Hosting (LIVE nuget dependency)
+﻿// Showcase: QylAgentFactory  x  Qyl.OpenTelemetry.AutoInstrumentation.Hosting (LIVE nuget dependency)
 //           x  ANcpLua.Agents.Hosting.ServiceDefaults  x  ANcpLua.Agents.Testing FakeChatClient (offline).
 //
 // Previously a documented-only combination: the Qyl AutoInstrumentation suite is published to
 // nuget.org as of 4.0.x, so this sample now consumes it live. AddQylAutoInstrumentation()
 // activates zero-code, AOT-native source-interceptor telemetry (HttpClient, ASP.NET Core,
 // SqlClient, EF Core, ...) emitting on the "Qyl.OpenTelemetry.AutoInstrumentation"
-// ActivitySource, while MAF-native UseOpenTelemetry() emits semconv 'invoke_agent' /
+// ActivitySource, while QylAgentFactory's mandatory MAF wrapper emits semconv 'invoke_agent' /
 // 'execute_tool' spans on "Experimental.Microsoft.Agents.AI". One TracerProvider registers
 // both sources, so agent spans and infrastructure spans export side by side with zero
 // per-call instrumentation code. Build-only sample; the FakeChatClient keeps it key-free.
 
 using ANcpLua.Agents.Hosting.ServiceDefaults;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
-using Microsoft.Agents.AI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,15 +42,14 @@ var app = builder.Build();
 using var chatClient = new FakeChatClient();
 chatClient.WithResponse("Auto-instrumented demo agent — no live model is wired.");
 
-// MAF-native OpenTelemetry: 'invoke_agent' spans on "Experimental.Microsoft.Agents.AI".
-// EnableSensitiveData defaults false; pinned explicitly to keep the prompt/response bound visible.
-var agent = new ChatClientAgent(
-        chatClient,
-        name: "auto-instrumented-agent",
-        instructions: "You are a key-free demo agent.")
-    .AsBuilder()
-    .UseOpenTelemetry(configure: otel => otel.EnableSensitiveData = false)
-    .Build(app.Services);
+// The Qyl-owned factory is the only construction boundary. It always adds MAF-native telemetry
+// with sensitive data disabled and uses the host service provider for agent dependencies.
+var agent = QylAgentFactory.Create(
+    chatClient,
+    static options => options
+        .WithName("auto-instrumented-agent")
+        .WithInstructions("You are a key-free demo agent."),
+    services: app.Services);
 
 // Minimal endpoint: run the agent and return its text.
 app.MapGet("/run", async () => (await agent.RunAsync("hello")).Text);

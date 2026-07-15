@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ANcpLua.Agents.Governance;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
@@ -28,7 +29,7 @@ using Microsoft.Extensions.AI;
 // (FICC) loop. By default FICC captures a tool exception, records it as a tool-result error, and
 // feeds it back to the model (up to MaximumConsecutiveErrorsPerRequest = 3) — which would swallow a
 // denial. Pre-building the FICC with MaximumConsecutiveErrorsPerRequest = 0 makes it rethrow
-// immediately, so AgentApprovalDeniedException surfaces to the caller as designed. ChatClientAgent
+// immediately, so AgentApprovalDeniedException surfaces to the caller as designed. The inner agent
 // reuses a FICC already present on the chat client instead of inserting its own
 // (ChatClientExtensions: `if (chatClient.GetService<FunctionInvokingChatClient>() is null)`).
 
@@ -77,7 +78,9 @@ var deterministicOptions = new ChatClientAgentRunOptions(new ChatOptions { Tools
     var hitlOptions = new ChatClientAgentRunOptions(new ChatOptions { Tools = [hitlTool] });
 
     using var chatClient = SeedRefundClient();
-    var agent = new ChatClientAgent(chatClient, name: "refund-agent");
+    var agent = QylAgentFactory.Create(
+        chatClient,
+        static options => options.WithName("refund-agent"));
     AgentSession session = await agent.CreateSessionAsync();
 
     // Turn 1: the model asks for the tool; the agent pauses and surfaces an approval request.
@@ -118,22 +121,20 @@ static FakeChatClient SeedRefundClient()
     return chatClient;
 }
 
-// Builds a ChatClientAgent whose FICC rethrows on denial (tolerance 0), then layers the
-// deterministic approval gate on top via the agent builder.
+// The Qyl factory builds the inner chat-client agent with a FICC that rethrows on denial,
+// layers the deterministic approval gate inside mandatory telemetry, and returns only the wrapper.
 static AIAgent BuildGatedAgent(IChatClient chatClient, bool approve) =>
-    new ChatClientAgent(
-            chatClient
-                .AsBuilder()
-                .UseFunctionInvocation(configure: static ficc => ficc.MaximumConsecutiveErrorsPerRequest = 0)
-                .Build(),
-            name: "refund-agent")
-        .AsBuilder()
-        .UseQylApproval((_, context) =>
+    QylAgentFactory.Create(
+        chatClient
+            .AsBuilder()
+            .UseFunctionInvocation(configure: static ficc => ficc.MaximumConsecutiveErrorsPerRequest = 0)
+            .Build(),
+        static options => options.WithName("refund-agent"),
+        pipeline => pipeline.UseQylApproval((_, context) =>
         {
             Console.WriteLine($"  approval requested for tool '{context.Function.Name}' -> {(approve ? "GRANTED" : "DENIED")}");
             return ValueTask.FromResult(approve);
-        })
-        .Build();
+        }));
 
 static Task<string> IssueRefundAsync(
     [Description("The order id to refund.")] string orderId,

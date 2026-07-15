@@ -1,12 +1,14 @@
 using ANcpLua.Agents.Facades;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using Microsoft.Agents.AI;
 using Qyl.Api.Contracts;
 
 // Showcase: a MAF agent emits a typed qyl public-API DTO, fully offline.
 //
-// Combination: MAF ChatClientAgent.RunAsync<T> (structured output)
+// Combination: MAF AIAgent.RunAsync<T> (structured output)
 //   x ANcpLua.Agents (QylSchemaExtensions.RunQylWithSchemaAsync<T> facade)
+//   x ANcpLua.Agents.Instrumentation (QylAgentFactory)
 //   x Qyl.Api.Contracts (the generated Qyl.Api.Contracts.ClearTelemetryResponse DTO).
 //
 // The agent runs over an offline FakeChatClient seeded with a single JSON payload.
@@ -31,12 +33,11 @@ chatClient.WithResponse(
     }
     """);
 
-ChatClientAgent agent = new QylAgentOptionsBuilder()
+AIAgent agent = QylAgentFactory.Create(chatClient, options => options
     .WithName("telemetry-admin-agent")
     .WithDescription("Clears qyl telemetry and reports the result as a typed API DTO.")
     .WithInstructions(
-        "Clear all stored telemetry and respond with a Qyl.Api.Contracts ClearTelemetryResponse JSON object.")
-    .BuildAgent(chatClient);
+        "Clear all stored telemetry and respond with a Qyl.Api.Contracts ClearTelemetryResponse JSON object."));
 
 AgentResponse<ClearTelemetryResponse> response =
     await agent.RunQylWithSchemaAsync<ClearTelemetryResponse>("Clear all telemetry for this workspace.");

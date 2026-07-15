@@ -1,4 +1,4 @@
-﻿using ANcpLua.Agents.Facades;
+﻿using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using ANcpLua.Agents.Workflows;
 using Microsoft.Agents.AI;
@@ -18,10 +18,11 @@ public sealed class ChainWorkflowTests
         using var chatClient = new FakeChatClient();
         chatClient.WithResponse("priority=HIGH; team=billing; reason=payment failure reported");
 
-        AIAgent triageAgent = new QylAgentOptionsBuilder()
-            .WithName("triage-agent")
-            .WithInstructions("Classify the support ticket as priority=...; team=...; reason=...")
-            .BuildAgent(chatClient);
+        AIAgent triageAgent = QylAgentFactory.Create(
+            chatClient,
+            static options => options
+                .WithName("triage-agent")
+                .WithInstructions("Classify the support ticket as priority=...; team=...; reason=..."));
 
         FunctionExecutor<string, string> normalize =
             QylExecutorFactoryExtensions.QylFunction<string, string>(

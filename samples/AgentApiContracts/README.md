@@ -3,11 +3,12 @@
 Showcases a Microsoft Agent Framework (MAF) agent producing a **typed qyl public-API DTO**,
 completely offline.
 
-**Combination:** MAF `ChatClientAgent.RunAsync<T>` (structured output)
+**Combination:** MAF `AIAgent.RunAsync<T>` (structured output)
 × ANcpLua.Agents `RunQylWithSchemaAsync<T>` facade
+× ANcpLua.Agents.Instrumentation `QylAgentFactory`
 × `Qyl.Api.Contracts.ClearTelemetryResponse`.
 
-The agent is built with the ANcpLua `QylAgentOptionsBuilder` over an offline
+The agent is built with the ANcpLua `QylAgentFactory` over an offline
 `FakeChatClient` (namespace `ANcpLua.Agents.Testing.ChatClients`) seeded with a single JSON
 payload — no network and no API keys. `RunQylWithSchemaAsync<ClearTelemetryResponse>` runs
 MAF's structured-output path with an enum-friendly, Web-cased `JsonSerializerOptions`, so the

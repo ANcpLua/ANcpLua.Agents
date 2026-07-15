@@ -5,14 +5,14 @@ Human-in-the-loop **plus** checkpoint/resume, fully offline (no API keys).
 **Combination showcased:** MAF `Microsoft.Agents.AI.Workflows` (`RequestPort` external call,
 `CheckpointManager`, `ResumeStreamingAsync`) x `ANcpLua.Agents.Workflows`
 (`QylWorkflowBuilderExtensions.AddQylHumanInTheLoop<TRequest,TResponse>` and
-`QylCheckpointStoreExtensions.AddQylInMemoryCheckpointing`) x `ANcpLua.Agents`
-(`QylAgentOptionsBuilder`) over the `ANcpLua.Agents.Testing` `FakeChatClient`.
+`QylCheckpointStoreExtensions.AddQylInMemoryCheckpointing`) x `ANcpLua.Agents.Instrumentation`
+(`QylAgentFactory`) over the `ANcpLua.Agents.Testing` `FakeChatClient`.
 
 ## What it shows
 
 An expense-approval workflow that pauses for an external (human) decision and resumes from a checkpoint:
 
-1. A `FakeChatClient`-backed `ChatClientAgent` (built with `QylAgentOptionsBuilder`) drafts the
+1. A `FakeChatClient`-backed `AIAgent` (built with `QylAgentFactory`) drafts the
    approval rationale offline.
 2. An `ApprovalGate` executor emits an `ApprovalRequest` through a port wired with
    `AddQylHumanInTheLoop<ApprovalRequest, ApprovalDecision>`. The workflow halts and surfaces a

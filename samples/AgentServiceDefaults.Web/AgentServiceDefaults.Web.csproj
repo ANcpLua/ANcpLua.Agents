@@ -10,7 +10,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Hosting.ServiceDefaults\ANcpLua.Agents.Hosting.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Instrumentation\ANcpLua.Agents.Instrumentation.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
     </ItemGroup>
 </Project>

@@ -25,8 +25,8 @@ src/
                                     # AgentBudgetEnforcer, AgentConcurrencyLimiter,
                                     # AgentCapabilityContext, GovernedAIFunction, AgentToolPolicy
     AgentsHelper, ColorHelper
-  ANcpLua.Agents.Instrumentation/   # UseAgentTelemetry, AddAgentFrameworkSources/Meters
-                                    # (thin MAF-native OpenTelemetry registration)
+  ANcpLua.Agents.Instrumentation/   # QylAgentFactory, UseAgentTelemetry,
+                                    # AddAgentFrameworkSources/Meters
   ANcpLua.Agents.Hosting.ServiceDefaults/ # Health endpoints + MAF ActivitySource helpers
   ANcpLua.Agents.Workflows/         # Workflow facades and execution helpers
   ANcpLua.Agents.Workflows.Declarative/ # Stable declarative workflow helpers
@@ -35,13 +35,13 @@ src/
 tests/
   ANcpLua.Agents.Tests/             # Unit tests for governance, instrumentation, workflows, package boundaries
 samples/
-  AgentTelemetry.Minimal/           # Local fake-agent telemetry smoke; no live API key
+  AgentTelemetry.SemConv/           # Local fake-agent telemetry + typed semantic-convention smoke
 ```
 
 ### Module guide
 
 - **Governance** — bounded-autonomy primitives. `AgentCallLineage` enforces depth + spawn budgets via `AsyncLocal`. `AgentBudgetEnforcer` tracks per-tool attempts and tool-call counts with rollback-on-failure reservations. `AgentConcurrencyLimiter` is a per-tool semaphore. `GovernedAIFunction` composes capability check + budget reservation + concurrency slot in front of any `AIFunction`. Producers project their richer descriptors down to the minimal `AgentToolPolicy` record. Human approval is orthogonal — wrap tools in `ApprovalRequiredAIFunction` from `Microsoft.Agents.AI` to drive the native `ToolApprovalRequestContent` loop.
-- **Instrumentation** — separate package. Thin MAF-native registration helpers: `UseAgentTelemetry` (MAF's `UseOpenTelemetry` on the `Experimental.Microsoft.Agents.AI` source, sensitive data off) plus `AddAgentFrameworkSources`/`AddAgentFrameworkMeters` for the tracer/meter providers. MAF 1.13 emits the `invoke_agent`/`execute_tool` spans itself (OTel sits below `FunctionInvokingChatClient` since upstream #6667, so tool spans parent under `invoke_agent`); the hand-rolled run/tool decorators were removed. Raw-argument/result logging and legacy Qyl-branded telemetry decorators are intentionally absent — removed, not forgotten.
+- **Instrumentation** — separate package. `QylAgentFactory` is the mandatory chat-client-agent construction boundary: it supplies DI, composes optional middleware, and returns MAF's `OpenTelemetryAgent` as the outermost wrapper with sensitive data pinned off. Lower-level helpers are `UseAgentTelemetry` plus `AddAgentFrameworkSources`/`AddAgentFrameworkMeters` for tracer/meter providers. MAF 1.13 emits the `invoke_agent`/`execute_tool` spans itself (OTel sits below `FunctionInvokingChatClient` since upstream #6667, so tool spans parent under `invoke_agent`); the hand-rolled run/tool decorators were removed. Raw-argument/result logging and legacy Qyl-branded telemetry decorators are intentionally absent — removed, not forgotten.
 - **Provider facades** — removed. Do not add compatibility shims for deleted hosting facades, MCP wrappers, data-ingestion helpers, Durable generator experiments, or product-host samples. Declarative workflows may exist only as a stable workflow package, not as a provider facade.
 
 All packages target `net10.0`. Foundation Roslyn helpers live in the sibling `ANcpLua.Roslyn.Utilities` repo and are consumed here via plain `<PackageReference>` pinned in `Directory.Packages.props`.

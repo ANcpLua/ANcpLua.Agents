@@ -1,19 +1,20 @@
 // Showcase: MAF DevUI + OpenAI-compatible hosting
 //   x ANcpLua.Agents.Governance (UseQylGovernance: capability + budget + concurrency enforcement)
-//   x MAF-native OpenTelemetry (UseOpenTelemetry -> semconv invoke_agent / execute_tool spans).
+//   x QylAgentFactory's mandatory MAF-native OpenTelemetry wrapper.
 //
 // Everything is OFFLINE: the agent is built over FakeChatClient (no API keys, no network).
 // Governance is the differentiator here: it sits between the MAF OpenTelemetry layer and the
-// inner ChatClientAgent, so every tool invocation is checked against a per-tool AgentToolPolicy
+// inner chat-client agent, so every tool invocation is checked against a per-tool AgentToolPolicy
 // (required capabilities + attempt/tool-call budget + concurrency cap) before it executes.
 //
-// Telemetry is emitted natively by MAF: .UseOpenTelemetry() wraps the agent in OpenTelemetryAgent,
+// Telemetry is emitted natively by MAF: QylAgentFactory wraps the agent in OpenTelemetryAgent,
 // producing conformant gen_ai 'invoke_agent' spans, and because OTel sits below the framework's
 // FunctionInvokingChatClient it also gets 'execute_tool' spans on the same source. Sensitive data
-// (raw prompts/arguments/results) is OFF by default and pinned off explicitly below.
+// (raw prompts/arguments/results) is pinned off by the factory.
 
 using System.ComponentModel;
 using ANcpLua.Agents.Governance;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.DevUI;
@@ -26,7 +27,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 // Default source/meter name MAF's OpenTelemetryAgent writes to (OpenTelemetryConsts.DefaultSourceName).
-const string AgentSource = "Experimental.Microsoft.Agents.AI";
+const string AgentSource = AgentTelemetryExtensions.AgentFrameworkSourceName;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,23 +74,18 @@ builder.AddAIAgent("ticket-agent", (serviceProvider, _) =>
         MaxToolCalls: 1,
         RequiredCapabilities: ["tickets:read"]);
 
-    return new ChatClientAgent(
-            chatClient,
-            name: "ticket-agent",
-            instructions: "You look up support ticket status.",
-            tools: [lookupStatus])
-        .AsBuilder()
-        // MAF-native telemetry: invoke_agent + execute_tool spans, sensitive data off.
-        .UseOpenTelemetry(configure: agent => agent.EnableSensitiveData = false)
-        // Governance wraps the inner agent's function invocation: capabilities are verified,
-        // budget is reserved (rolled back on failure), and a concurrency slot is acquired
-        // before each tool call runs.
-        .UseQylGovernance(
+    return QylAgentFactory.Create(
+        chatClient,
+        options => options
+            .WithName("ticket-agent")
+            .WithInstructions("You look up support ticket status.")
+            .WithTools([lookupStatus]),
+        pipeline => pipeline.UseQylGovernance(
             capabilities,
             budget,
             concurrency,
-            policyResolver: name => name == lookupStatus.Name ? lookupPolicy : AgentToolPolicy.Permissive)
-        .Build(serviceProvider);
+            policyResolver: name => name == lookupStatus.Name ? lookupPolicy : AgentToolPolicy.Permissive),
+        services: serviceProvider);
 });
 
 builder.AddOpenAIResponses();

@@ -12,7 +12,7 @@ namespace ANcpLua.Agents.Facades;
 ///     <see cref="QylAgentAdvancedOptionsBuilder"/> via <see cref="Advanced"/>.
 /// </summary>
 /// <remarks>
-///     Split per design note: a monolithic builder with 15+ methods inflates discoverability
+///     A monolithic builder with 15+ methods inflates discoverability
 ///     and IntelliSense noise. The core/advanced split keeps the common path obvious.
 /// </remarks>
 public sealed class QylAgentOptionsBuilder
@@ -74,14 +74,6 @@ public sealed class QylAgentOptionsBuilder
     /// <summary>Returns the constructed options without building an agent.</summary>
     public ChatClientAgentOptions BuildOptions() => _options;
 
-    /// <summary>Builds a <see cref="ChatClientAgent"/> using the supplied chat client and configured options.</summary>
-    public ChatClientAgent BuildAgent(IChatClient client)
-    {
-        Guard.NotNull(client);
-
-        return new ChatClientAgent(client, _options);
-    }
-
     private ChatOptions EnsureChatOptions() => _options.ChatOptions ??= new ChatOptions();
 }
 
@@ -99,6 +91,16 @@ public sealed class QylAgentAdvancedOptionsBuilder(ChatClientAgentOptions option
     {
         Guard.NotNull(providers);
         options.WithQylAIContextProviders(providers);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a conditionally activated tool provider configured by <paramref name="configure"/>.
+    /// </summary>
+    public QylAgentAdvancedOptionsBuilder WithConditionalTools(Action<QylConditionalToolProvider> configure)
+    {
+        Guard.NotNull(configure);
+        options.WithQylConditionalTools(configure);
         return this;
     }
 

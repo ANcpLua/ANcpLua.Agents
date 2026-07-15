@@ -6,7 +6,7 @@ using Microsoft.Agents.AI;
 namespace ANcpLua.Agents.Facades;
 
 /// <summary>
-///     Explicit-schema runner for <see cref="ChatClientAgent"/> with enum-friendly defaults.
+///     Explicit-schema runner for <see cref="AIAgent"/> with enum-friendly defaults.
 ///     MAF's built-in <c>RunAsync&lt;T&gt;</c> handles the structured-output path; this wrapper
 ///     adds a pre-configured <see cref="JsonSerializerOptions"/> with
 ///     <see cref="JsonStringEnumConverter"/> attached so enum-heavy domains "just work".
@@ -20,12 +20,12 @@ public static class QylSchemaExtensions
     ///     <paramref name="jsonOptions"/> if not already present.
     /// </summary>
     public static Task<AgentResponse<T>> RunQylWithSchemaAsync<T>(
-        this ChatClientAgent agent,
+        this AIAgent agent,
         string input,
         bool autoEnumConverter = true,
         JsonSerializerOptions? jsonOptions = null,
         AgentSession? session = null,
-        ChatClientAgentRunOptions? runOptions = null,
+        AgentRunOptions? runOptions = null,
         CancellationToken cancellationToken = default)
     {
         Guard.NotNull(agent);

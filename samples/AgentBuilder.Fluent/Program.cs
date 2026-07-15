@@ -1,13 +1,13 @@
 using System.ComponentModel;
-using ANcpLua.Agents.Facades;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 
-// Showcase: build a Microsoft Agent Framework agent with the ANcpLua fluent builder
-// (QylAgentOptionsBuilder) over an offline FakeChatClient — no API keys required.
+// Showcase: build a Microsoft Agent Framework agent through the Qyl-owned factory
+// over an offline FakeChatClient — no API keys required.
 //
-// Combination: MAF ChatClientAgent x ANcpLua.Agents (QylAgentOptionsBuilder) x ANcpLua.Agents.Testing.
+// Combination: MAF AIAgent x ANcpLua.Agents.Instrumentation (QylAgentFactory) x ANcpLua.Agents.Testing.
 
 using var chatClient = new FakeChatClient();
 chatClient
@@ -16,12 +16,11 @@ chatClient
         ChatFinishReason.ToolCalls)
     .WithResponse("It is 21°C and sunny in Vienna.");
 
-ChatClientAgent agent = new QylAgentOptionsBuilder()
+AIAgent agent = QylAgentFactory.Create(chatClient, options => options
     .WithName("weather-agent")
     .WithDescription("Answers weather questions for a city.")
     .WithInstructions("You answer weather questions using the get_weather tool.")
-    .WithTools([AIFunctionFactory.Create(GetWeatherAsync)])
-    .BuildAgent(chatClient);
+    .WithTools([AIFunctionFactory.Create(GetWeatherAsync)]));
 
 AgentSession session = await agent.CreateSessionAsync();
 AgentResponse response = await agent.RunAsync("What's the weather in Vienna?", session);

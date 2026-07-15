@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using ANcpLua.Agents.Context;
 using ANcpLua.Agents.Facades;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using ANcpLua.Agents.Testing.Diagnostics;
 using ANcpLua.Agents.Testing.Harnesses;
@@ -12,19 +13,19 @@ namespace AgentTesting.Harness;
 
 // Showcase: the ANcpLua agent + workflow TEST toolkit driving offline Microsoft Agent Framework code.
 //
-// Combination: MAF (ChatClientAgent + UseOpenTelemetry + MAF Workflows) x ANcpLua.Agents.Testing
+// Combination: MAF (wrapped chat-client agent + MAF Workflows) x ANcpLua.Agents.Testing
 //              (AgentRunHarness, FakeChatClient, ActivityCollector, ActivityAssert)
 //              x ANcpLua.Agents.Testing.Workflows (WorkflowFixture<TInput>, WorkflowRunAssertions).
 //
 // Everything runs offline over FakeChatClient and the in-process workflow environment — no API keys.
 //
 // Telemetry capture standardizes on ActivityListener (System.Diagnostics, in-box) via ActivityCollector,
-// and the span under assertion is MAF's own semconv 'invoke_agent' span (agent.AsBuilder().UseOpenTelemetry()),
+// and the span under assertion is MAF's own semconv 'invoke_agent' span (installed by QylAgentFactory),
 // not a hand-rolled decorator.
 public sealed class AgentTestingHarnessShowcaseTests
 {
     // The default MAF agent telemetry source/meter name (OpenTelemetryConsts.DefaultSourceName).
-    private const string AgentFrameworkSource = "Experimental.Microsoft.Agents.AI";
+    private const string AgentFrameworkSource = AgentTelemetryExtensions.AgentFrameworkSourceName;
 
     // (a) AgentRunHarness over a FakeChatClient-backed agent: arrange/run/assert the response text.
     [Fact]
@@ -33,10 +34,11 @@ public sealed class AgentTestingHarnessShowcaseTests
         using var chatClient = new FakeChatClient();
         chatClient.WithResponse("It is 21C and sunny in Vienna.");
 
-        ChatClientAgent agent = new QylAgentOptionsBuilder()
-            .WithName("weather-agent")
-            .WithInstructions("You answer weather questions.")
-            .BuildAgent(chatClient);
+        AIAgent agent = QylAgentFactory.Create(
+            chatClient,
+            static options => options
+                .WithName("weather-agent")
+                .WithInstructions("You answer weather questions."));
 
         AgentRunHarnessResult result = await AgentRunHarness.For(agent)
             .WithUserMessage("What's the weather in Vienna?")
@@ -54,9 +56,9 @@ public sealed class AgentTestingHarnessShowcaseTests
         using var chatClient = new FakeChatClient();
         chatClient.WithStreamingResponse("Hel", "lo!");
 
-        ChatClientAgent agent = new QylAgentOptionsBuilder()
-            .WithName("greeter")
-            .BuildAgent(chatClient);
+        AIAgent agent = QylAgentFactory.Create(
+            chatClient,
+            static options => options.WithName("greeter"));
 
         AgentStreamingRunHarnessResult result = await AgentRunHarness.For(agent)
             .WithUserMessage("hi")
@@ -67,10 +69,10 @@ public sealed class AgentTestingHarnessShowcaseTests
             .And.HaveTextContaining("Hello!");
     }
 
-    // (b) ActivityCollector captures MAF's native 'invoke_agent' span emitted by UseOpenTelemetry,
+    // (b) ActivityCollector captures MAF's native 'invoke_agent' span emitted by QylAgentFactory,
     //     then ActivityAssert checks its kind and gen_ai.* semantic-convention tags — all offline.
     //
-    //     UseOpenTelemetry wraps the agent in OpenTelemetryAgent, which emits a semconv 'invoke_agent'
+    //     The factory wraps the agent in OpenTelemetryAgent, which emits a semconv 'invoke_agent'
     //     span on the framework source; sensitive data (raw message content) is off by default and pinned
     //     off here. The collector also sees the inner 'chat' span on the same source, so the agent span is
     //     selected by its gen_ai.operation.name tag rather than by operation name (both carry "chat <model>").
@@ -79,17 +81,16 @@ public sealed class AgentTestingHarnessShowcaseTests
     {
         using var activities = new ActivityCollector(AgentFrameworkSource);
 
-        AIAgent agent = new ChatClientAgent(
-                FakeChatClient.WithText("hello from the agent"),
-                name: "support-agent")
-            .AsBuilder()
-            .UseOpenTelemetry(AgentFrameworkSource, options => options.EnableSensitiveData = false)
-            .Build();
+        AIAgent agent = QylAgentFactory.Create(
+            FakeChatClient.WithText("hello from the agent"),
+            static options => options.WithName("support-agent"));
 
         await agent.RunAsync("hello");
 
         Activity invokeAgent = activities.Activities.Single(
-            a => Equals(a.GetTagItem("gen_ai.operation.name"), "invoke_agent"));
+            static activity =>
+                Equals(activity.GetTagItem("gen_ai.operation.name"), "invoke_agent") &&
+                Equals(activity.GetTagItem("gen_ai.agent.name"), "support-agent"));
 
         invokeAgent
             .AssertKind(ActivityKind.Client)
@@ -107,13 +108,15 @@ public sealed class AgentTestingHarnessShowcaseTests
         using var chatClient = new FakeChatClient();
         chatClient.WithResponse("Refund queued.").WithResponse("Vienna is the capital of Austria.");
 
-        var options = new ChatClientAgentOptions { Name = "support-agent" };
-        options.WithQylConditionalTools(router => router.Register(
-            name: "billing",
-            matcher: messages => messages.Any(m => m.Text.Contains("refund", StringComparison.OrdinalIgnoreCase)),
-            toolFactory: () => [AIFunctionFactory.Create(static () => "ok", new AIFunctionFactoryOptions { Name = "refund_order" })],
-            instructions: "Use the billing tools for refunds."));
-        var agent = new ChatClientAgent(chatClient, options);
+        var agent = QylAgentFactory.Create(
+            chatClient,
+            options => options
+                .WithName("support-agent")
+                .Advanced(advanced => advanced.WithConditionalTools(router => router.Register(
+                    name: "billing",
+                    matcher: messages => messages.Any(m => m.Text.Contains("refund", StringComparison.OrdinalIgnoreCase)),
+                    toolFactory: () => [AIFunctionFactory.Create(static () => "ok", new AIFunctionFactoryOptions { Name = "refund_order" })],
+                    instructions: "Use the billing tools for refunds."))));
 
         await agent.RunAsync("I'd like a refund for order A-1001.", await agent.CreateSessionAsync());
         chatClient.LastOptions.Should().NotBeNull();
@@ -134,9 +137,9 @@ public sealed class AgentTestingHarnessShowcaseTests
         using var chatClient = new FakeChatClient();
         chatClient.WithResponse("""{ "city": "Vienna", "temperatureC": 21, "condition": "Sunny" }""");
 
-        ChatClientAgent agent = new QylAgentOptionsBuilder()
-            .WithName("weather-reporter")
-            .BuildAgent(chatClient);
+        AIAgent agent = QylAgentFactory.Create(
+            chatClient,
+            static options => options.WithName("weather-reporter"));
 
         AgentResponse<WeatherReport> response =
             await agent.RunQylWithSchemaAsync<WeatherReport>("What's the weather in Vienna?");

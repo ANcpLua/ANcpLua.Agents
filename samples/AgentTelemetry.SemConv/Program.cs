@@ -1,12 +1,12 @@
 // Showcase: MAF-native OpenTelemetry x Qyl typed gen_ai.* semantic conventions (Incubating).
 //
-// THE flagship telemetry sample. Two layers, cleanly separated:
+// The retained telemetry sample carries two layers, cleanly separated:
 //
-//   1. FRAMEWORK SPANS (MAF, not hand-rolled): .UseOpenTelemetry() wraps the agent in
+//   1. FRAMEWORK SPANS (MAF, not hand-rolled): QylAgentFactory wraps the agent in
 //      OpenTelemetryAgent, which emits conformant gen_ai 'invoke_agent' spans. Because the
 //      OTel layer sits BELOW the framework's FunctionInvokingChatClient, the same source also
 //      gets 'execute_tool' spans for every tool call. Sensitive data (raw prompts / arguments /
-//      results) is OFF by default and pinned off explicitly. We do NOT recreate these spans.
+//      results) is pinned off by the factory. We do NOT recreate these spans.
 //
 //   2. ONE ENRICHMENT SPAN (qyl earns its place): MAF has no concept of response evaluation, so
 //      after RunAsync returns we open a single custom 'evaluate_response' span and tag it with
@@ -21,6 +21,7 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
@@ -31,7 +32,7 @@ using OpenTelemetry.Trace;
 using Qyl.OpenTelemetry.SemanticConventions.Incubating.Attributes.GenAi;
 
 // Default source/meter name MAF's OpenTelemetryAgent writes to (OpenTelemetryConsts.DefaultSourceName).
-const string AgentSource = "Experimental.Microsoft.Agents.AI";
+const string AgentSource = AgentTelemetryExtensions.AgentFrameworkSourceName;
 // Our own source for the single evaluation span layered on top of the framework spans.
 const string EvalSource = "AgentTelemetry.SemConv.Eval";
 
@@ -70,15 +71,13 @@ chatClient
         ChatFinishReason.ToolCalls)
     .WithResponse("Ticket demo-123 is open.");
 
-var agent = new ChatClientAgent(
-        chatClient,
-        name: "support-agent",
-        instructions: "You look up support ticket status.",
-        tools: [AIFunctionFactory.Create(LookupStatusAsync, name: "lookup_status")])
-    .AsBuilder()
-    // MAF-native telemetry: invoke_agent + execute_tool spans, sensitive data off.
-    .UseOpenTelemetry(configure: a => a.EnableSensitiveData = false)
-    .Build(host.Services);
+var agent = QylAgentFactory.Create(
+    chatClient,
+    static options => options
+        .WithName("support-agent")
+        .WithInstructions("You look up support ticket status.")
+        .WithTools([AIFunctionFactory.Create(LookupStatusAsync, name: "lookup_status")]),
+    services: host.Services);
 
 // The framework owns the invoke_agent / execute_tool spans created inside RunAsync.
 var response = await agent.RunAsync("check demo ticket");

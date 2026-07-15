@@ -4,7 +4,7 @@
 //   MAF Microsoft.Agents.AI.Workflows (RequestPort / external-call / CheckpointManager / RestoreCheckpoint)
 //   x ANcpLua.Agents.Workflows.QylWorkflowBuilderExtensions.AddQylHumanInTheLoop<TRequest,TResponse>
 //   x ANcpLua.Agents.Workflows.QylCheckpointStoreExtensions.AddQylInMemoryCheckpointing
-//   x ANcpLua.Agents (QylAgentOptionsBuilder) over ANcpLua.Agents.Testing FakeChatClient (no API keys).
+//   x ANcpLua.Agents.Instrumentation (QylAgentFactory) over ANcpLua.Agents.Testing FakeChatClient (no API keys).
 //
 // Scenario: an expense-approval workflow pauses for an external (human) approval decision.
 //   1. A FakeChatClient-backed agent drafts the approval rationale (offline).
@@ -17,7 +17,7 @@
 //      gate yields the final outcome (the "AFTER" state).
 
 using System.ComponentModel;
-using ANcpLua.Agents.Facades;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using ANcpLua.Agents.Workflows;
 using Microsoft.Agents.AI;
@@ -32,11 +32,10 @@ using var chatClient = new FakeChatClient();
 chatClient.WithResponse(
     "Expense within policy: travel category, under the $1,000 manager threshold. Recommend approval.");
 
-ChatClientAgent reviewer = new QylAgentOptionsBuilder()
+AIAgent reviewer = QylAgentFactory.Create(chatClient, options => options
     .WithName("expense-reviewer")
     .WithDescription("Drafts a short rationale for an expense-approval decision.")
-    .WithInstructions("You summarize whether an expense looks reasonable and within policy.")
-    .BuildAgent(chatClient);
+    .WithInstructions("You summarize whether an expense looks reasonable and within policy."));
 
 var claim = new ExpenseClaim("Conference travel", 820m, "alice@contoso.com");
 

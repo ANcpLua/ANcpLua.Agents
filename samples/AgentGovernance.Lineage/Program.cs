@@ -1,6 +1,6 @@
 using System.ComponentModel;
-using ANcpLua.Agents.Facades;
 using ANcpLua.Agents.Governance;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.AI;
 // ANcpLua.Agents bounded-autonomy primitives enforce depth / spawn / tool-call limits while
 // emitting human-readable lineage summaries. Fully offline over FakeChatClient.
 //
-// Combination: MAF ChatClientAgent x ANcpLua.Agents.Governance
+// Combination: MAF AIAgent x ANcpLua.Agents.Instrumentation.QylAgentFactory x ANcpLua.Agents.Governance
 //   (AgentCallLineage.TryEnter/Current/Complete/FormatLineageSummary,
 //    AgentSpawnTracker.Register/GetDescendantCount + AgentSpawnLimitExceededException,
 //    AgentCallGuard.FromEnvironment/Wrap/RecordCall)
@@ -32,11 +32,10 @@ childClient
     .WithResponse("child agent: researched one sub-topic.")
     .WithResponse("child agent: researched one sub-topic.");
 
-ChatClientAgent researcher = new QylAgentOptionsBuilder()
+AIAgent researcher = QylAgentFactory.Create(childClient, options => options
     .WithName("researcher")
     .WithDescription("A child agent spawned to research a single sub-topic.")
-    .WithInstructions("Research the requested sub-topic and report back one finding.")
-    .BuildAgent(childClient);
+    .WithInstructions("Research the requested sub-topic and report back one finding."));
 
 var rootEntry = AgentCallLineage.TryEnter(maxDepth: 3, maxSpawns: 3);
 if (!rootEntry.IsAllowed)
@@ -122,12 +121,11 @@ toolClient
         ChatFinishReason.ToolCalls)
     .WithResponse("Parent agent finished: 1 search performed.");
 
-ChatClientAgent searchAgent = new QylAgentOptionsBuilder()
+AIAgent searchAgent = QylAgentFactory.Create(toolClient, options => options
     .WithName("search-agent")
     .WithDescription("Parent agent that calls a guarded search tool.")
     .WithInstructions("Use the search tool to answer the question.")
-    .WithTools([guardedSearch])
-    .BuildAgent(toolClient);
+    .WithTools([guardedSearch]));
 
 var searchReply = await searchAgent.RunAsync("Find references to lineage.");
 Console.WriteLine($"  agent: {searchReply.Text}");

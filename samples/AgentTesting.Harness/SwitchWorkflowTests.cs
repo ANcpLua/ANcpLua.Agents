@@ -1,4 +1,4 @@
-﻿using ANcpLua.Agents.Facades;
+﻿using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using ANcpLua.Agents.Workflows;
 using Microsoft.Agents.AI;
@@ -20,10 +20,11 @@ public sealed class SwitchWorkflowTests
         using var classifierClient = new FakeChatClient();
         classifierClient.WithResponse(agentLabel);
 
-        ChatClientAgent classifier = new QylAgentOptionsBuilder()
-            .WithName("ticket-classifier")
-            .WithInstructions("Reply with exactly one word: URGENT or STANDARD.")
-            .BuildAgent(classifierClient);
+        AIAgent classifier = QylAgentFactory.Create(
+            classifierClient,
+            static options => options
+                .WithName("ticket-classifier")
+                .WithInstructions("Reply with exactly one word: URGENT or STANDARD."));
 
         var triage = new TriageExecutor(classifier);
         var urgent = new UrgentBranch();

@@ -24,14 +24,13 @@ builder.AddAIAgent("ticket-agent", (serviceProvider, _) =>
             ChatFinishReason.ToolCalls)
         .WithResponse("Ticket demo-123 is currently open.");
 
-    return new ChatClientAgent(
-            chatClient,
-            name: "ticket-agent",
-            instructions: "You look up support ticket status.",
-            tools: [lookupStatus])
-        .AsBuilder()
-        .UseAgentTelemetry()
-        .Build(serviceProvider);
+    return QylAgentFactory.Create(
+        chatClient,
+        options => options
+            .WithName("ticket-agent")
+            .WithInstructions("You look up support ticket status.")
+            .WithTools([lookupStatus]),
+        services: serviceProvider);
 });
 
 builder.AddOpenAIResponses();

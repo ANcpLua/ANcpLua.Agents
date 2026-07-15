@@ -91,7 +91,7 @@ public sealed class StructuredOutputExplicitSchemaTests
     [Fact]
     public async Task RunQylWithSchemaAsync_NullAgent_Throws()
     {
-        ChatClientAgent agent = null!;
+        AIAgent agent = null!;
 
         var act = () => agent.RunQylWithSchemaAsync<TrafficLightReading>("any prompt");
 

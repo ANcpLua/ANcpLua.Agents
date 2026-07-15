@@ -4,7 +4,7 @@
 //   MAF Microsoft.Agents.AI.Workflows (Executor / ProtocolBuilder / RouteBuilder / conditioned edges /
 //     IResettableExecutor / custom WorkflowEvent / InProcessExecution)
 //   x MAF structured output (AIAgent.RunAsync<T> -> AgentResponse<T>)
-//   x ANcpLua.Agents (QylAgentOptionsBuilder) over ANcpLua.Agents.Testing FakeChatClient (no API keys).
+//   x ANcpLua.Agents.Instrumentation (QylAgentFactory) over ANcpLua.Agents.Testing FakeChatClient (no API keys).
 //
 // This is the corrected form of a common "inline-routing inside executors + agents-as-graph-nodes"
 // sketch. Five things that sketch gets wrong, fixed here:
@@ -25,7 +25,7 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using ANcpLua.Agents.Facades;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
@@ -50,17 +50,15 @@ solutionClient
     .WithResponse(JsonSerializer.Serialize(
         new SolutionPlan("INC-1043", "Run a destructive online rebuild that drops and recreates the index during peak traffic."), json));
 
-AIAgent rcaAgent = new QylAgentOptionsBuilder()
+AIAgent rcaAgent = QylAgentFactory.Create(rcaClient, options => options
     .WithName("rca-agent")
     .WithDescription("Reliability engineer that proposes a root-cause hypothesis.")
-    .WithInstructions("Analyze the incident and return a concise root-cause hypothesis.")
-    .BuildAgent(rcaClient);
+    .WithInstructions("Analyze the incident and return a concise root-cause hypothesis."));
 
-AIAgent solutionAgent = new QylAgentOptionsBuilder()
+AIAgent solutionAgent = QylAgentFactory.Create(solutionClient, options => options
     .WithName("solution-agent")
     .WithDescription("Remediation planner that proposes an execution plan.")
-    .WithInstructions("Given a root-cause hypothesis, produce a remediation plan.")
-    .BuildAgent(solutionClient);
+    .WithInstructions("Given a root-cause hypothesis, produce a remediation plan."));
 
 // --- Build ONE workflow and reuse it across incidents (IResettableExecutor makes that safe). ---
 var intake = new IntakeExecutor();

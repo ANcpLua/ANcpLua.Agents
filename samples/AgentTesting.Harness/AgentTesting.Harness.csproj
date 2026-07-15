@@ -15,8 +15,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- QylAgentOptionsBuilder facade used to build the ChatClientAgent under test. -->
+        <!-- Qyl options surface used by the mandatory wrapped factory. -->
         <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
+        <!-- QylAgentFactory: the only agent construction boundary, with mandatory telemetry. -->
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Instrumentation\ANcpLua.Agents.Instrumentation.csproj"/>
         <!-- AgentRunHarness, FakeChatClient, ActivityCollector, ActivityAssert. -->
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
         <!-- WorkflowFixture<T>, WorkflowRunResult, WorkflowRunAssertions. -->

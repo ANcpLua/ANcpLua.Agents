@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using ANcpLua.Agents.Governance;
+using ANcpLua.Agents.Instrumentation;
 using ANcpLua.Agents.Testing.ChatClients;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.AI;
 // Showcase: governed agent tools over an offline FakeChatClient — no API keys required.
 //
 // Combination:
-//   MAF (ChatClientAgent function-invoking loop + AIAgentBuilder.Use middleware)
+//   MAF (chat-client-agent function-invoking loop + AIAgentBuilder.Use middleware)
 //   x ANcpLua.Agents.Governance (QylToolSet.From<T>, AgentToolPolicy, AgentBudgetEnforcer,
 //                                AgentConcurrencyLimiter, AgentCapabilityContext,
 //                                AIAgentBuilder.UseQylGovernance)
@@ -57,17 +58,12 @@ refundClient
         finishReason: ChatFinishReason.ToolCalls)
     .WithResponse("I could not issue the refund: the billing:write capability is not granted.");
 
-var refundAgent = new ChatClientAgent(
+var refundAgent = QylAgentFactory.Create(
     refundClient,
-    new ChatClientAgentOptions
-    {
-        Name = "refund-agent",
-        ChatOptions = new ChatOptions
-        {
-            Instructions = "Issue refunds when asked, using the IssueRefund tool.",
-            Tools = [.. refundTools]
-        }
-    });
+    options => options
+        .WithName("refund-agent")
+        .WithInstructions("Issue refunds when asked, using the IssueRefund tool.")
+        .WithTools([.. refundTools]));
 
 AgentSession refundSession = await refundAgent.CreateSessionAsync();
 AgentResponse refundResponse = await refundAgent.RunAsync("Refund order A-100 for $42.", refundSession);
@@ -106,24 +102,17 @@ lookupClient
     .WithResponse("Looked up the first invoice; the second lookup was over budget.");
 
 // The tools are registered ungoverned; UseQylGovernance supplies enforcement at the agent layer.
-AIAgent lookupAgent = new ChatClientAgent(
-        lookupClient,
-        new ChatClientAgentOptions
-        {
-            Name = "lookup-agent",
-            ChatOptions = new ChatOptions
-            {
-                Instructions = "Look up invoices with the lookup_invoice tool.",
-                Tools = [lookupTool]
-            }
-        })
-    .AsBuilder()
-    .UseQylGovernance(
+AIAgent lookupAgent = QylAgentFactory.Create(
+    lookupClient,
+    options => options
+        .WithName("lookup-agent")
+        .WithInstructions("Look up invoices with the lookup_invoice tool.")
+        .WithTools([lookupTool]),
+    pipeline => pipeline.UseQylGovernance(
         capabilities,
         budget,
         concurrency,
-        policyResolver: name => name == "lookup_invoice" ? lookupPolicy : AgentToolPolicy.Permissive)
-    .Build();
+        policyResolver: name => name == "lookup_invoice" ? lookupPolicy : AgentToolPolicy.Permissive));
 
 AgentResponse lookupResponse = await lookupAgent.RunAsync("Look up invoices INV-1 and INV-2.");
 

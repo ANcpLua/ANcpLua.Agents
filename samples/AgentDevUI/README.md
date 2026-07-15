@@ -15,16 +15,16 @@ with no live model and no API key.
 
 ## What it wires
 
-- `AddAIAgent(name, factory)` registers a `FakeChatClient`-backed `ChatClientAgent`
-  so DevUI can discover and drive it — `Microsoft.Agents.AI.Hosting`.
+- `AddAIAgent(name, factory)` gives hosting the wrapped `AIAgent` returned by
+  `QylAgentFactory`, so DevUI can discover and drive it without a raw construction path.
 - `AddOpenAIResponses()` / `AddOpenAIConversations()` + their `Map*` calls — the
   OpenAI Responses/Conversations surface DevUI talks to. **Required**: `MapDevUI`
   alone serves no agents without these — `Microsoft.Agents.AI.Hosting.OpenAI`.
 - `AddDevUI()` / `MapDevUI()` — the playground at `/devui`, mapped only in the
   Development environment — `Microsoft.Agents.AI.DevUI`.
-- `UseAgentTelemetry()` — wraps the discovered agent in MAF-native
-  `OpenTelemetryAgent` (semconv `invoke_agent` / `execute_tool` spans, sensitive
-  data off) — `ANcpLua.Agents.Instrumentation`.
+- `QylAgentFactory` — creates the inner chat-client agent with the host DI provider and
+  always returns MAF-native `OpenTelemetryAgent` (semconv `invoke_agent` / `execute_tool`
+  spans, sensitive data off) — `ANcpLua.Agents.Instrumentation`.
 
 ## Why preview packages
 
@@ -32,7 +32,7 @@ DevUI, `Hosting`, and `Hosting.OpenAI` ship **preview/alpha only** — there is 
 stable release. The pins in `Version.props` are the `1.13.0-*` builds, which
 depend on the **stable** `Microsoft.Agents.AI 1.13.0` core the rest of the repo
 already uses, so nothing else moves off the stable line. These packages are
-referenced **only** by this sample (`IsPackable=false`); no shipped library
+referenced **only** by the DevUI samples (`IsPackable=false`); no shipped library
 takes a DevUI dependency.
 
 ## Security

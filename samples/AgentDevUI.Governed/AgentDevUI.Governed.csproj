@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\ANcpLua.Agents\ANcpLua.Agents.csproj"/>
+        <ProjectReference Include="..\..\src\ANcpLua.Agents.Instrumentation\ANcpLua.Agents.Instrumentation.csproj"/>
         <ProjectReference Include="..\..\src\ANcpLua.Agents.Testing\ANcpLua.Agents.Testing.csproj"/>
     </ItemGroup>
 
@@ -20,7 +21,7 @@
         <PackageReference Include="Microsoft.Agents.AI.DevUI"/>
     </ItemGroup>
 
-    <ItemGroup Label="MAF-native OpenTelemetry collection (replaces ANcpLua.Agents.Instrumentation)">
+    <ItemGroup Label="MAF-native OpenTelemetry collection">
         <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"/>
     </ItemGroup>

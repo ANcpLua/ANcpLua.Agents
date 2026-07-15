@@ -29,7 +29,8 @@ The sample uses `new ApprovalRequiredAIFunction(tool)` directly — that is the 
 `QylApprovalGate.RequireQylApproval` wrapper does.
 
 Both paths run fully offline against a seeded `ANcpLua.Agents.Testing.FakeChatClient`. No API keys or
-network access are required.
+network access are required. Both agents are constructed by `QylAgentFactory`; the deterministic
+approval middleware remains inside the factory's mandatory MAF-native telemetry wrapper.
 
 ## Run
 

@@ -15,7 +15,7 @@ Channel: stable. This package must not reference Microsoft Agent Framework previ
 |---|---|
 | Governance | `AgentCallLineage`, `AgentCallGuard`, `AgentSpawnTracker`, `AgentBudgetEnforcer`, `AgentConcurrencyLimiter`, `AgentCapabilityContext`, `GovernedAIFunction`, `AgentToolPolicy` |
 | Tool composition | `QylToolSet`, `QylToolScope`, `QylConditionalToolProvider` |
-| Agent options | `QylAgentOptionsBuilder`, `QylSchemaExtensions`, `QylBackgroundAgentsExtensions` |
+| Agent options | `QylAgentOptionsBuilder`, `QylSchemaExtensions`, `QylBackgroundAgentsExtensions` (consumed by `QylAgentFactory` in `.Instrumentation`) |
 
 ## Naming convention
 
@@ -23,4 +23,4 @@ Channel: stable. This package must not reference Microsoft Agent Framework previ
 
 ## Telemetry
 
-Telemetry is MAF-native: wrap the agent with `UseOpenTelemetry` (or the `UseAgentTelemetry` / `AddAgentFrameworkSources` / `AddAgentFrameworkMeters` registration helpers in `ANcpLua.Agents.Instrumentation`). This package does not contain tracing decorators, tool-decorating chat clients, or OpenTelemetry middleware.
+Telemetry is MAF-native. `QylAgentOptionsBuilder` only configures options; `QylAgentFactory` in `ANcpLua.Agents.Instrumentation` owns chat-client-agent construction, supplies DI, and installs the mandatory telemetry wrapper. This package does not contain tracing decorators, tool-decorating chat clients, or OpenTelemetry middleware.
