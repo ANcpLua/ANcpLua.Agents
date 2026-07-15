@@ -1,6 +1,13 @@
 # AGENTS.md — ANcpLua.Agents
 
 Instructions for AI coding agents working in this repo.
+
+## Workspace
+
+This repo lives in `~/RiderProjects/qyl-workspace/` alongside the qyl repos.
+Workspace-level rules are in the router at `../AGENTS.md`. The primary consumer
+of these packages is `qyl` (`../qyl/`).
+
 ## Framework conventions
 
 Branch protection, auto-merge, CodeRabbit posture, release flow, dependency
