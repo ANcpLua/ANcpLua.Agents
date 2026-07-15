@@ -85,7 +85,7 @@ Bevor du eine Variable in Truth oder im lokalen Override bumpst:
 
 - **Lokales Override gleich/unter Truth ist Müll.** Gleich = Doppelpflege, unter = stille Regression. Pruning sinnvoll, sobald die SDK mit matching Werten publisht.
 
-- **Publish triggert auf Tag-Push `v*`, gegated durch Tests.** Ein Tag auf einen build-broken Commit publisht nicht, bleibt aber als Ghost-Tag remote. Statt remote zu re-assignen (≈ Force-Push), nächste Patch-Version verwenden.
+- **Publish-Trigger ist repo-abhängig.** Dieses Repo (Agents) publisht — wie Roslyn.Utilities und NET.Sdk — auf **Push nach `main`**: CI auto-bumpt den Patch vom letzten `v*`-Tag und legt den Tag danach an. Nur Analyzers publisht auf `v*`-Tag-Push. So oder so: ein build-broken Commit publisht nicht — nächste Patch-Version verwenden statt einen Remote-Tag umzuhängen.
 
 - **Verifiziere Versionen vor dem Bump.** Ein Tippfehler (`2.0.20` statt `2.0.11`) bricht die Topo-Kette, weil Truth in alle Konsumenten fließt. NuGet-API: `https://api.nuget.org/v3-flatcontainer/<lowercased-id>/index.json`.
 

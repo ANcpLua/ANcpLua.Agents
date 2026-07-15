@@ -7,9 +7,9 @@
   -->
 
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.29</ANcpLuaRoslynUtilitiesVersion>
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.29</ANcpLuaRoslynUtilitiesTestingVersion>
-    <ANcpLuaRoslynUtilitiesTestingAotVersion>2.2.29</ANcpLuaRoslynUtilitiesTestingAotVersion>
+    <ANcpLuaRoslynUtilitiesVersion>2.2.37</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.37</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingAotVersion>2.2.37</ANcpLuaRoslynUtilitiesTestingAotVersion>
   </PropertyGroup>
   
   <PropertyGroup Label="Microsoft.Agents (MAF 1.13.0)">
