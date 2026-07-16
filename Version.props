@@ -7,9 +7,9 @@
   -->
 
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.38</ANcpLuaRoslynUtilitiesVersion>
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.38</ANcpLuaRoslynUtilitiesTestingVersion>
-    <ANcpLuaRoslynUtilitiesTestingAotVersion>2.2.38</ANcpLuaRoslynUtilitiesTestingAotVersion>
+    <ANcpLuaRoslynUtilitiesVersion>2.2.39</ANcpLuaRoslynUtilitiesVersion>
+    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.39</ANcpLuaRoslynUtilitiesTestingVersion>
+    <ANcpLuaRoslynUtilitiesTestingAotVersion>2.2.39</ANcpLuaRoslynUtilitiesTestingAotVersion>
   </PropertyGroup>
   
   <PropertyGroup Label="Microsoft.Agents (MAF 1.13.0)">
@@ -31,11 +31,11 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions">
-    <MicrosoftExtensionsAIVersion>10.7.0</MicrosoftExtensionsAIVersion>
-    <MicrosoftExtensionsAIAbstractionsVersion>10.7.0</MicrosoftExtensionsAIAbstractionsVersion>
-    <MicrosoftExtensionsAIOpenAIVersion>10.7.0</MicrosoftExtensionsAIOpenAIVersion>
-    <MicrosoftExtensionsHostingAbstractionsVersion>10.0.9</MicrosoftExtensionsHostingAbstractionsVersion>
-    <MicrosoftBclAsyncInterfacesVersion>10.0.9</MicrosoftBclAsyncInterfacesVersion>
+    <MicrosoftExtensionsAIVersion>10.8.0</MicrosoftExtensionsAIVersion>
+    <MicrosoftExtensionsAIAbstractionsVersion>10.8.0</MicrosoftExtensionsAIAbstractionsVersion>
+    <MicrosoftExtensionsAIOpenAIVersion>10.8.0</MicrosoftExtensionsAIOpenAIVersion>
+    <MicrosoftExtensionsHostingAbstractionsVersion>10.0.10</MicrosoftExtensionsHostingAbstractionsVersion>
+    <MicrosoftBclAsyncInterfacesVersion>10.0.10</MicrosoftBclAsyncInterfacesVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="OpenTelemetry">
@@ -54,7 +54,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="LLM Provider SDKs (Testing fixtures)">
-    <OpenAIVersion>2.11.0</OpenAIVersion>
+    <OpenAIVersion>2.12.0</OpenAIVersion>
     <AzureAIOpenAIVersion>2.1.0</AzureAIOpenAIVersion>
     <AzureIdentityVersion>1.21.0</AzureIdentityVersion>
     <AnthropicSDKVersion>5.10.0</AnthropicSDKVersion>
@@ -72,6 +72,6 @@
   </PropertyGroup>
 
   <PropertyGroup Label="ASP.NET Core">
-    <AspNetCoreVersion>10.0.9</AspNetCoreVersion>
+    <AspNetCoreVersion>10.0.10</AspNetCoreVersion>
   </PropertyGroup>
 </Project>
