@@ -132,7 +132,9 @@ jobs:
               echo "has_changes=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            CHANGES=$(git diff --name-only "$COMPARE_TAG" HEAD -- 'src/**' 'tests/**' 'samples/**' '.github/workflows/nuget-publish.yml' || true)
+            # Version.props / Directory.Packages.props drive the shipped nuspec's dependency
+            # versions — a dep bump with no src/ change must still publish.
+            CHANGES=$(git diff --name-only "$COMPARE_TAG" HEAD -- 'src/**' 'tests/**' 'samples/**' 'Version.props' 'Directory.Packages.props' '.github/workflows/nuget-publish.yml' || true)
             if [ -n "$CHANGES" ]; then
               echo "$CHANGES"
               echo "has_changes=true" >> "$GITHUB_OUTPUT"
