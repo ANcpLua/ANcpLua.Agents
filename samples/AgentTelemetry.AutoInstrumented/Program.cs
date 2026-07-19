@@ -34,7 +34,7 @@ builder.AddQylAgentServiceDefaults();
 // auto-instrumented infrastructure spans (HTTP/DB spans appear as soon as the app makes them).
 builder.Services.AddOpenTelemetry().WithTracing(tracing => tracing
     .AddSource("Experimental.Microsoft.Agents.AI")
-    .AddSource(QylActivitySource.Name));
+    .AddSource("Qyl.OpenTelemetry.AutoInstrumentation"));
 
 var app = builder.Build();
 

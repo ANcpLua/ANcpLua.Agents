@@ -48,9 +48,9 @@
       version line (currently 3.1.0). The Qyl AutoInstrumentation suite is now published
       to nuget.org (4.0.x), so it can be consumed as a live sample dependency.
     -->
-    <QylSemanticConventionsVersion>3.1.0</QylSemanticConventionsVersion>
+    <QylSemanticConventionsVersion>3.5.1</QylSemanticConventionsVersion>
     <QylApiContractsVersion>0.2.2</QylApiContractsVersion>
-    <QylAutoInstrumentationVersion>4.0.3</QylAutoInstrumentationVersion>
+    <QylAutoInstrumentationVersion>8.0.0</QylAutoInstrumentationVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="LLM Provider SDKs (Testing fixtures)">
