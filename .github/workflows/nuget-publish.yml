@@ -86,6 +86,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           dotnet pack src/ANcpLua.Agents/ANcpLua.Agents.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
+          dotnet pack src/ANcpLua.Agents.Evaluation/ANcpLua.Agents.Evaluation.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Instrumentation/ANcpLua.Agents.Instrumentation.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Hosting.ServiceDefaults/ANcpLua.Agents.Hosting.ServiceDefaults.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
           dotnet pack src/ANcpLua.Agents.Workflows/ANcpLua.Agents.Workflows.csproj -c Release -o artifacts -p:Version=${{ needs.version.outputs.version }} --no-build
