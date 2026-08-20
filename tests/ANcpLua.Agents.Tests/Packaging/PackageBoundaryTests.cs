@@ -11,6 +11,7 @@ public sealed partial class PackageBoundaryTests
     private static readonly HashSet<string> s_expectedPackageIds =
     [
         "ANcpLua.Agents",
+        "ANcpLua.Agents.Evaluation",
         "ANcpLua.Agents.Hosting.ServiceDefaults",
         "ANcpLua.Agents.Instrumentation",
         "ANcpLua.Agents.Workflows",
@@ -22,6 +23,7 @@ public sealed partial class PackageBoundaryTests
     private static readonly HashSet<string> s_stablePackageIds =
     [
         "ANcpLua.Agents",
+        "ANcpLua.Agents.Evaluation",
         "ANcpLua.Agents.Hosting.ServiceDefaults",
         "ANcpLua.Agents.Instrumentation",
         "ANcpLua.Agents.Workflows",
@@ -33,6 +35,7 @@ public sealed partial class PackageBoundaryTests
     private static readonly Dictionary<string, string[]> s_expectedDirectMafReferences = new(StringComparer.Ordinal)
     {
         ["ANcpLua.Agents"] = ["Microsoft.Agents.AI"],
+        ["ANcpLua.Agents.Evaluation"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Abstractions"],
         ["ANcpLua.Agents.Hosting.ServiceDefaults"] = [],
         ["ANcpLua.Agents.Instrumentation"] = ["Microsoft.Agents.AI"],
         ["ANcpLua.Agents.Workflows"] = ["Microsoft.Agents.AI", "Microsoft.Agents.AI.Workflows"],

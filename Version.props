@@ -32,6 +32,9 @@
 
   <PropertyGroup Label="Microsoft.Extensions">
     <MicrosoftExtensionsAIVersion>10.8.0</MicrosoftExtensionsAIVersion>
+    <!-- MEAI evaluation abstractions (IEvaluator/EvaluationResult) wrapped by ANcpLua.Agents.Evaluation.
+         Versioned independently of Microsoft.Extensions.AI: the evaluation packages ship on their own cadence. -->
+    <MicrosoftExtensionsAIEvaluationVersion>10.8.0</MicrosoftExtensionsAIEvaluationVersion>
     <MicrosoftExtensionsAIAbstractionsVersion>10.8.0</MicrosoftExtensionsAIAbstractionsVersion>
     <MicrosoftExtensionsAIOpenAIVersion>10.8.0</MicrosoftExtensionsAIOpenAIVersion>
     <MicrosoftExtensionsHostingAbstractionsVersion>10.0.10</MicrosoftExtensionsHostingAbstractionsVersion>

@@ -1,0 +1,28 @@
+<Project Sdk="ANcpLua.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>ANcpLua.Agents.Evaluation</RootNamespace>
+        <PackageId>ANcpLua.Agents.Evaluation</PackageId>
+        <Description>Fail-closed evaluation suite for Microsoft Agent Framework. One fluent builder composes deterministic local checks, LLM-judged quality, and any IAgentEvaluator stage over a single agent run, then ends in a gate that cannot silently pass.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>agent;evaluation;eval;gate;ci;microsoft-agents;llm-judge</PackageTags>
+        <!-- MAAI001/MEAI001 — the MAF and MEAI evaluation APIs this package wraps are still marked
+             experimental upstream. Wrapping them is the entire point of the package. -->
+        <NoWarn>$(NoWarn);MAAI001;MEAI001</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- LocalEvaluator, EvalChecks, EvalItem, IAgentEvaluator, conversation splitters. -->
+        <PackageReference Include="Microsoft.Agents.AI"/>
+        <PackageReference Include="Microsoft.Agents.AI.Abstractions"/>
+        <!-- The IEvaluator seam QualityEvaluator bridges. Quality (RelevanceEvaluator etc.) is
+             deliberately NOT referenced: callers pick their own scorers, and this package stays
+             free of the judge-prompt dependency closure. -->
+        <PackageReference Include="Microsoft.Extensions.AI.Evaluation"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+</Project>
