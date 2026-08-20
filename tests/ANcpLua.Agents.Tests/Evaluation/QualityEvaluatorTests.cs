@@ -6,7 +6,7 @@ namespace ANcpLua.Agents.Tests.Evaluation;
 
 public sealed class QualityEvaluatorTests
 {
-    private static readonly ChatConfiguration Judge = new(new UnusedChatClient());
+    private static readonly ChatConfiguration s_judge = new(new UnusedChatClient());
 
     [Fact]
     public async Task EvaluateAsync_ScoreAtThreshold_Passes()
@@ -14,7 +14,7 @@ public sealed class QualityEvaluatorTests
         // Arrange — minScore is inclusive.
         var evaluator = new QualityEvaluator(
             new StubEvaluator(() => new EvaluationResult(new NumericMetric("relevance", 4.0))),
-            Judge,
+            s_judge,
             minScore: 4.0);
 
         // Act
@@ -30,7 +30,7 @@ public sealed class QualityEvaluatorTests
         // Arrange
         var evaluator = new QualityEvaluator(
             new StubEvaluator(() => new EvaluationResult(new NumericMetric("relevance", 3.9))),
-            Judge,
+            s_judge,
             minScore: 4.0);
 
         // Act
@@ -47,7 +47,7 @@ public sealed class QualityEvaluatorTests
         // reason this bridge exists is that an un-scored item must never read as a pass.
         var evaluator = new QualityEvaluator(
             new StubEvaluator(() => new EvaluationResult(new NumericMetric("relevance"))),
-            Judge,
+            s_judge,
             minScore: 0.0);
 
         // Act
@@ -65,7 +65,7 @@ public sealed class QualityEvaluatorTests
         {
             Interpretation = new EvaluationMetricInterpretation { Rating = EvaluationRating.Good, Failed = false },
         };
-        var evaluator = new QualityEvaluator(new StubEvaluator(() => new EvaluationResult(metric)), Judge, minScore: 4.0);
+        var evaluator = new QualityEvaluator(new StubEvaluator(() => new EvaluationResult(metric)), s_judge, minScore: 4.0);
 
         // Act
         var results = await evaluator.EvaluateAsync([new EvalItem("q", "a")], cancellationToken: TestContext.Current.CancellationToken);
@@ -80,7 +80,7 @@ public sealed class QualityEvaluatorTests
         // Arrange — minScore cannot judge a string verdict, so it must not pretend to.
         var evaluator = new QualityEvaluator(
             new StubEvaluator(() => new EvaluationResult(new StringMetric("verdict", "probably fine"))),
-            Judge,
+            s_judge,
             minScore: 4.0);
 
         // Act
@@ -98,7 +98,7 @@ public sealed class QualityEvaluatorTests
             new StubEvaluator(
                 () => new EvaluationResult(new NumericMetric("relevance", 5.0)),
                 () => new EvaluationResult(new NumericMetric("relevance", 1.0))),
-            Judge,
+            s_judge,
             minScore: 4.0);
 
         // Act
@@ -116,7 +116,7 @@ public sealed class QualityEvaluatorTests
     public void Constructor_NullEvaluator_Throws()
     {
         // Act
-        var act = () => new QualityEvaluator(null!, Judge, minScore: 4.0);
+        var act = () => new QualityEvaluator(null!, s_judge, minScore: 4.0);
 
         // Assert
         act.Should().Throw<ArgumentNullException>();
@@ -128,7 +128,7 @@ public sealed class QualityEvaluatorTests
         // Arrange — the end-to-end path: a judged score under the bar turns the gate red.
         var suite = EvaluationSuite.Create("judged")
             .Items(new EvalItem("q", "an answer"))
-            .Quality(new StubEvaluator(() => new EvaluationResult(new NumericMetric("relevance", 2.0))), Judge, minScore: 4.0);
+            .Quality(new StubEvaluator(() => new EvaluationResult(new NumericMetric("relevance", 2.0))), s_judge, minScore: 4.0);
 
         // Act
         int exitCode = await suite.GateAsync(TextWriter.Null, TestContext.Current.CancellationToken);

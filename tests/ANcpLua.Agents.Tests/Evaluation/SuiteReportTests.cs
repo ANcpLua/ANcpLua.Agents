@@ -205,7 +205,7 @@ public sealed class SuiteReportTests
             .Custom("ok", _ => true)
             .Stage("remote", StubStage.AlwaysThrows("remote", failure))
             .RunAsync(TestContext.Current.CancellationToken);
-        var output = new StringWriter();
+        await using var output = new StringWriter();
 
         // Act
         report.Print(output);
@@ -227,7 +227,7 @@ public sealed class SuiteReportTests
             .Custom("ok", _ => true)
             .Stage("remote", StubStage.AlwaysThrows("remote", new HttpRequestException("connection refused")))
             .RunAsync(TestContext.Current.CancellationToken);
-        var output = new StringWriter();
+        await using var output = new StringWriter();
 
         // Act
         report.Print(output);

@@ -40,7 +40,7 @@ public sealed class EvaluationSuiteTests
 
         // Act
         var report = await suite.RunAsync(TestContext.Current.CancellationToken);
-        var output = new StringWriter();
+        await using var output = new StringWriter();
         report.Print(output);
 
         // Assert
@@ -76,7 +76,7 @@ public sealed class EvaluationSuiteTests
     {
         // Arrange
         var suite = EvaluationSuite.Create("empty").Items().Custom("c", _ => true);
-        var output = new StringWriter();
+        await using var output = new StringWriter();
 
         // Act
         int exitCode = await suite.GateAsync(output, TestContext.Current.CancellationToken);
@@ -94,7 +94,7 @@ public sealed class EvaluationSuiteTests
             .Items(new EvalItem("q", "a"))
             .Expecting("ground-truth")
             .Custom("c", _ => true);
-        var output = new StringWriter();
+        await using var output = new StringWriter();
 
         // Act
         int exitCode = await suite.GateAsync(output, TestContext.Current.CancellationToken);
@@ -258,7 +258,7 @@ public sealed class EvaluationSuiteTests
 
         // Act
         var report = await suite.RunAsync(TestContext.Current.CancellationToken);
-        var output = new StringWriter();
+        await using var output = new StringWriter();
         report.Print(output);
 
         // Assert
@@ -276,7 +276,7 @@ public sealed class EvaluationSuiteTests
 
         // Act
         var report = await suite.RunAsync(TestContext.Current.CancellationToken);
-        var output = new StringWriter();
+        await using var output = new StringWriter();
         report.Print(output);
 
         // Assert

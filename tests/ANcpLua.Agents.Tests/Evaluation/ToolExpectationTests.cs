@@ -19,7 +19,7 @@ public sealed class ToolExpectationTests
 
         // Act
         var report = await suite.RunAsync(TestContext.Current.CancellationToken);
-        var output = new StringWriter();
+        await using var output = new StringWriter();
         report.Print(output);
 
         // Assert
