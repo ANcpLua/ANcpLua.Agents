@@ -37,8 +37,7 @@
     <MicrosoftExtensionsAIEvaluationVersion>10.8.0</MicrosoftExtensionsAIEvaluationVersion>
     <MicrosoftExtensionsAIAbstractionsVersion>10.8.0</MicrosoftExtensionsAIAbstractionsVersion>
     <MicrosoftExtensionsAIOpenAIVersion>10.8.0</MicrosoftExtensionsAIOpenAIVersion>
-    <MicrosoftExtensionsHostingAbstractionsVersion>10.0.10</MicrosoftExtensionsHostingAbstractionsVersion>
-    <MicrosoftBclAsyncInterfacesVersion>10.0.10</MicrosoftBclAsyncInterfacesVersion>
+    <MicrosoftExtensionsHostingAbstractionsVersion>$(DotNetRuntimeVersion)</MicrosoftExtensionsHostingAbstractionsVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="OpenTelemetry">
@@ -68,13 +67,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Testing">
-    <XunitV3Version>3.2.2</XunitV3Version>
-    <AwesomeAssertionsVersion>9.4.0</AwesomeAssertionsVersion>
-    <MTPExtensionsVersion>2.1.0</MTPExtensionsVersion>
     <MoqVersion>4.20.72</MoqVersion>
   </PropertyGroup>
 
-  <PropertyGroup Label="ASP.NET Core">
-    <AspNetCoreVersion>10.0.10</AspNetCoreVersion>
-  </PropertyGroup>
 </Project>
