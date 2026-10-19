@@ -69,7 +69,7 @@
     <!-- renovate: datasource=nuget depName=Qyl.Api.Contracts -->
     <QylApiContractsVersion>0.2.2</QylApiContractsVersion>
     <!-- renovate: datasource=nuget depName=Qyl.OpenTelemetry.AutoInstrumentation -->
-    <QylAutoInstrumentationVersion>8.0.0</QylAutoInstrumentationVersion>
+    <QylAutoInstrumentationVersion>8.5.0</QylAutoInstrumentationVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="LLM Provider SDKs (Testing fixtures)">
