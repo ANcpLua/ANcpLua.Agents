@@ -70,7 +70,8 @@ public class ExecutorRouteGeneratorShowcaseTests(ITestOutputHelper output)
         foreach (var generated in first.Results.SelectMany(r => r.GeneratedSources))
             compile.WithSource(generated.SourceText.ToString());
 
-        compile.Build().ShouldSucceed();
+        var result = compile.Build();
+        Assert.True(result.Succeeded, $"Compilation should succeed. Diagnostics:\n{result.FormatDiagnostics()}");
     }
 
     [Fact]

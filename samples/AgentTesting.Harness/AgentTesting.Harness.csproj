@@ -7,11 +7,9 @@
             CS1591   — XML docs not required on sample test methods.
             CA1707   — underscores in identifiers: convention for test names (Method_Condition_Expected).
             xUnit1051 — TestContext.Current.CancellationToken: stylistic, not bug-catching in a sample.
-            TUXU0001 — the .Testing harness transitively ships the TUnit analyzer, which nudges xUnit->TUnit;
-                       this repo is xUnit, so the suggestion is suppressed.
             MEAI001 / MAAI001 — upstream MAF/MEAI experimental API markers surfaced via agent telemetry.
         -->
-        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051;TUXU0001;MEAI001;MAAI001</NoWarn>
+        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051;MEAI001;MAAI001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

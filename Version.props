@@ -2,16 +2,26 @@
   <!--
     LOCAL OVERRIDE — ANcpLua.Agents
 
-    Directory.Packages.props imports this file before the SDK-shipped truth is
-    in scope, so every referenced version variable must be defined here.
+    ANcpLua.NET.Sdk loads its own Build/Common/Version.props first; Directory.Packages.props
+    imports this file afterwards, so every property here overrides SDK truth and every SDK
+    property (DotNetRuntimeVersion, AspNetCoreVersion, XunitV3Version, ...) is already in scope.
+    Define a property here only when the SDK ships no value or this repo must differ from it.
+
+    A "renovate: datasource=nuget depName=PackageId" comment directly above a property makes it
+    an updatable dependency (custom manager in ANcpLua/github-settings-automation). The MAF pins
+    carry none: moving them off 1.13.0 is the owner's decision, and the preset's MAF rule would
+    automerge stable bumps.
   -->
 
   <PropertyGroup Label="Roslyn.Utilities">
-    <ANcpLuaRoslynUtilitiesVersion>2.2.48</ANcpLuaRoslynUtilitiesVersion>
-    <ANcpLuaRoslynUtilitiesTestingVersion>2.2.48</ANcpLuaRoslynUtilitiesTestingVersion>
-    <ANcpLuaRoslynUtilitiesTestingAotVersion>2.2.48</ANcpLuaRoslynUtilitiesTestingAotVersion>
+    <!-- renovate: datasource=nuget depName=ANcpLua.Roslyn.Utilities -->
+    <ANcpLuaRoslynUtilitiesVersion>3.0.1</ANcpLuaRoslynUtilitiesVersion>
+    <!-- renovate: datasource=nuget depName=ANcpLua.Roslyn.Utilities.Testing -->
+    <ANcpLuaRoslynUtilitiesTestingVersion>3.0.1</ANcpLuaRoslynUtilitiesTestingVersion>
+    <!-- renovate: datasource=nuget depName=ANcpLua.Roslyn.Utilities.Testing.Aot -->
+    <ANcpLuaRoslynUtilitiesTestingAotVersion>3.0.1</ANcpLuaRoslynUtilitiesTestingAotVersion>
   </PropertyGroup>
-  
+
   <PropertyGroup Label="Microsoft.Agents (MAF 1.13.0)">
     <MicrosoftAgentsAIVersion>1.13.0</MicrosoftAgentsAIVersion>
     <MicrosoftAgentsAIWorkflowsVersion>1.13.0</MicrosoftAgentsAIWorkflowsVersion>
@@ -31,42 +41,57 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Microsoft.Extensions">
+    <!-- renovate: datasource=nuget depName=Microsoft.Extensions.AI -->
     <MicrosoftExtensionsAIVersion>10.8.0</MicrosoftExtensionsAIVersion>
     <!-- MEAI evaluation abstractions (IEvaluator/EvaluationResult) wrapped by ANcpLua.Agents.Evaluation.
          Versioned independently of Microsoft.Extensions.AI: the evaluation packages ship on their own cadence. -->
+    <!-- renovate: datasource=nuget depName=Microsoft.Extensions.AI.Evaluation -->
     <MicrosoftExtensionsAIEvaluationVersion>10.8.0</MicrosoftExtensionsAIEvaluationVersion>
+    <!-- renovate: datasource=nuget depName=Microsoft.Extensions.AI.Abstractions -->
     <MicrosoftExtensionsAIAbstractionsVersion>10.8.0</MicrosoftExtensionsAIAbstractionsVersion>
+    <!-- renovate: datasource=nuget depName=Microsoft.Extensions.AI.OpenAI -->
     <MicrosoftExtensionsAIOpenAIVersion>10.8.0</MicrosoftExtensionsAIOpenAIVersion>
     <MicrosoftExtensionsHostingAbstractionsVersion>$(DotNetRuntimeVersion)</MicrosoftExtensionsHostingAbstractionsVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="OpenTelemetry">
+    <!-- renovate: datasource=nuget depName=OpenTelemetry -->
     <OpenTelemetryVersion>1.15.3</OpenTelemetryVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="qyl (live showcase dependencies — currently samples-only)">
     <!--
       qyl packages restorable from nuget.org. SemanticConventions + .Incubating share a
-      version line (currently 3.1.0). The Qyl AutoInstrumentation suite is now published
-      to nuget.org (4.0.x), so it can be consumed as a live sample dependency.
+      version line, as do AutoInstrumentation + .Hosting.
     -->
+    <!-- renovate: datasource=nuget depName=Qyl.OpenTelemetry.SemanticConventions -->
     <QylSemanticConventionsVersion>3.5.1</QylSemanticConventionsVersion>
+    <!-- renovate: datasource=nuget depName=Qyl.Api.Contracts -->
     <QylApiContractsVersion>0.2.2</QylApiContractsVersion>
+    <!-- renovate: datasource=nuget depName=Qyl.OpenTelemetry.AutoInstrumentation -->
     <QylAutoInstrumentationVersion>8.0.0</QylAutoInstrumentationVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="LLM Provider SDKs (Testing fixtures)">
+    <!-- renovate: datasource=nuget depName=OpenAI -->
     <OpenAIVersion>2.12.0</OpenAIVersion>
+    <!-- renovate: datasource=nuget depName=Azure.AI.OpenAI -->
     <AzureAIOpenAIVersion>2.1.0</AzureAIOpenAIVersion>
+    <!-- renovate: datasource=nuget depName=Azure.Identity -->
     <AzureIdentityVersion>1.21.0</AzureIdentityVersion>
+    <!-- renovate: datasource=nuget depName=Anthropic.SDK -->
     <AnthropicSDKVersion>5.10.0</AnthropicSDKVersion>
     <!-- Official Anthropic .NET SDK — exposes the Managed Agents beta (agents/environments/sessions/multiagent). -->
+    <!-- renovate: datasource=nuget depName=Anthropic -->
     <AnthropicOfficialVersion>12.35.1</AnthropicOfficialVersion>
+    <!-- renovate: datasource=nuget depName=OllamaSharp -->
     <OllamaSharpVersion>5.4.25</OllamaSharpVersion>
+    <!-- renovate: datasource=nuget depName=Google.GenAI -->
     <GoogleGenAIVersion>1.6.2</GoogleGenAIVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Testing">
+    <!-- renovate: datasource=nuget depName=Moq -->
     <MoqVersion>4.20.72</MoqVersion>
   </PropertyGroup>
 

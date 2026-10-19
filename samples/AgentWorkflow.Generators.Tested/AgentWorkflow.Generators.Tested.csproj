@@ -3,10 +3,8 @@
         <RootNamespace>AgentWorkflow.Generators.Tested</RootNamespace>
         <OutputType>Exe</OutputType>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
-        <!-- Test-name underscores, TestContext token, XML docs not required in a sample test.
-             TUXU0001: the .Testing harness transitively ships the TUnit analyzer, which nudges
-             xUnit->TUnit; this repo is xUnit, so the suggestion is suppressed. -->
-        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051;TUXU0001</NoWarn>
+        <!-- Test-name underscores, TestContext token, XML docs not required in a sample test. -->
+        <NoWarn>$(NoWarn);CS1591;CA1707;xUnit1051</NoWarn>
         <!-- "Generators" in the name makes ANcpLua.NET.Sdk treat this test project as a source generator and
              inject Microsoft.CodeAnalysis.CSharp at the SDK's RoslynVersion. Roslyn arrives through
              ANcpLua.Roslyn.Utilities.Testing instead, whose exact Workspaces pin the SDK copy would contradict. -->

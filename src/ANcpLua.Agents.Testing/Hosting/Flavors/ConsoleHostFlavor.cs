@@ -12,7 +12,7 @@ namespace ANcpLua.Agents.Testing.Hosting.Flavors;
 ///     <see cref="HostApplicationBuilder" /> API.
 ///     <para>
 ///         <c>AddHealthChecks()</c> is wired in even though no endpoint is mapped — it satisfies
-///         the AL0081 conformance default and matches what production console hosts ship.
+///         the AL1106 conformance default and matches what production console hosts ship.
 ///     </para>
 /// </summary>
 public sealed class ConsoleHostFlavor : IHostFlavor
