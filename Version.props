@@ -65,7 +65,7 @@
       version line, as do AutoInstrumentation + .Hosting.
     -->
     <!-- renovate: datasource=nuget depName=Qyl.OpenTelemetry.SemanticConventions -->
-    <QylSemanticConventionsVersion>3.5.1</QylSemanticConventionsVersion>
+    <QylSemanticConventionsVersion>4.0.0</QylSemanticConventionsVersion>
     <!-- renovate: datasource=nuget depName=Qyl.Api.Contracts -->
     <QylApiContractsVersion>0.2.2</QylApiContractsVersion>
     <!-- renovate: datasource=nuget depName=Qyl.OpenTelemetry.AutoInstrumentation -->
