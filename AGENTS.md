@@ -1,5 +1,11 @@
 # AGENTS.md — ANcpLua.Agents
 
+## Status: unmaintained
+
+This repository is currently unmaintained until the owner decides otherwise. Don't start work
+here unless a task explicitly asks for it. If work resumes, expect a refactor first: too much has
+changed since.
+
 Instructions for AI coding agents working in this repo.
 
 ## Workspace
